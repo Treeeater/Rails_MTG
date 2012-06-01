@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   
-  before_filter :signed_in_user, only: [:edit, :update, :index]		#before_filter runs before any other code.
+  before_filter :signed_in_user, only: [:edit, :update, :index, :show]		#before_filter runs before any other code.
   before_filter :correct_user,   only: [:edit, :update]
   before_filter :admin_user,     only: :destroy
 
@@ -46,7 +46,7 @@ class UsersController < ApplicationController
   def destroy
     User.find(params[:id]).destroy
     flash[:success] = "User destroyed."
-    redirect_to users_path
+    redirect_to home_path
   end
 
 

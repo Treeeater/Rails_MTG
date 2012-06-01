@@ -24,6 +24,7 @@ module SessionsHelper
   def sign_out
     current_user = nil
     cookies.delete(:remember_token)
+	session.delete(:return_to)
   end
   
   def redirect_back_or(default)
@@ -35,4 +36,7 @@ module SessionsHelper
     session[:return_to] = request.fullpath
   end
 
+  def stored_location
+	session[:return_to]
+  end
 end
