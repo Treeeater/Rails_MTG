@@ -1,0 +1,6 @@
+/**
+ * application-home.css
+ *
+ *= require_self
+ *= require_tree ./home
+ */
