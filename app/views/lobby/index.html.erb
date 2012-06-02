@@ -1,4 +1,9 @@
 <div class="lobby_container">
-<%= render "user_lists" %>
+<div class="lobby_title_wrapper"><h1>Welcome to the lobby</h1>
+<p>Your connection with lobby is: <%= image_tag("lobby/broken.png", id:"status_img", alt: "broken", height: "20px")%></p>
+<%= button_to_function "(re)connect", "connectChatServer()", :class => "btn btn-small btn-primary" %>
+</div>
+<%= render "users_list" %>
 <%= render "chat_box" %>
+<%= render "games_list" %>
 </div>
