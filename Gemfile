@@ -13,6 +13,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'eventmachine', ">= 1.0.0.beta.4", "<= 1.0.0.beta.4.1"
 gem 'em-websocket-server'
 gem 'em-websocket'
+gem 'activesupport'
 
 # Gems used only for assets and not required
 # in production environments by default.
