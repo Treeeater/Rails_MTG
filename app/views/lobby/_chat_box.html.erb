@@ -1,0 +1,9 @@
+<div class="lobby_chatbox_wrapper">
+<h2> Your name: <span id="username"><%= current_user.name %></span> </h2>
+<textarea id = "chatbox" placeholder="Find lobby messages here!" rows="10" disabled="true"></textarea>
+<input id="chatInput" type="text" disabled="disabled" onkeydown="enterChat(event);" value="Hi"></input>
+<div class="chat_button_wrapper">
+<%= button_to_function "send", "sendChatMsg($('#chatInput').val())", :class => "btn btn-medium btn-primary" %>
+<%= button_to_function "clear", "clearChatBox()", :class => "btn btn-medium btn-primary" %>
+</div>
+</div>

@@ -193,3 +193,49 @@ input, textarea, select, .uneditable-input {
     }
   }
 }
+
+/*lobby sidebar */
+$lightpink: #FFEFD5;
+
+.lobby_title_wrapper {
+border-bottom: 1px solid $grayMediumLight;
+text-align:center;
+}
+
+.user_list_sidebar_wrapper {
+margin-top:10px;
+float:left;
+width:100px;
+height:90%;
+background:$lightpink;
+padding-right:10px;
+border-right: 1px solid $grayMediumLight;
+  .center {
+    margin-top: -10px;
+	margin-left:auto;
+	width:99%;
+  }
+}
+
+.user_list_wrapper {
+margin-top:10px;
+margin-left:10px;
+width:80px;
+}
+
+.lobby_container {
+height:1000px;
+}
+
+/*lobby chatbox */
+.lobby_chatbox_wrapper {
+margin-top:10px;
+display:inline-block;
+margin-left:20px;
+width:60%;
+height:1000px;
+	.chat_button_wrapper{
+		width:120px;
+		margin:auto;
+	}
+}
