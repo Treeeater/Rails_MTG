@@ -10,6 +10,7 @@ gem 'sqlite3'
 gem 'bootstrap-sass'
 gem 'annotate', '~> 2.4.1.beta1'
 gem 'bcrypt-ruby', '3.0.1'
+gem 'eventmachine', '1.0.0.beta.4'
 
 # Gems used only for assets and not required
 # in production environments by default.
