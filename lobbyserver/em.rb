@@ -5,6 +5,10 @@ require 'em-websocket'
 require './chatLobby.rb'
 require 'json'
 
+BroadCast = 1
+SingleCast = 2
+OtherCast = 3
+
 def sendMessage(ws, msg)
 	ws.send msg
 	puts "Sending Message to #{$cl.users[ws.object_id.inspect].name}: " + msg
@@ -29,11 +33,7 @@ EventMachine.run {
 
     ws.onclose { 
 		puts "Connection closed from #{ws.object_id}"
-		response = ResponseMessage.new
-		response.type = "logout"
-		response.uid = $cl.users[ws.object_id.inspect].uid
-		response.username = $cl.users[ws.object_id.inspect].name
-		response.body = ""
+		response = ResponseMessage.new("logout",$cl.users[ws.object_id.inspect].name,$cl.users[ws.object_id.inspect].uid)
 		$cl.users.delete(ws.object_id.inspect)
 		$cl.websockets.delete(ws.object_id.inspect)
 		#broadcast the message to everybody
@@ -50,25 +50,24 @@ EventMachine.run {
 		msgUID = parsedMSG["uid"]
 		msgUsername = parsedMSG["username"]
 		msgBody = parsedMSG["body"]
-		response = ResponseMessage.new
+		response = nil
 		responseMsg = ""
-		broadcast = true
+		castType = nil
 		case parsedMSG["type"]
 			when "login"
 				#detect if this user is already connected
 				logged_in = false
 				$cl.users.each_value{|c|
 					if (c.uid == msgUID)
-						response.body = "You already logged in, cannot log in again!"
-						response.type = "error"
-						broadcast = false
+						response = ResponseMessage.new("error",msgUsername,msgUID,"You already logged in, cannot log in again!")
+						castType = SingleCast
 						logged_in = true
 					end
 				}
 				
 				#new a user and add it to $cl.
-				
 				if (!logged_in)
+					castType = OtherCast
 					newuser = ChatUser.new()
 					newuser.socketID = ws.object_id
 					newuser.name = msgUsername
@@ -77,24 +76,39 @@ EventMachine.run {
 					$cl.websockets[ws.object_id.inspect] = ws
 					
 					#respond with pong msg
-					response.body = ""
-					response.username = msgUsername
-					response.uid = msgUID
-					response.type = "login"
+					response = ResponseMessage.new("login",msgUsername,msgUID,"")
 					responseMsg = response.serialize()
+
+					#sending other users information to current user logging in
+					$cl.users.each_value{|c|
+						if (c.uid == msgUID)
+							tempUser = ResponseMessage.new("login", c.name, c.uid, ActiveSupport::JSON.encode($cl.users))
+							sendMessage(ws, tempUser.serialize())
+						end
+					}
 				end
 				
 			when "message"
 				responseMsg = msg
+				castType = BroadCast
 			else
 			
 		end
-		if (broadcast)
+		if (castType == BroadCast)
+			#broadcast the message to everbody.
 			$cl.websockets.each_value {|w|
 				sendMessage(w, responseMsg)
 			}
-		else
+		elsif (castType == SingleCast)
+			#singlecast the message back to the sender.
 			sendMessage(ws, responseMsg)
+		elsif (castType == OtherCast)
+			#reply this msg to everybody EXCEPT the sender.
+			$cl.websockets.each_value {|w|
+				if (w.object_id!=ws.object_id)
+					sendMessage(w, responseMsg)
+				end
+			}
 		end
     }
 	

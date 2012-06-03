@@ -4,7 +4,22 @@
 	username = $('#username').text();
 	uid = $('#username').attr('uid');
 	$('#chatInput').attr('disabled','disabled');
+	window.addEventListener('load', clearChatBox, false);			//FF does not clear chatbox after refresh, this is a work around.
 })();
+
+function keys(obj)
+{
+    var keys = [];
+
+    for(var key in obj)
+    {
+        if(obj.hasOwnProperty(key))
+        {
+            keys.push(key);
+        }
+	}
+    return keys;
+}
 
 function Message()
 {
@@ -16,9 +31,10 @@ function Message()
 
 function connectChatServer()
 {
+	$('#chatbox').val($('#chatbox').val() + 'Connecting to chat server...\n');
 	if (connecting||chatServerConnected)
 	{
-		alert("already connecting! don't click this twice!")
+		alert("already connecting or connected! don't click this twice!")
 		return;
 	}
 	connecting = true;
@@ -34,6 +50,7 @@ function connectChatServer()
 
 function initChat()
 {
+	$('#chatbox').val($('#chatbox').val() + 'Server connected!\n');
 	chatServerConnected = true;
 	connecting = false;
 	var message = new Message();
@@ -46,6 +63,7 @@ function initChat()
 	$('#chatInput').removeAttr('disabled');
 	$('#chatInput').val('');
 	chatws.onmessage = processMessage;
+	$('#chatbox').val($('#chatbox').val() + 'Initialization done, retrieving users list...\n');
 }
 
 function closeConnection()
@@ -54,14 +72,20 @@ function closeConnection()
 	chatServerConnected = false;
 	connecting = false;
 	$('#status_img').attr('src','/assets/lobby/broken.png');
+	clearLists();
 }
 
+function clearLists()
+{
+	$("#userslist").html("");
+	$("#gameslist").html("");
+}
 function timeOut()
 {
 	if (chatServerConnected) return;
 	connecting = false;
-	errorMessage = "Failed to connect to remote chat server, try again later."
-	alert(errorMessage);
+	errorMessage = "Failed to connect to remote chat server, try again later.\n"
+	$('#chatbox').val($('#chatbox').val() + errorMessage);
 }
 
 function testAndSend(e)
@@ -90,6 +114,18 @@ function clearChatBox()
 	$('#chatbox').val("");	
 }
 
+function createGame()
+{
+}
+
+function joinGame()
+{
+}
+
+function leaveGame()
+{
+}
+
 function processMessage(s)
 {
 	//debug: $('#chatbox').val($('#chatbox').val()+s.data+"\n");
@@ -99,8 +135,24 @@ function processMessage(s)
 	switch (msg.type)
 	{
 		case "login":
-			$('#chatbox').val($('#chatbox').val() + time + " " + msg.username + " has entered the room\n");
-			$('#userslist').append("<option id='user_"+msg.uid+"'>"+msg.username+"</option>")
+			if (msg.body!="")
+			{
+				//initial login msg
+				//need to parse body
+				users = JSON.parse(msg.body);
+				k = keys(users);
+				for (i = 0; i < k.length; i++)
+				{
+					$('#userslist').append("<option id='user_"+users[k[i]].uid+"'>"+users[k[i]].name+"</option>")
+				}
+				$('#chatbox').val($('#chatbox').val() + 'Users list retrieved!\nRetrieving games list...\n');
+			}
+			else
+			{
+				//other user joins after current user did, no need to parse body
+				$('#userslist').append("<option id='user_"+msg.uid+"'>"+msg.username+"</option>")
+				$('#chatbox').val($('#chatbox').val() + time + " " + msg.username + " has entered the room\n");
+			}
 			break;
 		case "message":
 			$('#chatbox').val($('#chatbox').val() + time + " " + msg.username + " : " + msg.body + "\n");

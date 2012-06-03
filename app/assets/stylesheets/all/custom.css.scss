@@ -210,11 +210,13 @@ width:100px;
 height:90%;
 background:$lightpink;
 padding-right:10px;
+text-align:center;
 border-right: 1px solid $grayMediumLight;
   .center {
-    margin-top: -10px;
+    margin-top: 10px;
 	margin-left:auto;
 	width:99%;
+	text-align:center;
   }
 }
 
@@ -249,12 +251,19 @@ width:200px;
 height:90%;
 background:$lightpink;
 padding-left:10px;
+text-align:center;
 border-right: 1px solid $grayMediumLight;
 	.center {
-    margin-top: -10px;
+    margin-top: 10px;
 	margin-left:auto;
 	width:99%;
-  }
+    }
+	.centerbutton {
+    margin-top: 10px;
+	margin-left:auto;
+	width:80%;
+	text-align:center;
+    }
 }
 
 .games_list_wrapper {
