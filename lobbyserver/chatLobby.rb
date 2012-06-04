@@ -23,7 +23,13 @@ class ResponseMessage
 end
 
 class Game
-	attr_accessor :users, :gameName
+	attr_accessor :players, :hostUID, :hostName
+	def initialize(uid, username)
+		@hostName = username
+		@hostUID = uid
+		@players = Array.new
+		@players.push([uid,username])
+	end
 end
 
 class GamesList

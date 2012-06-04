@@ -2,6 +2,8 @@
 	chatServerConnected = false;
 	connecting = false;
 	username = $('#username').text();
+	games = new Array();					//Array of Games
+	initialization = true;					//boolean to record init status
 	uid = $('#username').attr('uid');
 	$('#chatInput').attr('disabled','disabled');
 	window.addEventListener('load', clearChatBox, false);			//FF does not clear chatbox after refresh, this is a work around.
@@ -21,12 +23,19 @@ function keys(obj)
     return keys;
 }
 
-function Message()
+function Message(type, username, body, uid)
 {
-	var type;
-	var username;
-	var body;
-	var uid;
+	this.type = type;
+	this.username = username;
+	this.body = body;
+	this.uid = uid;
+}
+
+function Game(hostName, hostUID, players)
+{
+	this.hostName = hostName;
+	this.hostUID = hostUID;
+	this.players = players;
 }
 
 function connectChatServer()
@@ -53,11 +62,7 @@ function initChat()
 	$('#chatbox').val($('#chatbox').val() + 'Server connected!\n');
 	chatServerConnected = true;
 	connecting = false;
-	var message = new Message();
-	message.type = "login";
-	message.username = username;
-	message.body = "";
-	message.uid = uid;
+	var message = new Message("login", username, "", uid);
 	chatws.send(JSON.stringify(message));
 	$('#status_img').attr('src','/assets/lobby/connected.jpg');
 	$('#chatInput').removeAttr('disabled');
@@ -99,11 +104,7 @@ function sendChatMsg(s)
 	//post this to textarea first
 	//$('#chatbox').val($('#chatbox').val()+username+" : "+s+"\n");
 	//then push this to chat server
-	msg = new Message();
-	msg.type = "message";
-	msg.body = s;
-	msg.username = username;
-	msg.uid = uid;
+	msg = new Message("message",username,s,uid);
 	chatws.send(JSON.stringify(msg));
 	$('#chatInput').val("");
 	//should setup a callback to remove 'sending...' after receiving response.
@@ -116,6 +117,8 @@ function clearChatBox()
 
 function createGame()
 {
+	message = new Message("createGame", username, "", uid);
+	chatws.send(JSON.stringify(message));
 }
 
 function joinGame()
@@ -124,6 +127,37 @@ function joinGame()
 
 function leaveGame()
 {
+}
+
+function retrieveGameList()
+{
+	message = new Message("retrieveGameList", username, "", uid);
+	chatws.send(JSON.stringify(message));
+}
+
+function rerenderGamesList(g)
+{
+	$('#gameslist').html("");		//clear
+	k = keys(g);
+	for (i = 0; i < k.length; i++)
+	{
+		$('#gameslist').append("<option id='game_"+g[k[i]].hostUID+"' onclick = 'rerenderPlayersList();'>Host:"+g[k[i]].hostName+"  "+g[k[i]].players.length+"/2</option>")
+	}
+}
+
+function rerenderPlayersList(g)
+{
+	cur_selected = $("#gameslist option:selected").attr('id');
+	if (cur_selected!=undefined)
+	{
+		cur_selected = cur_selected.replace(/\D*/,'');
+		cur_game = games[cur_selected];
+		$('#playerslist').html("");
+		for (i = 0; i < cur_game.players.length; i++)
+		{
+			$('#playerslist').append("<option id='player_"+cur_game.players[i][0]+"'>"+cur_game.players[i][1]+"</option>")
+		}
+	}
 }
 
 function processMessage(s)
@@ -146,6 +180,7 @@ function processMessage(s)
 					$('#userslist').append("<option id='user_"+users[k[i]].uid+"'>"+users[k[i]].name+"</option>")
 				}
 				$('#chatbox').val($('#chatbox').val() + 'Users list retrieved!\nRetrieving games list...\n');
+				retrieveGameList();
 			}
 			else
 			{
@@ -162,6 +197,19 @@ function processMessage(s)
 			$('#user_'+id).remove();
 			$('#chatbox').val($('#chatbox').val() + time + " " + msg.username + " has left the room\n");
 			break;
+		case "createGame":
+			games[msg.uid] = new Game(msg.username,msg.uid,[[msg.uid,msg.username]]);
+			rerenderGamesList(games);
+			break;
+		case "gameList":
+			games = JSON.parse(msg.body);
+			rerenderGamesList(games);
+			if (initialization){
+				$('#chatbox').val($('#chatbox').val() + 'Games list retrieved!\nInitialization done! Enjoy the game!\n');
+			}
+			break;
+		case "error":
+			$('#chatbox').val($('#chatbox').val() + 'Error : ' + msg.body + '\n');
 		default:
 	}
 		

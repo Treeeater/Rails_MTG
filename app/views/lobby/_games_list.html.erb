@@ -2,10 +2,16 @@
 <div class="center"><h4>Games List</h4></div>
 <div class="games_list_wrapper">
 <form>
-<select id="gamelist" size="8"></select>
+<select id="gameslist" size="8"></select>
 </form>
 </div>
 <%= button_to_function "Create a game", "createGame()", :class => "btn btn-medium btn-primary centerbutton" %>
 <%= button_to_function "Join selected game", "joinGame()", :class => "btn btn-medium btn-primary centerbutton" %>
 <%= button_to_function "Leave game", "leaveGame()", :class => "btn btn-medium btn-primary centerbutton" %>
+<div class="games_list_wrapper">
+<div class="center"><h4>Players in the game</h4></div>
+<form style="padding-top:20px">
+<select id="playerslist" size="4"></select>
+</form>
+</div>
 </div>

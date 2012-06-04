@@ -8,6 +8,7 @@ require 'json'
 BroadCast = 1
 SingleCast = 2
 OtherCast = 3
+NoCast = 4
 
 def sendMessage(ws, msg)
 	ws.send msg
@@ -21,7 +22,8 @@ EventMachine.run {
 	$cl = ChatLobby.new
 	$cl.users = Hash.new
 	$cl.websockets = Hash.new
-	
+	$gl = GamesList.new
+	$gl.games = Hash.new
     EventMachine::WebSocket.start(:host => "localhost", :port => 3001) do |ws|
 	
 	ws.onopen {
@@ -33,11 +35,22 @@ EventMachine.run {
 
     ws.onclose { 
 		puts "Connection closed from #{ws.object_id}"
-		response = ResponseMessage.new("logout",$cl.users[ws.object_id.inspect].name,$cl.users[ws.object_id.inspect].uid)
+		cuid = $cl.users[ws.object_id.inspect].uid
+		response = ResponseMessage.new("logout",$cl.users[ws.object_id.inspect].name, cuid)
 		$cl.users.delete(ws.object_id.inspect)
 		$cl.websockets.delete(ws.object_id.inspect)
+		if ($gl.games.has_key? cuid)
+			$gl.games.delete(cuid)
+			#delete game msg should be sent to everyone.
+			$cl.websockets.each_value {|w|
+				#user exit msg should be sent to everyone.
+				responseMsg = ResponseMessage.new("gameList","","",ActiveSupport::JSON.encode($gl.games)).serialize()
+				sendMessage(w, responseMsg)
+			}
+		end
 		#broadcast the message to everybody
 		$cl.websockets.each_value {|w|
+			#user exit msg should be sent to everyone.
 			sendMessage(w, response.serialize())
 		}
 	}
@@ -80,20 +93,32 @@ EventMachine.run {
 					responseMsg = response.serialize()
 
 					#sending other users information to current user logging in
-					$cl.users.each_value{|c|
-						if (c.uid == msgUID)
-							tempUser = ResponseMessage.new("login", c.name, c.uid, ActiveSupport::JSON.encode($cl.users))
-							sendMessage(ws, tempUser.serialize())
-						end
-					}
+					tempUser = ResponseMessage.new("login", msgUsername, msgUID, ActiveSupport::JSON.encode($cl.users))
+					sendMessage(ws, tempUser.serialize())
 				end
 				
 			when "message"
 				responseMsg = msg
 				castType = BroadCast
+			when "createGame"
+				if ($gl.games.has_key? msgUID)
+					#This user already created a game, we should return an error
+					castType = SingleCast
+					response = ResponseMessage.new("error",msgUsername,msgUID,"You already created a game, cannot create another!")
+					responseMsg = response.serialize()
+				else
+					castType = BroadCast
+					#init the game on back-end
+					$gl.games[msgUID] = Game.new(msgUID, msgUsername)
+					response = ResponseMessage.new("createGame",msgUsername,msgUID,ActiveSupport::JSON.encode($gl.games[msgUID]))
+					responseMsg = response.serialize()
+				end
+			when "retrieveGameList"
+				castType = SingleCast
+				responseMsg = ResponseMessage.new("gameList","","",ActiveSupport::JSON.encode($gl.games)).serialize()
 			else
-			
 		end
+		
 		if (castType == BroadCast)
 			#broadcast the message to everbody.
 			$cl.websockets.each_value {|w|
