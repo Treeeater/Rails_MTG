@@ -10,9 +10,47 @@ SingleCast = 2
 OtherCast = 3
 NoCast = 4
 
+MaxPlayers = 2
+
 def sendMessage(ws, msg)
 	ws.send msg
 	puts "Sending Message to #{$cl.users[ws.object_id.inspect].name}: " + msg
+end
+
+def userLeaveGame(msgUID)
+	returnValue = false
+	deleteGame = false
+	$gl.games.each_key{|g|
+		$gl.games[g].players.each_index{|p|
+			if ($gl.games[g].players[p][0]==msgUID)
+				returnValue = true
+				if ($gl.games[g].players.length == 1)
+					#this is the last player, we should delete this game.
+					deleteGame = true
+				else
+					#there are still players in this game
+					$gl.games[g].players.slice!(p)
+				end
+				break
+			end
+		}
+		if (deleteGame)
+			$gl.games.delete(g)
+			break
+		end
+	}
+	return returnValue;
+end
+
+def checkIfUserIsInGame?(msgUID)
+	$gl.games.each_key{|g|
+		$gl.games[g].players.each_index{|p|
+			if ($gl.games[g].players[p][0]==msgUID)
+				return true
+			end
+		}
+	}
+	return false
 end
 
 EventMachine.run {
@@ -35,13 +73,14 @@ EventMachine.run {
 
     ws.onclose { 
 		puts "Connection closed from #{ws.object_id}"
-		cuid = $cl.users[ws.object_id.inspect].uid
-		response = ResponseMessage.new("logout",$cl.users[ws.object_id.inspect].name, cuid)
+		msgUID = $cl.users[ws.object_id.inspect].uid
+		msgUsername = $cl.users[ws.object_id.inspect].name
+		response = ResponseMessage.new("logout",$cl.users[ws.object_id.inspect].name, msgUID)
 		$cl.users.delete(ws.object_id.inspect)
 		$cl.websockets.delete(ws.object_id.inspect)
-		if ($gl.games.has_key? cuid)
-			$gl.games.delete(cuid)
-			#delete game msg should be sent to everyone.
+		#find the games he is in and withdraw him.
+		leftGame = userLeaveGame(msgUID)
+		if (leftGame)
 			$cl.websockets.each_value {|w|
 				#user exit msg should be sent to everyone.
 				responseMsg = ResponseMessage.new("gameList","","",ActiveSupport::JSON.encode($gl.games)).serialize()
@@ -101,10 +140,10 @@ EventMachine.run {
 				responseMsg = msg
 				castType = BroadCast
 			when "createGame"
-				if ($gl.games.has_key? msgUID)
+				if (checkIfUserIsInGame? msgUID)
 					#This user already created a game, we should return an error
 					castType = SingleCast
-					response = ResponseMessage.new("error",msgUsername,msgUID,"You already created a game, cannot create another!")
+					response = ResponseMessage.new("error",msgUsername,msgUID,"You are already in a game, cannot create another!")
 					responseMsg = response.serialize()
 				else
 					castType = BroadCast
@@ -116,6 +155,31 @@ EventMachine.run {
 			when "retrieveGameList"
 				castType = SingleCast
 				responseMsg = ResponseMessage.new("gameList","","",ActiveSupport::JSON.encode($gl.games)).serialize()
+			when "leaveGame"
+				castType = BroadCast
+				leftGame = userLeaveGame(msgUID)
+				responseMsg = ResponseMessage.new("gameList","","",ActiveSupport::JSON.encode($gl.games)).serialize()
+			when "joinGame"
+				castType = SingleCast
+				if (checkIfUserIsInGame? msgUID)
+					response = ResponseMessage.new("error",msgUsername,msgUID,"You are already in a game, cannot join another!")
+					responseMsg = response.serialize()
+				else
+					if ($gl.games.has_key?(msgBody))
+						if ($gl.games[msgBody].players.length<MaxPlayers)
+							#eligible to join
+							castType = BroadCast
+							$gl.games[msgBody].players.push([msgUID,msgUsername])
+							responseMsg = ResponseMessage.new("gameList","","",ActiveSupport::JSON.encode($gl.games)).serialize()
+						else
+							response = ResponseMessage.new("error",msgUsername,msgUID,"Maximum number of players reached! If you are seeing otherwise, try refresh the page?")
+							responseMsg = response.serialize()
+						end
+					else
+						response = ResponseMessage.new("error",msgUsername,msgUID,"Cannot find the game specified, test your connection?")
+						responseMsg = response.serialize()
+					end
+				end
 			else
 		end
 		

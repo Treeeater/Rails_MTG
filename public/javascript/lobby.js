@@ -23,6 +23,11 @@ function keys(obj)
     return keys;
 }
 
+function log(s)
+{
+	$('#chatbox').val($('#chatbox').val() + s);
+}
+
 function Message(type, username, body, uid)
 {
 	this.type = type;
@@ -40,7 +45,7 @@ function Game(hostName, hostUID, players)
 
 function connectChatServer()
 {
-	$('#chatbox').val($('#chatbox').val() + 'Connecting to chat server...\n');
+	log('Connecting to chat server...\n');
 	if (connecting||chatServerConnected)
 	{
 		alert("already connecting or connected! don't click this twice!")
@@ -59,7 +64,7 @@ function connectChatServer()
 
 function initChat()
 {
-	$('#chatbox').val($('#chatbox').val() + 'Server connected!\n');
+	log('Server connected!\n');
 	chatServerConnected = true;
 	connecting = false;
 	var message = new Message("login", username, "", uid);
@@ -68,7 +73,7 @@ function initChat()
 	$('#chatInput').removeAttr('disabled');
 	$('#chatInput').val('');
 	chatws.onmessage = processMessage;
-	$('#chatbox').val($('#chatbox').val() + 'Initialization done, retrieving users list...\n');
+	log('Retrieving users list...\n');
 }
 
 function closeConnection()
@@ -76,6 +81,7 @@ function closeConnection()
 	if (!chatServerConnected) return;
 	chatServerConnected = false;
 	connecting = false;
+	initialization = true;
 	$('#status_img').attr('src','/assets/lobby/broken.png');
 	clearLists();
 }
@@ -90,7 +96,7 @@ function timeOut()
 	if (chatServerConnected) return;
 	connecting = false;
 	errorMessage = "Failed to connect to remote chat server, try again later.\n"
-	$('#chatbox').val($('#chatbox').val() + errorMessage);
+	log(errorMessage);
 }
 
 function testAndSend(e)
@@ -123,10 +129,23 @@ function createGame()
 
 function joinGame()
 {
+	cur_selected = $("#gameslist option:selected").attr('id');
+	if (cur_selected!=undefined)
+	{
+		cur_selected = cur_selected.replace(/\D*/,'');
+		message = new Message("joinGame", username, cur_selected, uid);			//cur_selected is the game intended to join
+		chatws.send(JSON.stringify(message));
+	}
+	else
+	{
+		log("please select a game first!");
+	}
 }
 
 function leaveGame()
 {
+	message = new Message("leaveGame", username, "", uid);
+	chatws.send(JSON.stringify(message));
 }
 
 function retrieveGameList()
@@ -179,23 +198,23 @@ function processMessage(s)
 				{
 					$('#userslist').append("<option id='user_"+users[k[i]].uid+"'>"+users[k[i]].name+"</option>")
 				}
-				$('#chatbox').val($('#chatbox').val() + 'Users list retrieved!\nRetrieving games list...\n');
+				log('Users list retrieved!\nRetrieving games list...\n');
 				retrieveGameList();
 			}
 			else
 			{
 				//other user joins after current user did, no need to parse body
 				$('#userslist').append("<option id='user_"+msg.uid+"'>"+msg.username+"</option>")
-				$('#chatbox').val($('#chatbox').val() + time + " " + msg.username + " has entered the room\n");
+				log(time + " " + msg.username + " has entered the room\n");
 			}
 			break;
 		case "message":
-			$('#chatbox').val($('#chatbox').val() + time + " " + msg.username + " : " + msg.body + "\n");
+			log(time + " " + msg.username + " : " + msg.body + "\n");
 			break;
 		case "logout":
 			var id = msg.uid;
 			$('#user_'+id).remove();
-			$('#chatbox').val($('#chatbox').val() + time + " " + msg.username + " has left the room\n");
+			log(time + " " + msg.username + " has left the room\n");
 			break;
 		case "createGame":
 			games[msg.uid] = new Game(msg.username,msg.uid,[[msg.uid,msg.username]]);
@@ -205,11 +224,12 @@ function processMessage(s)
 			games = JSON.parse(msg.body);
 			rerenderGamesList(games);
 			if (initialization){
-				$('#chatbox').val($('#chatbox').val() + 'Games list retrieved!\nInitialization done! Enjoy the game!\n');
+				log('Games list retrieved!\nInitialization done! Enjoy the game!\n');
+				initialization = false;
 			}
 			break;
 		case "error":
-			$('#chatbox').val($('#chatbox').val() + 'Error : ' + msg.body + '\n');
+			log('Error : ' + msg.body + '\n');
 		default:
 	}
 		
