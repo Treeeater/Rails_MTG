@@ -10,7 +10,7 @@
 		    <li><%= link_to "Lobby", lobby_path %></li>
             <li><%= link_to "Users", users_path %></li>
             <li id="fat-menu" class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="account" uid="<%= current_user.id %>" uname="<%= current_user.name %>">
                 Account <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">

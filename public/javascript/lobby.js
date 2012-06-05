@@ -1,10 +1,10 @@
 (function (){
 	chatServerConnected = false;
 	connecting = false;
-	username = $('#username').text();
 	games = new Array();					//Array of Games
 	initialization = true;					//boolean to record init status
-	uid = $('#username').attr('uid');
+	uid = $('#account').attr('uid');
+	username = $('#account').attr('uname');
 	$('#chatInput').attr('disabled','disabled');
 	window.addEventListener('load', clearChatBox, false);			//FF does not clear chatbox after refresh, this is a work around.
 	host = "http://localhost:3000/"
