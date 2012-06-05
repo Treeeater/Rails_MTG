@@ -15,7 +15,8 @@ Mtg::Application.routes.draw do
   
   #lobby
   match '/lobby',	to: 'lobby#index'
-  
+  #sealed
+  match '/sealed',	to: 'sealed#index'
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
