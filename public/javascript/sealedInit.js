@@ -1,5 +1,5 @@
 	//helpers:
-	landsVisual = {"plains":515,"island":555,"swamp":595,"mountain":635,"forest":675};
+	var landsVisual = {"plains":515,"island":555,"swamp":595,"mountain":635,"forest":675};
 	var addLands = function(l){
 		var number = prompt("How many " + l + " do you want?");
 		window[l] = number;
@@ -113,7 +113,7 @@
 		timerLayer.add(timerText);
 		setInterval("timeDown();",1000);
 		//cardback
-		imageObj = new Image();
+		var imageObj = new Image();
 		imageObj.onload = function() {
 			var image = new Kinetic.Image({
 				x: 0,
@@ -128,7 +128,7 @@
 		}
 		//five colors
 		plains=0,island=0,swamp=0,mountain=0,forest=0;
-		imageObj2 = new Image();
+		var imageObj2 = new Image();
 		imageObj2.onload = function() {
 			var image = new Kinetic.Image({
 				x: 20,
@@ -143,7 +143,7 @@
 			layer.add(image);
 			testAndDraw();
 		}
-		imageObj3 = new Image();
+		var imageObj3 = new Image();
 		imageObj3.onload = function() {
 			var image = new Kinetic.Image({
 				x: 20,
@@ -158,7 +158,7 @@
 			layer.add(image);
 			testAndDraw();
 		}
-		imageObj4 = new Image();
+		var imageObj4 = new Image();
 		imageObj4.onload = function() {
 			var image = new Kinetic.Image({
 				x: 20,
@@ -173,7 +173,7 @@
 			layer.add(image);
 			testAndDraw();
 		}
-		imageObj5 = new Image();
+		var imageObj5 = new Image();
 		imageObj5.onload = function() {
 			var image = new Kinetic.Image({
 				x: 20,
@@ -188,7 +188,7 @@
 			layer.add(image);
 			testAndDraw();
 		}
-		imageObj6 = new Image();
+		var imageObj6 = new Image();
 		imageObj6.onload = function() {
 			var image = new Kinetic.Image({
 				x: 20,
