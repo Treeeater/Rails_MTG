@@ -5,7 +5,7 @@
 <select id="gameslist" size="8"></select>
 </form>
 </div>
-<%= button_to_function "Create a game", "createGame()", :class => "btn btn-medium btn-primary centerbutton" %>
+<%= button_to_function "Create a game", "createGame()", :class => "btn btn-medium btn-primary centerbutton", :id => "createStartGame" %>
 <%= button_to_function "Join selected game", "joinGame()", :class => "btn btn-medium btn-primary centerbutton" %>
 <%= button_to_function "Leave game", "leaveGame()", :class => "btn btn-medium btn-primary centerbutton" %>
 <div class="games_list_wrapper">

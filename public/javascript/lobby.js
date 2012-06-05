@@ -7,6 +7,8 @@
 	uid = $('#username').attr('uid');
 	$('#chatInput').attr('disabled','disabled');
 	window.addEventListener('load', clearChatBox, false);			//FF does not clear chatbox after refresh, this is a work around.
+	host = "http://localhost:3000/"
+	lobbyServerHost = "ws://localhost:12341/"
 })();
 
 function keys(obj)
@@ -52,7 +54,7 @@ function connectChatServer()
 		return;
 	}
 	connecting = true;
-	chatws = new WebSocket("ws://localhost:3001/");
+	chatws = new WebSocket(lobbyServerHost);
 	chatws.onopen = function(){  
 		initChat();
     }
@@ -125,6 +127,14 @@ function createGame()
 {
 	message = new Message("createGame", username, "", uid);
 	chatws.send(JSON.stringify(message));
+	$("#createStartGame").val("Start game!");
+	$("#createStartGame").attr('onclick', 'startGame()');
+}
+
+function startGame()
+{
+	message = new Message("startGame", username, "", uid);
+	chatws.send(JSON.stringify(message));
 }
 
 function joinGame()
@@ -146,6 +156,8 @@ function leaveGame()
 {
 	message = new Message("leaveGame", username, "", uid);
 	chatws.send(JSON.stringify(message));
+	$("#createStartGame").val("Create a game");
+	$("#createStartGame").attr('onclick', 'createGame()');
 }
 
 function retrieveGameList()
@@ -226,6 +238,26 @@ function processMessage(s)
 			if (initialization){
 				log('Games list retrieved!\nInitialization done! Enjoy the game!\n');
 				initialization = false;
+			}
+			break;
+		case "startGame":
+			game = JSON.parse(msg.body);
+			shouldStartGame = false;
+			for (i = 0; i<game.players.length; i++)
+			{
+				if (uid == game.players[i][0])
+				{
+					shouldStartGame = true;
+					break;
+				}
+			}
+			if (!shouldStartGame)
+			{
+				$('#game_'+game.hostUID).remove();
+			}
+			else
+			{
+				window.location = host+"game/"+game.hostUID;
 			}
 			break;
 		case "error":

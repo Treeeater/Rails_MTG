@@ -1,3 +1,5 @@
+#!/usr/local/bin/ruby
+
 require 'rubygems'
 require 'active_support'
 require 'eventmachine'
@@ -21,19 +23,25 @@ def userLeaveGame(msgUID)
 	returnValue = false
 	deleteGame = false
 	$gl.games.each_key{|g|
-		$gl.games[g].players.each_index{|p|
-			if ($gl.games[g].players[p][0]==msgUID)
-				returnValue = true
-				if ($gl.games[g].players.length == 1)
-					#this is the last player, we should delete this game.
-					deleteGame = true
-				else
-					#there are still players in this game
-					$gl.games[g].players.slice!(p)
+		if (g==msgUID)
+			#this user created this game
+			deleteGame = true
+			returnValue = true
+		else
+			$gl.games[g].players.each_index{|p|
+				if ($gl.games[g].players[p][0]==msgUID)
+					returnValue = true
+					if ($gl.games[g].players.length == 1)
+						#this is the last player, we should delete this game.
+						deleteGame = true
+					else
+						#there are still players in this game
+						$gl.games[g].players.slice!(p)
+					end
+					break
 				end
-				break
-			end
-		}
+			}
+		end
 		if (deleteGame)
 			$gl.games.delete(g)
 			break
@@ -58,11 +66,11 @@ EventMachine.run {
 	puts "WebSocket server opened!"
 	
 	$cl = ChatLobby.new
-	$cl.users = Hash.new
-	$cl.websockets = Hash.new
+	$cl.users = Hash.new				#ws.object_id.inspect => ChatUser
+	$cl.websockets = Hash.new			#uid => ws
 	$gl = GamesList.new
 	$gl.games = Hash.new
-    EventMachine::WebSocket.start(:host => "localhost", :port => 3001) do |ws|
+    EventMachine::WebSocket.start(:host => "localhost", :port => 12341) do |ws|
 	
 	ws.onopen {
         puts "WebSocket connection open from #{ws.object_id}"
@@ -77,7 +85,7 @@ EventMachine.run {
 		msgUsername = $cl.users[ws.object_id.inspect].name
 		response = ResponseMessage.new("logout",$cl.users[ws.object_id.inspect].name, msgUID)
 		$cl.users.delete(ws.object_id.inspect)
-		$cl.websockets.delete(ws.object_id.inspect)
+		$cl.websockets.delete(msgUID)
 		#find the games he is in and withdraw him.
 		leftGame = userLeaveGame(msgUID)
 		if (leftGame)
@@ -125,7 +133,7 @@ EventMachine.run {
 					newuser.name = msgUsername
 					newuser.uid = msgUID
 					$cl.users[ws.object_id.inspect] = newuser
-					$cl.websockets[ws.object_id.inspect] = ws
+					$cl.websockets[msgUID] = ws
 					
 					#respond with pong msg
 					response = ResponseMessage.new("login",msgUsername,msgUID,"")
@@ -179,6 +187,25 @@ EventMachine.run {
 						response = ResponseMessage.new("error",msgUsername,msgUID,"Cannot find the game specified, test your connection?")
 						responseMsg = response.serialize()
 					end
+				end
+			when "startGame"
+				if (!$gl.games.has_key? msgUID)
+					castType = SingleCast
+					response = ResponseMessage.new("error",msgUsername,msgUID,"You are not a host of any game, cannot start a game!")
+					responseMsg = response.serialize()
+				elsif ($gl.games[msgUID].players.length() == 1)
+					castType = SingleCast
+					response = ResponseMessage.new("error",msgUsername,msgUID,"You want to play against yourself? We might implement this in the future.")
+					responseMsg = response.serialize()
+				else
+					#The user hosted a game and that game has two or more users.
+					castType = NoCast
+					response = ResponseMessage.new("startGame", msgUsername, msgUID, ActiveSupport::JSON.encode($gl.games[msgUID]))
+					responseMsg = response.serialize()
+					$gl.games[msgUID].players.each{|p|
+						sendMessage($cl.websockets[p[0]],responseMsg)
+					}
+					
 				end
 			else
 		end
