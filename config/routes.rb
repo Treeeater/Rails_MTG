@@ -4,19 +4,19 @@ Mtg::Application.routes.draw do
   # just remember to delete public/index.html.
   resources :users
   resources :sessions, only: [:new, :create, :destroy]
-  root :to => 'static_pages#home'
-  
+  resources :sealed, only: [:show, :new]
+
+  root :to => 'static_pages#home' 
   match '/signup',  to: 'users#new'
   match '/signin',  to: 'sessions#new'
   match '/signout', to: 'sessions#destroy', via: :delete		#Use the DELETE http verb
   match '/home',    to: 'static_pages#home'
   match '/help',    to: 'static_pages#help'
   match '/contact', to: 'static_pages#contact'
-  
   #lobby
   match '/lobby',	to: 'lobby#index'
   #sealed
-  match '/sealed',	to: 'sealed#index'
+  #match '/sealed',	to: 'sealed#index'
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
