@@ -9,7 +9,7 @@ EventMachine.run {
 
 	puts "WebSocket server opened!"
 	
-	EventMachine::WebSocket.start(:host => "localhost", :port => ("1234"+ARGV[0]).to_i ) do |ws|
+	EventMachine::WebSocket.start(:host => "localhost", :port => (12341+ARGV[0].to_i) ) do |ws|
 	
 		ws.onopen {
 			puts "WebSocket connection open from #{ws.object_id}"

@@ -128,11 +128,24 @@ function createGame()
 	message = new Message("createGame", username, "", uid);
 	chatws.send(JSON.stringify(message));
 	$("#createStartGame").val("Start game!");
-	$("#createStartGame").attr('onclick', 'startGame()');
+	$("#createStartGame").attr('onclick', 'initializeGame()');
+}
+
+function initializeGame()
+{
+	xhr = new XMLHttpRequest();
+	xhr.open('GET', hostServerAddress+"/sealed/new", false);  		//hostServerAddress is derived from index.html.erb, must
+	//use this under rails framework.
+	log("Sending initialize game command...\n");
+	xhr.send();
+	if (xhr.status == 200) {  
+		startGame(); 
+	}
 }
 
 function startGame()
 {
+	log("Game server initialized, starting the game...");
 	message = new Message("startGame", username, "", uid);
 	chatws.send(JSON.stringify(message));
 }
@@ -257,7 +270,8 @@ function processMessage(s)
 			}
 			else
 			{
-				window.location = host+"game/"+game.hostUID;
+				log("Redirecting to new game page...\n");
+				window.location = host+"sealed/"+game.hostUID;
 			}
 			break;
 		case "error":

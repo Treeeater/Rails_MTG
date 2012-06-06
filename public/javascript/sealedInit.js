@@ -203,12 +203,12 @@
 			layer.add(image);
 			testAndDraw();
 		}
-		imageObj.src = "mtg/general/back.jpg";
-		imageObj2.src = "mtg/general/white.png";
-		imageObj3.src = "mtg/general/blue.png";
-		imageObj4.src = "mtg/general/black.png";
-		imageObj5.src = "mtg/general/red.png";
-		imageObj6.src = "mtg/general/green.png";
+		imageObj.src = hostServerAddress+"assets/mtg/general/back.jpg";
+		imageObj2.src = hostServerAddress+"assets/mtg/general/white.png";
+		imageObj3.src = hostServerAddress+"assets/mtg/general/blue.png";
+		imageObj4.src = hostServerAddress+"assets/mtg/general/black.png";
+		imageObj5.src = hostServerAddress+"assets/mtg/general/red.png";
+		imageObj6.src = hostServerAddress+"assets/mtg/general/green.png";
 		
 		//sort buttons
 		var buttonSortColor = new Kinetic.Rect({
