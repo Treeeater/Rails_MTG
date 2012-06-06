@@ -6,7 +6,7 @@ class SealedController < ApplicationController
 	end
 
 	def new
-		pid = Kernel.spawn("/home/yuchen/sites/mtg/sealedServer/sealedServer.rb " + current_user.id.to_s)
+		pid = Kernel.spawn("ruby ./sealedServer/sealedServer.rb " + current_user.id.to_s)
 		Process.detach(pid)
 	end
 	
