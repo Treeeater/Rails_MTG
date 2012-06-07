@@ -1,26 +1,111 @@
-(function(){
-	//var ws = 0;
+function start(){
+	//var ws = 0;				//uncomment this line in production.
+	var myUsername = $('#account').attr('uname');
+	var myUID = $('#account').attr('uid');
+	var bothPlayersConnected = 0;
+	var bothPlayersReady = 0;
+	var bothPlayersSubmittedDecks = 0;
+	var init_status = false;
+	function Message(type, username, uid, body)
+	{
+		this.type = type;
+		this.username = username;
+		this.uid = uid;
+		this.body = body;
+	}
+
 	function log(s)
 	{
 		$('#statusbox').val($('#statusbox').val() + s);
 	}
+
 	function clearStatusBox()
 	{
 		$('#statusbox').val('');
 	}
-	randomWait = function(f)
+
+	function handShake()
 	{
-		setTimeout(f,Math.random()*1000);
+		var msg = new Message("init",myUsername,myUID,"")
+		ws.send(JSON.stringify(msg))
 	}
-	initializeCommunication = function()
+
+	function initializeCommunication()
 	{
 		clearStatusBox();
 		ws = new WebSocket("ws://"+hostServerDomain+":"+gamePort+"/");
 		ws.onopen = function(){
-			log("Game server connected.");
-			ws.close()
+			log("Game server connected.\n\n");
+			handShake();
+			//ws.close();
    		}
+		ws.onclose = function(){
+			log("Game server disconnected.\n\n");
+			$("#status_oppo_img").attr("src",'/assets/lobby/broken.png');
+			$("#status_me_img").attr("src",'/assets/lobby/broken.png');
+		}
+		ws.onmessage = processMessage;
 	}
-	window.addEventListener("load",randomWait.bind(this,"initializeCommunication()"))
-})();
 
+	function processMessage(s)
+	{
+		msg = JSON.parse(s.data);
+		var d = new Date();
+		time = d.toTimeString();
+		switch (msg.type)
+		{
+			case "init":
+				if (msg.uid == myUID){
+					bothPlayersConnected++;
+					$("#status_me_img").attr("src",'/assets/lobby/connected.jpg');
+					if (bothPlayersConnected==2)
+					{
+						log("Initialization done, you are ready to open the packs, just click open the packs!\n\n");
+						init_status = true;
+					}
+					else if (bothPlayersConnected==1)
+					{
+						if (msg.body=="ready"){
+							bothPlayersConnected++;
+							log("Initialization done, you are ready to open the packs, just click open the packs!\n\n");
+							$("#status_oppo_img").attr("src",'/assets/lobby/connected.jpg');
+						}
+						else {log("Please wait for your opponent to finish initializing.\n\n");}
+					}
+				}
+				else{
+					bothPlayersConnected++;
+					$("#status_oppo_img").attr("src",'/assets/lobby/connected.jpg');
+					if (bothPlayersConnected==2)
+					{
+						if (init_status==false)
+						{
+							log("Initialization done, you are ready to open the packs, just click open the packs!\n\n");
+							init_status = true;
+						}
+						else
+						{
+							//your opponent has just reconnected.
+							log("Just FYI your opponent has reconnected. Enjoy your game.\n\n");
+						}
+					}
+					else if (bothPlayersConnected==1)
+					{
+						log("Your session is not yet fully initialized, please wait.\n\n");
+					}
+				}
+				break;
+			case "disconnect":
+				// this is gotta be opponent disconnect, so no worries.
+				bothPlayersConnected--;
+				$("#status_oppo_img").attr("src",'/assets/lobby/broken.png');
+				log("Just FYI your opponent has disconnected, you can continue deck building regardless. He/She can resume deck building once reconnected.\n\n")
+				break;
+			default:
+		}
+	}
+
+	initializeCommunication();
+}
+
+window.addEventListener("load",start);

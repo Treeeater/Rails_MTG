@@ -7,8 +7,8 @@
 <div class = "sealedContainer" id="container"></div>
 <div class = "sealedContainerHolder" id="containerHolder"></div>
 <div class = "sealedStatusContainer" id="statusContainer">
-<div id="meStatusContainer">Me<%= image_tag("lobby/broken.png", id:"status_img", alt: "broken", height: "20px")%></div>
-<div id="oppoStatusContainer">He/She<%= image_tag("lobby/broken.png", id:"status_img", alt: "broken", height: "20px")%></div>
+<div id="meStatusContainer">Me<%= image_tag("lobby/broken.png", id:"status_me_img", alt: "broken", height: "20px")%></div>
+<div id="oppoStatusContainer">He/She<%= image_tag("lobby/broken.png", id:"status_oppo_img", alt: "broken", height: "20px")%></div>
 <textarea id="statusbox" disabled="disabled" placeholder="When ready, click ready. When both players are ready, sealed event begins."></textarea>
 <%= button_to_function "Let's crack the packs", "f()", :class => "btn btn-medium btn-primary" %>
 <%= button_to_function "Let's crush the opponent!", "f()", :class => "btn btn-medium btn-primary", :style => "margin-top:10px" %>

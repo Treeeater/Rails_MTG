@@ -271,7 +271,7 @@ function processMessage(s)
 			else
 			{
 				log("Redirecting to new game page...\n");
-				window.location = host+"sealed/"+game.hostUID;
+				window.setTimeout('window.location = host+"sealed/"+game.hostUID;',1000);
 			}
 			break;
 		case "error":
