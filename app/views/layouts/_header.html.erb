@@ -7,7 +7,7 @@
           <li><%= link_to "Home", root_path %></li>
           <li><%= link_to "Help", help_path %></li>
           <% if signed_in? %>
-		    <li><%= link_to "Lobby", lobby_path %></li>
+	    <li><%= link_to "Lobby", lobby_path %></li>
             <li><%= link_to "Users", users_path %></li>
             <li id="fat-menu" class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="account" uid="<%= current_user.id %>" uname="<%= current_user.name %>">
@@ -22,6 +22,7 @@
                 </li>
               </ul>
             </li>
+	    <li style = "color: #999999; line-height: 19px; padding: 9px 10px 11px; text-decoration: none; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);">Welcome, <%= current_user.name %>!</li>
           <% else %>
             <li><%= link_to "Sign in", signin_path %></li>
           <% end %>

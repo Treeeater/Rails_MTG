@@ -7,7 +7,7 @@ require 'json'
 
 EventMachine.run {
 
-	puts "WebSocket server opened!"
+	puts "WebSocket server opened at localhost on port " + (12341+ARGV[0].to_i).to_s + "!"
 	
 	EventMachine::WebSocket.start(:host => "localhost", :port => (12341+ARGV[0].to_i) ) do |ws|
 	
@@ -17,7 +17,7 @@ EventMachine.run {
 
 		ws.onclose { 
 			puts "Connection closed from #{ws.object_id}"
-			Kernel.exit!
+			#Kernel.exit!
 		}
 	
 		ws.onmessage { |msg|

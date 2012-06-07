@@ -3,6 +3,7 @@ class SealedController < ApplicationController
 		if !signed_in?
 			redirect_to signin_path
 		end
+    		@user = User.find(params[:id])
 	end
 
 	def new
