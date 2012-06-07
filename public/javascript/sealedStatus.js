@@ -67,6 +67,7 @@ function start(){
 					{
 						if (msg.body=="ready"){
 							bothPlayersConnected++;
+							init_status = true;
 							log("Initialization done, you are ready to open the packs, just click open the packs!\n\n");
 							$("#status_oppo_img").attr("src",'/assets/lobby/connected.jpg');
 						}
