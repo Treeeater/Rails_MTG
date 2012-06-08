@@ -26,8 +26,8 @@ function start(){
 
 	function handShake()
 	{
-		var msg = new Message("init",myUsername,myUID,"")
-		ws.send(JSON.stringify(msg))
+		var msg = new Message("init",myUsername,myUID,"");
+		ws.send(JSON.stringify(msg));
 	}
 
 	function initializeCommunication()
@@ -47,6 +47,19 @@ function start(){
 		ws.onmessage = processMessage;
 	}
 
+	initPacks = function()
+	{
+
+		if (bothPlayersConnected != 2)
+		{
+			log("The session is not fully initialized for either you or your opponent, please wait for the faces to turn green before clicking this button!\n\n");
+			return false;
+		}
+		//both players ready.
+		var msg = new Message("initPacks",myUsername,myUID,"");
+		ws.send(JSON.stringify(msg));
+	}
+	
 	function processMessage(s)
 	{
 		msg = JSON.parse(s.data);
@@ -102,6 +115,10 @@ function start(){
 				$("#status_oppo_img").attr("src",'/assets/lobby/broken.png');
 				log("Just FYI your opponent has disconnected, you can continue deck building regardless. He/She can resume deck building once reconnected.\n\n")
 				break;
+			case "error":
+				log('Error : ' + msg.body + '\n\n');
+			case "info":
+				log('Info : ' + msg.body + '\n\n');
 			default:
 		}
 	}
