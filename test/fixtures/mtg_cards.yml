@@ -1,0 +1,50 @@
+# == Schema Information
+#
+# Table name: mtg_cards
+#
+#  id         :integer         not null, primary key
+#  idInSet    :integer
+#  cardName   :string(255)
+#  cardType   :integer
+#  engSRC     :string(255)
+#  chiSRC     :string(255)
+#  power      :integer
+#  toughness  :integer
+#  color      :integer
+#  cmc        :integer
+#  level      :integer         default(0)
+#  rarity     :integer
+#  expansion  :string(255)
+#  created_at :datetime        not null
+#  updated_at :datetime        not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  idInSet: 1
+  name: MyString
+  type: 1
+  engSRC: MyString
+  chiSRC: MyString
+  power: 1
+  toughness: 1
+  color: 1
+  cmc: 1
+  level: 1
+  rarity: 1
+  expansion: MyString
+
+two:
+  idInSet: 1
+  name: MyString
+  type: 1
+  engSRC: MyString
+  chiSRC: MyString
+  power: 1
+  toughness: 1
+  color: 1
+  cmc: 1
+  level: 1
+  rarity: 1
+  expansion: MyString

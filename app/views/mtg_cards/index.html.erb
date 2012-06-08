@@ -1,0 +1,45 @@
+<h1>Listing mtg_cards</h1>
+
+<table>
+  <tr>
+    <th>Idinset</th>
+    <th>cardName</th>
+    <th>cardType</th>
+    <th>Engsrc</th>
+    <th>Chisrc</th>
+    <th>Power</th>
+    <th>Toughness</th>
+    <th>Color</th>
+    <th>Cmc</th>
+    <th>Level</th>
+    <th>Rarity</th>
+    <th>Expansion</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @mtg_cards.each do |mtg_card| %>
+  <tr>
+    <td><%= mtg_card.idInSet %></td>
+    <td><%= mtg_card.cardName %></td>
+    <td><%= mtg_card.cardType %></td>
+    <td><%= mtg_card.engSRC %></td>
+    <td><%= mtg_card.chiSRC %></td>
+    <td><%= mtg_card.power %></td>
+    <td><%= mtg_card.toughness %></td>
+    <td><%= mtg_card.color %></td>
+    <td><%= mtg_card.cmc %></td>
+    <td><%= mtg_card.level %></td>
+    <td><%= mtg_card.rarity %></td>
+    <td><%= mtg_card.expansion %></td>
+    <td><%= link_to 'Show', mtg_card %></td>
+    <td><%= link_to 'Edit', edit_mtg_card_path(mtg_card) %></td>
+    <td><%= link_to 'Destroy', mtg_card, confirm: 'Are you sure?', method: :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Mtg card', new_mtg_card_path %>

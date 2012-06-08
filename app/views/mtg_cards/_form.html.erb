@@ -1,0 +1,65 @@
+<%= form_for(@mtg_card) do |f| %>
+  <% if @mtg_card.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@mtg_card.errors.count, "error") %> prohibited this mtg_card from being saved:</h2>
+
+      <ul>
+      <% @mtg_card.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :idInSet %><br />
+    <%= f.number_field :idInSet %>
+  </div>
+  <div class="field">
+    <%= f.label :cardName %><br />
+    <%= f.text_field :cardName %>
+  </div>
+  <div class="field">
+    <%= f.label :cardType %><br />
+    <%= f.number_field :cardType %>
+  </div>
+  <div class="field">
+    <%= f.label :engSRC %><br />
+    <%= f.text_field :engSRC %>
+  </div>
+  <div class="field">
+    <%= f.label :chiSRC %><br />
+    <%= f.text_field :chiSRC %>
+  </div>
+  <div class="field">
+    <%= f.label :power %><br />
+    <%= f.number_field :power %>
+  </div>
+  <div class="field">
+    <%= f.label :toughness %><br />
+    <%= f.number_field :toughness %>
+  </div>
+  <div class="field">
+    <%= f.label :color %><br />
+    <%= f.number_field :color %>
+  </div>
+  <div class="field">
+    <%= f.label :cmc %><br />
+    <%= f.number_field :cmc %>
+  </div>
+  <div class="field">
+    <%= f.label :level %><br />
+    <%= f.number_field :level %>
+  </div>
+  <div class="field">
+    <%= f.label :rarity %><br />
+    <%= f.number_field :rarity %>
+  </div>
+  <div class="field">
+    <%= f.label :expansion %><br />
+    <%= f.text_field :expansion %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

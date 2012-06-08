@@ -1,0 +1,65 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Idinset:</b>
+  <%= @mtg_card.idInSet %>
+</p>
+
+<p>
+  <b>cardName:</b>
+  <%= @mtg_card.cardName %>
+</p>
+
+<p>
+  <b>cardType:</b>
+  <%= @mtg_card.cardType %>
+</p>
+
+<p>
+  <b>Engsrc:</b>
+  <%= @mtg_card.engSRC %>
+</p>
+
+<p>
+  <b>Chisrc:</b>
+  <%= @mtg_card.chiSRC %>
+</p>
+
+<p>
+  <b>Power:</b>
+  <%= @mtg_card.power %>
+</p>
+
+<p>
+  <b>Toughness:</b>
+  <%= @mtg_card.toughness %>
+</p>
+
+<p>
+  <b>Color:</b>
+  <%= @mtg_card.color %>
+</p>
+
+<p>
+  <b>Cmc:</b>
+  <%= @mtg_card.cmc %>
+</p>
+
+<p>
+  <b>Level:</b>
+  <%= @mtg_card.level %>
+</p>
+
+<p>
+  <b>Rarity:</b>
+  <%= @mtg_card.rarity %>
+</p>
+
+<p>
+  <b>Expansion:</b>
+  <%= @mtg_card.expansion %>
+</p>
+
+
+<%= link_to 'Edit', edit_mtg_card_path(@mtg_card) %> |
+<%= link_to 'Back', mtg_cards_path %>

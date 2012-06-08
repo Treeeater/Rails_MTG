@@ -11,7 +11,24 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120601050005) do
+ActiveRecord::Schema.define(:version => 20120608182456) do
+
+  create_table "mtg_cards", :force => true do |t|
+    t.integer  "idInSet"
+    t.string   "cardName"
+    t.integer  "cardType"
+    t.string   "engSRC"
+    t.string   "chiSRC"
+    t.integer  "power"
+    t.integer  "toughness"
+    t.integer  "color"
+    t.integer  "cmc"
+    t.integer  "level",      :default => 0
+    t.integer  "rarity"
+    t.string   "expansion"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
 
   create_table "users", :force => true do |t|
     t.string   "name"
