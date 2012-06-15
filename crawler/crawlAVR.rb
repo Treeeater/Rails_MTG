@@ -3,7 +3,7 @@
 require 'net/http'
 
 baseURL = 'http://magiccards.info/query?q=e%3Aavr%2Fen&s=issue&v=card'
-totalPages = 1
+totalPages = 12
 currentPage = 0
 expansion = "AVR"
 #initial Padding:
@@ -44,24 +44,32 @@ while (currentPage < totalPages)
 		#p cardTypeString
 		power = nil
 		toughness = nil
-		if (cardTypeString[0..7]=="Creature")
+		if (cardTypeString.index("Creature")!=nil)
+			cardTypeString.gsub!(/\*/,'0')
 			power = cardTypeString.gsub(/.*\s(\d+)\/.*/,'\1')
 			toughness = cardTypeString.gsub(/.*\/(\d+).*/,'\1')
 			#p power
 			#p toughness	
 		end
+		if (cardTypeString[0..4]=="Basic")
+			#we've reached basic lands, which are always the last. We don't record these, so break and we are done.
+			break	
+		end
+		cmc = 0
+		colorString = ""
+		if (cardTypeString[0..3]!="Land")
+			curResponse.gsub!(/^,[\s\n\r]*/,'')
+			endPoint = curResponse.index(' ')
+			colorString = curResponse[0..endPoint-1]
+			curResponse = curResponse[endPoint..-1]
+			#p colorString
 
-		curResponse.gsub!(/^,[\s\n\r]*/,'')
-		endPoint = curResponse.index(' ')
-		colorString = curResponse[0..endPoint-1]
-		curResponse = curResponse[endPoint..-1]
-		#p colorString
-
-		curResponse = curResponse[curResponse.index('(')..-1]
-		endPoint = curResponse.index(')',1)
-		cmc = curResponse[1..endPoint-1]
-		curResponse = curResponse[endPoint..-1]
-		#p cmc
+			curResponse = curResponse[curResponse.index('(')..-1]
+			endPoint = curResponse.index(')',1)
+			cmc = curResponse[1..endPoint-1]
+			curResponse = curResponse[endPoint..-1]
+			#p cmc
+		end
 
 		curResponse = curResponse[curResponse.index('<u><b>Printings:</b></u><br>')..-1]
 		curResponse = curResponse[curResponse.index('<b>#')..-1]
