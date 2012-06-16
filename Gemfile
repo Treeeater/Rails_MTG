@@ -14,6 +14,7 @@ gem 'eventmachine', ">= 1.0.0.beta.4", "<= 1.0.0.beta.4.1"
 gem 'em-websocket-server'
 gem 'em-websocket'
 gem 'activesupport'
+gem 'sqlite3'
 
 # Gems used only for assets and not required
 # in production environments by default.
