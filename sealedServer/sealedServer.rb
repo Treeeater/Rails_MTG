@@ -4,6 +4,7 @@ require 'active_support'
 require 'eventmachine'
 require 'em-websocket'
 require 'json'
+require './sealedServer/selectCards.rb'
 
 class Game
 	attr_accessor :users, :wsID_userHash, :wsID_wsHash
@@ -38,8 +39,17 @@ class Game
 		return i
 	end
 
-	def dispatchPacks()
+	def dispatchPacks(packNumber)
 		puts "dispatching packs..."
+		totalCards = Array.new
+		i = 0
+		while (i<packNumber)
+			i+=1
+			cards = pickCards("AVR")
+			totalCards += cards
+		end
+		p totalCards
+		return totalCards
 	end
 end
 
@@ -136,7 +146,7 @@ EventMachine.run {
 					else
 						$game.users[msgUID].packReadyStatus = true
 						if ($game.users.values[0].packReadyStatus && $game.users.values[1].packReadyStatus)
-							$game.dispatchPacks()
+							$game.dispatchPacks(6)
 						else
 							response = ResponseMessage.new("info",msgUsername,msgUID,"Your 'pack ready' status has been set to ready, waiting for your opponent now...")
 							response.send(ws)

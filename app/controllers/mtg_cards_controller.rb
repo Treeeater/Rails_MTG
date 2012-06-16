@@ -1,6 +1,8 @@
 class MtgCardsController < ApplicationController
   # GET /mtg_cards
   # GET /mtg_cards.json
+  before_filter :admin_user
+  
   def index
     @mtg_cards = MtgCard.all
 
@@ -79,5 +81,10 @@ class MtgCardsController < ApplicationController
       format.html { redirect_to mtg_cards_url }
       format.json { head :no_content }
     end
+  end
+
+private
+  def admin_user
+      redirect_to(root_path) unless admin_user?
   end
 end
