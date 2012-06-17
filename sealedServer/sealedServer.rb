@@ -41,6 +41,7 @@ class Game
 
 	def dispatchPacks(packNumber)
 		puts "dispatching packs..."
+		
 		totalCards = Array.new
 		i = 0
 		while (i<packNumber)
@@ -48,13 +49,21 @@ class Game
 			cards = pickCards("AVR")
 			totalCards += cards
 		end
-		p totalCards
-		return totalCards
+		@users.values[0].cardPool = totalCards
+		
+		totalCards = Array.new
+		i = 0
+		while (i<packNumber)
+			i+=1
+			cards = pickCards("AVR")
+			totalCards += cards
+		end
+		@users.values[1].cardPool = totalCards
 	end
 end
 
 class User
-	attr_accessor :uid, :username, :wsObjectID, :packReadyStatus, :connectionStatus
+	attr_accessor :uid, :username, :wsObjectID, :packReadyStatus, :connectionStatus, :cardPool
 	
 	def initialize(uid,username,wsObjectID)
 		@uid = uid
@@ -62,6 +71,7 @@ class User
 		@wsObjectID = wsObjectID
 		@packReadyStatus = false
 		@connectionStatus = true
+		@cardPool = Array.new
 	end
 end
 
@@ -146,7 +156,17 @@ EventMachine.run {
 					else
 						$game.users[msgUID].packReadyStatus = true
 						if ($game.users.values[0].packReadyStatus && $game.users.values[1].packReadyStatus)
-							$game.dispatchPacks(6)
+							$game.dispatchPacks(2)
+							puts "Packs distributed..."
+							$game.wsID_wsHash.each_key{|wsid|
+								p "sending these cards to player " + $game.wsID_userHash[wsid].username
+								toSend = Array.new
+								$game.wsID_userHash[wsid].cardPool.each{|c|
+									toSend.push(c.to_hash)
+								}
+								response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
+								response.send($game.wsID_wsHash[wsid])
+							}
 						else
 							response = ResponseMessage.new("info",msgUsername,msgUID,"Your 'pack ready' status has been set to ready, waiting for your opponent now...")
 							response.send(ws)

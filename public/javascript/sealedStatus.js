@@ -119,6 +119,8 @@ function start(){
 				log('Error : ' + msg.body + '\n\n');
 			case "info":
 				log('Info : ' + msg.body + '\n\n');
+			case "cards":
+				cards = JSON.parse(msg.body);
 			default:
 		}
 	}

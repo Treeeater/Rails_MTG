@@ -18,7 +18,8 @@ class Card
 		@expansion = exp
 	end
 	
-	def to_s()
-		@idInSet.to_s
+	def to_hash()
+		return {"idInSet" => @idInSet, "cardName" => @cardName, "cardType" => @cardType, "engSRC" => @engSRC, "chiSRC" => @chiSRC, "power" => @power, "toughness" => @toughness, "color" => @color, "cmc" => @cmc, "level" => @level, "rarity" => @rarity, "expansion" => @expansion}
 	end
+	
 end
