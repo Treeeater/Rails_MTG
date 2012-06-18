@@ -1,3 +1,17 @@
+Card = function(uid,card){
+	this.uid = uid;
+	this.card = card;
+	this.displayOrder = 0;
+};
+
+cards = new Array();
+sbCards = new Array();
+mbCards = new Array();
+displayOrderArray = new Array();
+sbDisplayOrderArray = new Array();
+mbDisplayOrderArray = new Array();
+gotpacks = false;
+
 function start(){
 	//var ws = 0;				//uncomment this line in production.
 	var myUsername = $('#account').attr('uname');
@@ -14,7 +28,7 @@ function start(){
 		this.body = body;
 	}
 
-	function log(s)
+	log = function (s)
 	{
 		$('#statusbox').val($('#statusbox').val() + s);
 	}
@@ -56,6 +70,7 @@ function start(){
 			return false;
 		}
 		//both players ready.
+		if (gotpacks) {log("Sorry man, you already got your packs, hitting me doesn't give you extra cards!\n\n");return;};
 		var msg = new Message("initPacks",myUsername,myUID,"");
 		ws.send(JSON.stringify(msg));
 	}
@@ -120,7 +135,17 @@ function start(){
 			case "info":
 				log('Info : ' + msg.body + '\n\n');
 			case "cards":
-				cards = JSON.parse(msg.body);
+				var c = JSON.parse(msg.body);
+				var i = 0;
+				//global var 'cards' holding all cards
+				for (i = 0; i<c.length; i++)
+				{
+					var card = new Card(i,c[i]);
+					cards.push(card);
+				}
+				gotpacks = true;
+				log('Info : packs received, rendering card images...\n\n');
+				initCardDisplay();		//hand control over to sealedUI.js
 			default:
 		}
 	}

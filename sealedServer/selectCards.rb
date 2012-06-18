@@ -70,7 +70,7 @@ def pickCards(exp, mythicThreshold = 2, foilThreshold = 1)
 		card = Card.new(cardArray[1],cardArray[2],cardArray[3],cardArray[4],cardArray[5],cardArray[6],cardArray[7],cardArray[8],cardArray[9],cardArray[10],cardArray[11],cardArray[12])
 		returnArray.push(card)
 	}
-	
+	p returnArray
 	return returnArray
 	
 	rescue SQLite3::Exception => e
@@ -82,4 +82,3 @@ def pickCards(exp, mythicThreshold = 2, foilThreshold = 1)
 	end
 
 end
-

@@ -7,7 +7,7 @@ require 'json'
 require './sealedServer/selectCards.rb'
 
 class Game
-	attr_accessor :users, :wsID_userHash, :wsID_wsHash
+	attr_accessor :users, :wsID_userHash, :wsID_wsHash, :distributedPacks
 	
 	def userDelete(uID,wsID)
 		@users.delete(leavingUID)
@@ -26,7 +26,7 @@ class Game
 		@users[uID].connectionStatus = true
 		@users[uID].wsObjectID = ws.object_id
 		@wsID_userHash[ws.object_id] = @users[uID]
-		@wsID_wsHash[uID] = ws
+		@wsID_wsHash[ws.object_id] = ws
 	end
 	
 	def connectedUserNumber()
@@ -101,6 +101,7 @@ EventMachine.run {
 	$game.users = Hash.new
 	$game.wsID_userHash = Hash.new
 	$game.wsID_wsHash = Hash.new
+	$game.distributedPacks = false
 
 	puts "WebSocket server opened at localhost on port " + (12341+ARGV[0].to_i).to_s + "!"
 	
@@ -122,6 +123,7 @@ EventMachine.run {
 			else
 				response = ResponseMessage.new("disconnect",leavingUsername,leavingUID,"")
 				#wsToSend = (wsID_wsHash.values[0] == ws) ? wsID_wsHash.values[1] : wsID_wsHash.values[0]
+				#p $game.wsID_wsHash.keys
 				response.send($game.wsID_wsHash.values[0])
 			end
 		}
@@ -149,27 +151,39 @@ EventMachine.run {
 					$game.wsID_wsHash.each_value{|w|
 						response.send(w)
 					}
-				when "initPacks"
-					if ($game.connectedUserNumber()!=2)
-						response = ResponseMessage.new("error",msgUsername,msgUID,"Please wait until both players are connected and try again.")
+					if ($game.distributedPacks)
+						#this player disconnected after the packs are already distributed, let's re-setup him.
+						toSend = Array.new
+						$game.users[msgUID].cardPool.each{|c|
+							toSend.push(c.to_hash)
+						}
+						response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
 						response.send(ws)
-					else
-						$game.users[msgUID].packReadyStatus = true
-						if ($game.users.values[0].packReadyStatus && $game.users.values[1].packReadyStatus)
-							$game.dispatchPacks(2)
-							puts "Packs distributed..."
-							$game.wsID_wsHash.each_key{|wsid|
-								p "sending these cards to player " + $game.wsID_userHash[wsid].username
-								toSend = Array.new
-								$game.wsID_userHash[wsid].cardPool.each{|c|
-									toSend.push(c.to_hash)
-								}
-								response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
-								response.send($game.wsID_wsHash[wsid])
-							}
-						else
-							response = ResponseMessage.new("info",msgUsername,msgUID,"Your 'pack ready' status has been set to ready, waiting for your opponent now...")
+					end
+				when "initPacks"
+					if (!$game.distributedPacks)
+						if ($game.connectedUserNumber()!=2)
+							response = ResponseMessage.new("error",msgUsername,msgUID,"Please wait until both players are connected and try again.")
 							response.send(ws)
+						else
+							$game.users[msgUID].packReadyStatus = true
+							if ($game.users.values[0].packReadyStatus && $game.users.values[1].packReadyStatus)
+								$game.distributedPacks = true
+								$game.dispatchPacks(6)
+								puts "Packs distributed..."
+								$game.wsID_wsHash.each_key{|wsid|
+									p "sending these cards to player " + $game.wsID_userHash[wsid].username
+									toSend = Array.new
+									$game.wsID_userHash[wsid].cardPool.each{|c|
+										toSend.push(c.to_hash)
+									}
+									response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
+									response.send($game.wsID_wsHash[wsid])
+								}
+							else
+								response = ResponseMessage.new("info",msgUsername,msgUID,"Your 'pack ready' status has been set to ready, waiting for your opponent now...")
+								response.send(ws)
+							end
 						end
 					end
 				else
