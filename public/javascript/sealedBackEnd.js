@@ -8,8 +8,8 @@ cards = new Array();
 sbCards = new Array();
 mbCards = new Array();
 displayOrderArray = new Array();
-sbDisplayOrderArray = new Array();
-mbDisplayOrderArray = new Array();
+//sbDisplayOrderArray = new Array();
+//mbDisplayOrderArray = new Array();
 gotpacks = false;
 
 function start(){
@@ -143,6 +143,7 @@ function start(){
 					var card = new Card(i,c[i]);
 					cards.push(card);
 				}
+				totalCardNumber = cards.length;
 				gotpacks = true;
 				log('Info : packs received, rendering card images...\n\n');
 				initCardDisplay();		//hand control over to sealedUI.js

@@ -45,7 +45,7 @@ function loadFixedFrames() {
 	  height: 900
 	});
 	layer = new Kinetic.Layer();
-	
+	cardLayer = new Kinetic.Layer();
 	//draw section division lines
 	var blueLine = new Kinetic.Line({
 	  points: [240, 360, 1280, 360],
@@ -136,7 +136,8 @@ function loadFixedFrames() {
 			id: "tooltip"
 		});
 		layer.add(imageTooltip);
-		testAndDraw();
+		imageTooltip.setZIndex(99999);
+		layer.draw();
 	}
 	//five colors
 	plains=0,island=0,swamp=0,mountain=0,forest=0;
@@ -304,18 +305,21 @@ function loadFixedFrames() {
 	
 	//finalize
 	stage.add(timerLayer);
+	stage.add(cardLayer);
 	stage.add(layer);
 	document.getElementById('container').firstChild.children[3].oncontextmenu = function() {
 		return false;
 	}
 };
-function sortByColor()
+
+function sortSBByColor()
 {
 	var i;
 	var w=u=b=r=g=a=0;
+	sbDisplayOrderArray = new Array();
 	//get the total number of wubrgas
-	for (i in cards){
-		switch (cards[i].card.color){
+	for (i in sbCards){
+		switch (sbCards[i].card.color){
 			case 16:
 				w++;
 				break;
@@ -345,61 +349,135 @@ function sortByColor()
 	a+=g;
 	//assign the order
 	z = 0;
-	for (i in cards){
-		switch (cards[i].card.color){
+	for (i in sbCards){
+		switch (sbCards[i].card.color){
 			case 16:
-				cards[i].displayOrder = z;
-				displayOrderArray[z] = i;
+				sbCards[i].displayOrder = z;
+				sbDisplayOrderArray[z] = i;
 				z++;
 				break;
 			case 8:
-				cards[i].displayOrder = w;
-				displayOrderArray[w] = i;
+				sbCards[i].displayOrder = w;
+				sbDisplayOrderArray[w] = i;
 				w++;
 				break;
 			case 4:
-				cards[i].displayOrder = u;
-				displayOrderArray[u] = i;
+				sbCards[i].displayOrder = u;
+				sbDisplayOrderArray[u] = i;
 				u++;
 				break;
 			case 2:
-				cards[i].displayOrder = b;
-				displayOrderArray[b] = i;
+				sbCards[i].displayOrder = b;
+				sbDisplayOrderArray[b] = i;
 				b++;
 				break;
 			case 1:
-				cards[i].displayOrder = r;
-				displayOrderArray[r] = i;
+				sbCards[i].displayOrder = r;
+				sbDisplayOrderArray[r] = i;
 				r++;
 				break;
 			case 0:
-				cards[i].displayOrder = g;
-				displayOrderArray[g] = i;
+				sbCards[i].displayOrder = g;
+				sbDisplayOrderArray[g] = i;
 				g++;
 				break;
 			default:
-				cards[i].displayOrder = a;
-				displayOrderArray[a] = i;
+				sbCards[i].displayOrder = a;
+				sbDisplayOrderArray[a] = i;
 				a++;
 		}
 	}
-	loadAllCards();
 }
-function redrawAllCards()
+
+function sortMBByColor()
 {
-};
+	var i;
+	var w=u=b=r=g=a=0;
+	mbDisplayOrderArray = new Array();
+	//get the total number of wubrgas
+	for (i in mbCards){
+		switch (mbCards[i].card.color){
+			case 16:
+				w++;
+				break;
+			case 8:
+				u++;
+				break;
+			case 4:
+				b++;
+				break;
+			case 2:
+				r++;
+				break;
+			case 1:
+				g++;
+				break;
+			case 0:
+				a++;
+				break;
+			default:
+		}
+	}
+	//accumulate
+	u+=w;
+	b+=u;
+	r+=b;
+	g+=r;
+	a+=g;
+	//assign the order
+	z = 0;
+	for (i in mbCards){
+		switch (mbCards[i].card.color){
+			case 16:
+				mbCards[i].displayOrder = z;
+				mbDisplayOrderArray[z] = i;
+				z++;
+				break;
+			case 8:
+				mbCards[i].displayOrder = w;
+				mbDisplayOrderArray[w] = i;
+				w++;
+				break;
+			case 4:
+				mbCards[i].displayOrder = u;
+				mbDisplayOrderArray[u] = i;
+				u++;
+				break;
+			case 2:
+				mbCards[i].displayOrder = b;
+				mbDisplayOrderArray[b] = i;
+				b++;
+				break;
+			case 1:
+				mbCards[i].displayOrder = r;
+				mbDisplayOrderArray[r] = i;
+				r++;
+				break;
+			case 0:
+				mbCards[i].displayOrder = g;
+				mbDisplayOrderArray[g] = i;
+				g++;
+				break;
+			default:
+				mbCards[i].displayOrder = a;
+				mbDisplayOrderArray[a] = i;
+				a++;
+		}
+	}
+}
 
 function loadAllCards()
 {
+	//load sb first.
 	var startX = 250;
 	var startY = 370;
-	var i;
+	var i,d;
 	cardsLoaded = 0;
-	for (d in displayOrderArray)
+	for (d in sbDisplayOrderArray)
 	{
-		i = displayOrderArray[d];
+		i = sbDisplayOrderArray[d];
 		(function (X,Y,I){
-			var displayOrder = cards[I].displayOrder;
+			var displayOrder = sbCards[I].displayOrder;
 			var imageObj = new Image();
 			imageObj.onload = function() {
 				var image = new Kinetic.Image({
@@ -415,12 +493,15 @@ function loadAllCards()
 						right: 1160,
 						bottom: 730
 					},
-					id: "card"+cards[I].uid.toString()
+					id: "card"+sbCards[I].uid.toString()
 				});
+				image.cuid = sbCards[I].uid;
+				image.cname = sbCards[I].card.cardName;
 				image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
 				image.on("mousedown",function(evt){
-					console.log('downed '+evt.cancelable);
+					console.log('downed');
 					if (evt.which==1) {
+						curMouseDownCardUID = image.cuid;		//global var
 						downLayer = image.getZIndex();
 						image.moveToTop();
 					}
@@ -444,9 +525,9 @@ function loadAllCards()
 					return false;
 				});
 				image.on("mouseup",function(evt){
-					console.log('uped '+evt.cancelable);
+					console.log('uped');
 					if (evt.which==1){
-						image.setZIndex(downLayer);
+						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
 					}
 					if (evt.which==2){
 						evt.stopPropagation();
@@ -458,7 +539,7 @@ function loadAllCards()
 					return false;
 				});
 				image.on('click', function(evt) {
-					console.log('clicked '+evt.cancelable);
+					console.log('clicked');
 					if (evt.which==3){
 						evt.stopPropagation();
 						evt.preventDefault(evt);
@@ -470,31 +551,358 @@ function loadAllCards()
 					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
 					//console.log(evt.which);
 				});
-				layer.add(image);
+				image.on('dblclick', function(evt) {
+					console.log('dblclicked');
+					if (evt.which==1){
+						evt.stopPropagation();
+						evt.preventDefault(evt);
+						evt.cancelBubble = true;
+						cardToMB(image.cuid,image);
+						cardLayer.draw();
+					}
+					return false;
+					//var evt = window.event;
+					//evt.stopPropagation()
+					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
+					//console.log(evt.which);
+				});
+				cardLayer.add(image);
 				cardsLoaded++;
-				if (cardsLoaded == cards.length) reLayerCards();
+				if (cardsLoaded == totalCardNumber) reLayerCards();
 			}
-			imageObj.src = cards[I].card.engSRC;
+			imageObj.src = sbCards[I].card.engSRC;
 		})(startX,startY,i);
-		/*curY+=20;
-		if (curY>550)
-		{
-			curY = 370;
-			curX += 130;
-		}*/
+	}
+	
+	//load mb second.
+	startX = 250;
+	startY = 5;
+	for (d in mbDisplayOrderArray)
+	{
+		i = mbDisplayOrderArray[d];
+		(function (X,Y,I){
+			var displayOrder = mbCards[I].displayOrder;
+			var imageObj = new Image();
+			imageObj.onload = function() {
+				var image = new Kinetic.Image({
+					x: X + Math.floor(displayOrder/11) * 128,
+					y: Y + (displayOrder%11) * 18,
+					image: imageObj,
+					width: 120,
+					height: 160,
+					draggable: true,
+					dragBounds: {
+						top: 5,
+						left: 250,
+						right: 1160,
+						bottom: 200
+					},
+					id: "card"+mbCards[I].uid.toString()
+				});
+				image.cuid = mbCards[I].uid;
+				image.cname = mbCards[I].card.cardName;
+				image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
+				image.on("mousedown",function(evt){
+					console.log('downed');
+					if (evt.which==1) {
+						curMouseDownCardUID = image.cuid;		//global var
+						downLayer = image.getZIndex();
+						image.moveToTop();
+					}
+					if (evt.which==2)
+					{
+						evt.stopPropagation();
+						evt.preventDefault(evt);
+						evt.cancelBubble = true;
+						var imageTooltip = stage.get("#tooltip")[0];
+						var p = image.getPosition();
+						if (p.x<1000){
+							imageTooltip.setX(p.x+130);
+						}
+						else {imageTooltip.setX(p.x-250)};
+						imageTooltip.setY(p.y);
+						imageTooltip.setImage(imageObj);
+						imageTooltip.show();
+						imageTooltip.moveToTop();
+						layer.draw();
+					}
+					return false;
+				});
+				image.on("mouseup",function(evt){
+					console.log('uped');
+					if (evt.which==1){
+						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+					}
+					if (evt.which==2){
+						evt.stopPropagation();
+						evt.preventDefault(evt);
+						evt.cancelBubble = true;
+						stage.get("#tooltip")[0].hide();
+					}
+					layer.draw();
+					return false;
+				});
+				image.on('click', function(evt) {
+					console.log('clicked');
+					if (evt.which==3){
+						evt.stopPropagation();
+						evt.preventDefault(evt);
+						evt.cancelBubble = true;
+					}
+					return false;
+					//var evt = window.event;
+					//evt.stopPropagation()
+					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
+					//console.log(evt.which);
+				});
+				image.on('dblclick', function(evt) {
+					console.log('dblclicked');
+					if (evt.which==1){
+						evt.stopPropagation();
+						evt.preventDefault(evt);
+						evt.cancelBubble = true;
+						cardToSB(image.cuid,image);
+						cardLayer.draw();
+					}
+					return false;
+					//var evt = window.event;
+					//evt.stopPropagation()
+					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
+					//console.log(evt.which);
+				});
+				cardLayer.add(image);
+				cardsLoaded++;
+				if (cardsLoaded == totalCardNumber) reLayerCards();
+			}
+			imageObj.src = mbCards[I].card.engSRC;
+		})(startX,startY,i);
 	}
 };
 
+function cardToMB(cuid,oldimage)
+{
+	cardLayer.remove(oldimage);		//visually remove this one.
+	//back end representation move
+	for (i in sbCards)
+	{
+		if (sbCards[i].uid == cuid) break;
+	}
+	thisCard = sbCards[i];
+	mbCards.push(thisCard);
+	sbCards.splice(i,1);
+	//visually add this image to MB
+	var imageObj = new Image();
+	X = 250;
+	Y = 5;
+	imageObj.onload = function() {
+		var image = new Kinetic.Image({
+			x: X + Math.floor(mbCards.length/11) * 128,
+			y: Y + (mbCards.length%11) * 18,
+			image: imageObj,
+			width: 120,
+			height: 160,
+			draggable: true,
+			dragBounds: {
+				top: 5,
+				left: 250,
+				right: 1160,
+				bottom: 200
+			},
+			id: "card"+cuid.toString()
+		});
+		image.cuid = cuid;
+		image.cname = thisCard.card.cardName;
+		image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
+		image.on("mousedown",function(evt){
+			console.log('downed');
+			if (evt.which==1) {
+				curMouseDownCardUID = image.cuid;		//global var
+				downLayer = image.getZIndex();
+				image.moveToTop();
+			}
+			if (evt.which==2)
+			{
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+				var imageTooltip = stage.get("#tooltip")[0];
+				var p = image.getPosition();
+				if (p.x<1000){
+					imageTooltip.setX(p.x+130);
+				}
+				else {imageTooltip.setX(p.x-250)};
+				imageTooltip.setY(p.y);
+				imageTooltip.setImage(imageObj);
+				imageTooltip.show();
+				imageTooltip.moveToTop();
+				layer.draw();
+			}
+			return false;
+		});
+		image.on("mouseup",function(evt){
+			console.log('uped');
+			if (evt.which==1){
+				if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+			}
+			if (evt.which==2){
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+				stage.get("#tooltip")[0].hide();
+			}
+			layer.draw();
+			return false;
+		});
+		image.on('click', function(evt) {
+			console.log('clicked');
+			if (evt.which==3){
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+			}
+			return false;
+		});
+		image.on('dblclick', function(evt) {
+			console.log('dblclicked');
+			if (evt.which==1){
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+				cardToSB(image.cuid,image);
+				cardLayer.draw();
+			}
+			return false;
+		});
+		cardLayer.add(image);
+		cardLayer.draw();
+	}
+	imageObj.src = thisCard.card.engSRC;
+}
+
+function cardToSB(cuid,oldimage)
+{
+	cardLayer.remove(oldimage);		//visually remove this one.
+	//back end representation move
+	for (i in mbCards)
+	{
+		if (mbCards[i].uid == cuid) break;
+	}
+	thisCard = mbCards[i];
+	sbCards.push(thisCard);
+	mbCards.splice(i,1);
+	//visually add this image to MB
+	var imageObj = new Image();
+	X = 250;
+	Y = 370;
+	imageObj.onload = function() {
+		var image = new Kinetic.Image({
+			x: X + Math.floor(sbCards.length/11) * 128,
+			y: Y + (sbCards.length%11) * 18,
+			image: imageObj,
+			width: 120,
+			height: 160,
+			draggable: true,
+			dragBounds: {
+				top: 370,
+				left: 250,
+				right: 1160,
+				bottom: 730
+			},
+			id: "card"+cuid.toString()
+		});
+		image.cuid = cuid;
+		image.cname = thisCard.card.cardName;
+		image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
+		image.on("mousedown",function(evt){
+			console.log('downed');
+			if (evt.which==1) {
+				curMouseDownCardUID = image.cuid;		//global var
+				downLayer = image.getZIndex();
+				image.moveToTop();
+			}
+			if (evt.which==2)
+			{
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+				var imageTooltip = stage.get("#tooltip")[0];
+				var p = image.getPosition();
+				if (p.x<1000){
+					imageTooltip.setX(p.x+130);
+				}
+				else {imageTooltip.setX(p.x-250)};
+				imageTooltip.setY(p.y);
+				imageTooltip.setImage(imageObj);
+				imageTooltip.show();
+				imageTooltip.moveToTop();
+				layer.draw();
+			}
+			return false;
+		});
+		image.on("mouseup",function(evt){
+			console.log('uped');
+			if (evt.which==1){
+				if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+			}
+			if (evt.which==2){
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+				stage.get("#tooltip")[0].hide();
+			}
+			layer.draw();
+			return false;
+		});
+		image.on('click', function(evt) {
+			console.log('clicked');
+			if (evt.which==3){
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+			}
+			return false;
+		});
+		image.on('dblclick', function(evt) {
+			console.log('dblclicked');
+			if (evt.which==1){
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+				cardToMB(image.cuid,image);
+				cardLayer.draw();
+			}
+			return false;
+		});
+		cardLayer.add(image);
+		cardLayer.draw();
+	}
+	imageObj.src = thisCard.card.engSRC;
+}
+
 function reLayerCards()
 {
-	for (d in displayOrderArray)
+	for (d in sbDisplayOrderArray)
 	{
-		i = displayOrderArray[d];
-		stage.get("#card"+cards[i].uid.toString())[0].setZIndex( cards[i].displayOrder % 11 );
+		i = sbDisplayOrderArray[d];
+		stage.get("#card"+sbCards[i].uid.toString())[0].setZIndex( sbCards[i].displayOrder % 11 );
 	}
-	layer.draw();
+	for (d in mbDisplayOrderArray)
+	{
+		i = mbDisplayOrderArray[d];
+		stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( mbCards[i].displayOrder % 11 + 1000);
+	}
+	cardLayer.draw();
 	log('Info : All cards rendered. Please build your deck before the time runs out.\n\n');
 }
+
+function sortByColor()
+{
+	sortSBByColor();
+	sortMBByColor();
+	cardLayer.removeChildren();
+	loadAllCards();
+};
+
 //call this function upon receiving of cards
 function initCardDisplay()
 {
