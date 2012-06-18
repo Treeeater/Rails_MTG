@@ -535,6 +535,7 @@ function loadAllCards()
 						evt.cancelBubble = true;
 						stage.get("#tooltip")[0].hide();
 					}
+					cardLayer.draw();
 					layer.draw();
 					return false;
 				});
@@ -640,6 +641,7 @@ function loadAllCards()
 						stage.get("#tooltip")[0].hide();
 					}
 					layer.draw();
+					cardLayer.draw();
 					return false;
 				});
 				image.on('click', function(evt) {
@@ -751,6 +753,7 @@ function cardToMB(cuid,oldimage)
 				stage.get("#tooltip")[0].hide();
 			}
 			layer.draw();
+			cardLayer.draw();
 			return false;
 		});
 		image.on('click', function(evt) {
@@ -851,6 +854,7 @@ function cardToSB(cuid,oldimage)
 				stage.get("#tooltip")[0].hide();
 			}
 			layer.draw();
+			cardLayer.draw();
 			return false;
 		});
 		image.on('click', function(evt) {
