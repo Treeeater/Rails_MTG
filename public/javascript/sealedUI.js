@@ -260,8 +260,7 @@ function loadFixedFrames() {
 	});
 	buttonSortCMC.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortCMC.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonSortCMC.on("click",function(){alert("CMC sort not implemented!")//sortByCMC;
-	});
+	buttonSortCMC.on("click",sortByCMC);//sortByCMC;
 	layer.add(buttonSortCMC);
 	var buttonSortCMCText = new Kinetic.Text({
 	  x: 170,
@@ -311,6 +310,64 @@ function loadFixedFrames() {
 		return false;
 	}
 };
+
+function sortSBByCMC()
+{
+	var c = new Array();
+	var i=0;
+	for (i = 0; i < 30; i++) c[i] = 0;
+	sbDisplayOrderArray = new Array();
+	for (i in sbCards){
+		c[sbCards[i].card.cmc] ++;
+	}
+	for (i in c)
+	{
+		if (i!=0) c[i]+=c[i-1];
+	}
+	c0 = 0;
+	for (i in sbCards)
+	{
+		if (sbCards[i].card.cmc==0) {
+			sbCards[i].displayOrder = c0;
+			sbDisplayOrderArray[c0] = i;
+			c0++;
+		}
+		else {
+			sbCards[i].displayOrder = c[sbCards[i].card.cmc-1];
+			sbDisplayOrderArray[c[sbCards[i].card.cmc-1]] = i;
+			c[sbCards[i].card.cmc-1]++;
+		}
+	}
+}
+
+function sortMBByCMC()
+{
+	var c = new Array();
+	var i=0;
+	for (i = 0; i < 30; i++) c[i] = 0;
+	mbDisplayOrderArray = new Array();
+	for (i in mbCards){
+		c[mbCards[i].card.cmc] ++;
+	}
+	for (i in c)
+	{
+		if (i!=0) c[i]+=c[i-1];
+	}
+	c0 = 0;
+	for (i in mbCards)
+	{
+		if (mbCards[i].card.cmc==0) {
+			mbCards[i].displayOrder = c0;
+			mbDisplayOrderArray[c0] = i;
+			c0++;
+		}
+		else {
+			mbCards[i].displayOrder = c[mbCards[i].card.cmc-1];
+			mbDisplayOrderArray[c[mbCards[i].card.cmc-1]] = i;
+			c[mbCards[i].card.cmc-1]++;
+		}
+	}
+}
 
 function sortSBByColor()
 {
@@ -896,7 +953,6 @@ function reLayerCards()
 		stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( mbCards[i].displayOrder % 11 + 1000);
 	}
 	cardLayer.draw();
-	log('Info : All cards rendered. Please build your deck before the time runs out.\n\n');
 }
 
 function sortByColor()
@@ -907,11 +963,21 @@ function sortByColor()
 	loadAllCards();
 };
 
+
+function sortByCMC()
+{
+	sortSBByCMC();
+	sortMBByCMC();
+	cardLayer.removeChildren();
+	loadAllCards();
+};
+
 //call this function upon receiving of cards
 function initCardDisplay()
 {
 	//init
 	sbCards = cards;
 	sortByColor();
+	log('Info : All cards rendered. Please build your deck before the time runs out.\n\n');
 };
 window.addEventListener("load",loadFixedFrames);
