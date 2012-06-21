@@ -1,5 +1,7 @@
 //helpers:
 var landsVisual = {"plains":515,"island":555,"swamp":595,"mountain":635,"forest":675};
+var middleMouseDown = false;
+var originalTipImage = null;
 var addLands = function(l){
 	var number = prompt("How many " + l + " do you want?");
 	window[l] = number;
@@ -554,9 +556,38 @@ function loadAllCards()
 				});
 				image.cuid = sbCards[I].uid;
 				image.cname = sbCards[I].card.cardName;
-				image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
+				image.on("mouseover",function(){
+					stage.get("#detailed")[0].setImage(imageObj);layer.draw();
+					if (middleMouseDown)
+					{
+						var imageTooltip = stage.get("#tooltip")[0];
+						var p = image.getPosition();
+						if (p.x<1000){
+							imageTooltip.setX(p.x+130);
+						}
+						else {imageTooltip.setX(p.x-250)};
+						imageTooltip.setY(p.y);
+						imageTooltip.setImage(imageObj);
+						imageTooltip.show();
+						layer.draw();
+						cardLayer.draw();
+					}
+				});
+
+				image.on("mouseout",function(evt){
+					if (evt.which == 2){
+						evt.stopPropagation();
+						evt.preventDefault(evt);
+						evt.cancelBubble = true;
+						stage.get("#tooltip")[0].hide();
+						if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+						cardLayer.draw();
+						layer.draw();
+					}
+				});
+
 				image.on("mousedown",function(evt){
-					console.log('downed');
+					//console.log('downed');
 					if (evt.which==1) {
 						curMouseDownCardUID = image.cuid;		//global var
 						downLayer = image.getZIndex();
@@ -567,6 +598,9 @@ function loadAllCards()
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
+						image.setDraggable(false);
+						middleMouseDown = true;				//this is used in mouseover event.
+						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
 						var p = image.getPosition();
 						if (p.x<1000){
@@ -582,7 +616,7 @@ function loadAllCards()
 					return false;
 				});
 				image.on("mouseup",function(evt){
-					console.log('uped');
+					//console.log('uped');
 					if (evt.which==1){
 						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
 					}
@@ -591,13 +625,15 @@ function loadAllCards()
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
 						stage.get("#tooltip")[0].hide();
+						originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+						middleMouseDown = false;
 					}
 					cardLayer.draw();
 					layer.draw();
 					return false;
 				});
 				image.on('click', function(evt) {
-					console.log('clicked');
+					//console.log('clicked');
 					if (evt.which==3){
 						evt.stopPropagation();
 						evt.preventDefault(evt);
@@ -610,7 +646,7 @@ function loadAllCards()
 					//console.log(evt.which);
 				});
 				image.on('dblclick', function(evt) {
-					console.log('dblclicked');
+					//console.log('dblclicked');
 					if (evt.which==1){
 						evt.stopPropagation();
 						evt.preventDefault(evt);
@@ -661,7 +697,7 @@ function loadAllCards()
 				image.cname = mbCards[I].card.cardName;
 				image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
 				image.on("mousedown",function(evt){
-					console.log('downed');
+					//console.log('downed');
 					if (evt.which==1) {
 						curMouseDownCardUID = image.cuid;		//global var
 						downLayer = image.getZIndex();
@@ -687,7 +723,7 @@ function loadAllCards()
 					return false;
 				});
 				image.on("mouseup",function(evt){
-					console.log('uped');
+					//console.log('uped');
 					if (evt.which==1){
 						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
 					}
@@ -702,7 +738,7 @@ function loadAllCards()
 					return false;
 				});
 				image.on('click', function(evt) {
-					console.log('clicked');
+					//console.log('clicked');
 					if (evt.which==3){
 						evt.stopPropagation();
 						evt.preventDefault(evt);
@@ -715,7 +751,7 @@ function loadAllCards()
 					//console.log(evt.which);
 				});
 				image.on('dblclick', function(evt) {
-					console.log('dblclicked');
+					//console.log('dblclicked');
 					if (evt.which==1){
 						evt.stopPropagation();
 						evt.preventDefault(evt);
@@ -773,7 +809,7 @@ function cardToMB(cuid,oldimage)
 		image.cname = thisCard.card.cardName;
 		image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
 		image.on("mousedown",function(evt){
-			console.log('downed');
+			//console.log('downed');
 			if (evt.which==1) {
 				curMouseDownCardUID = image.cuid;		//global var
 				downLayer = image.getZIndex();
@@ -799,7 +835,7 @@ function cardToMB(cuid,oldimage)
 			return false;
 		});
 		image.on("mouseup",function(evt){
-			console.log('uped');
+			//console.log('uped');
 			if (evt.which==1){
 				if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
 			}
@@ -814,7 +850,7 @@ function cardToMB(cuid,oldimage)
 			return false;
 		});
 		image.on('click', function(evt) {
-			console.log('clicked');
+			//console.log('clicked');
 			if (evt.which==3){
 				evt.stopPropagation();
 				evt.preventDefault(evt);
@@ -823,7 +859,7 @@ function cardToMB(cuid,oldimage)
 			return false;
 		});
 		image.on('dblclick', function(evt) {
-			console.log('dblclicked');
+			//console.log('dblclicked');
 			if (evt.which==1){
 				evt.stopPropagation();
 				evt.preventDefault(evt);
@@ -874,7 +910,7 @@ function cardToSB(cuid,oldimage)
 		image.cname = thisCard.card.cardName;
 		image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
 		image.on("mousedown",function(evt){
-			console.log('downed');
+			//console.log('downed');
 			if (evt.which==1) {
 				curMouseDownCardUID = image.cuid;		//global var
 				downLayer = image.getZIndex();
@@ -900,7 +936,7 @@ function cardToSB(cuid,oldimage)
 			return false;
 		});
 		image.on("mouseup",function(evt){
-			console.log('uped');
+			//console.log('uped');
 			if (evt.which==1){
 				if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
 			}
@@ -915,7 +951,7 @@ function cardToSB(cuid,oldimage)
 			return false;
 		});
 		image.on('click', function(evt) {
-			console.log('clicked');
+			//console.log('clicked');
 			if (evt.which==3){
 				evt.stopPropagation();
 				evt.preventDefault(evt);
@@ -924,7 +960,7 @@ function cardToSB(cuid,oldimage)
 			return false;
 		});
 		image.on('dblclick', function(evt) {
-			console.log('dblclicked');
+			//console.log('dblclicked');
 			if (evt.which==1){
 				evt.stopPropagation();
 				evt.preventDefault(evt);
