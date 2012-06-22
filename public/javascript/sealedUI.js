@@ -8,9 +8,9 @@ var addLands = function(l){
 	if (stage.get("#"+l+"Number").length==0)
 	{
 		var landText = new Kinetic.Text({
-		  x: 70,
+		  x: 95,
 		  y: landsVisual[l],
-		  text: number,
+		  text: number + " " + l,
 		  fontSize: 12,
 		  fontFamily: "Calibri",
 		  textFill: "green",
@@ -22,7 +22,7 @@ var addLands = function(l){
 	}
 	else
 	{
-		stage.get("#"+l+"Number")[0].attrs.text=number;
+		stage.get("#"+l+"Number")[0].attrs.text=number + " " + l;
 	}
 	layer.draw();
 };
@@ -81,10 +81,46 @@ function loadFixedFrames() {
 	  lineJoin: "round"
 	});
 	
+	var blueLine5 = new Kinetic.Line({
+	  points: [0, 450, 240, 450],
+	  stroke: "blue",
+	  strokeWidth: 3,
+	  lineCap: "round",
+	  lineJoin: "round"
+	});
+
+	var blueLine6 = new Kinetic.Line({
+	  points: [0, 490, 240, 490],
+	  stroke: "blue",
+	  strokeWidth: 3,
+	  lineCap: "round",
+	  lineJoin: "round"
+	});
+
+	var blueLine7 = new Kinetic.Line({
+	  points: [150, 490, 150, 700],
+	  stroke: "blue",
+	  strokeWidth: 3,
+	  lineCap: "round",
+	  lineJoin: "round"
+	});
+
+	var blueLine8 = new Kinetic.Line({
+	  points: [0, 700, 240, 700],
+	  stroke: "blue",
+	  strokeWidth: 3,
+	  lineCap: "round",
+	  lineJoin: "round"
+	});
+
 	layer.add(blueLine);
 	layer.add(blueLine2);
 	layer.add(blueLine3);
 	layer.add(blueLine4);
+	layer.add(blueLine5);
+	layer.add(blueLine6);
+	layer.add(blueLine7);
+	layer.add(blueLine8);
 	
 	//add timer
 	var timerTitleText = new Kinetic.Text({
@@ -141,8 +177,9 @@ function loadFixedFrames() {
 		imageTooltip.setZIndex(99999);
 		layer.draw();
 	}
-	//five colors
-	plains=0,island=0,swamp=0,mountain=0,forest=0;
+	//
+	//five basic lands
+	plains=island=swamp=mountain=forest=0;
 	var imageObj2 = new Image();
 	imageObj2.onload = function() {
 		var image = new Kinetic.Image({
@@ -225,7 +262,28 @@ function loadFixedFrames() {
 	imageObj5.src = hostServerAddress+"assets/mtg/general/red.png";
 	imageObj6.src = hostServerAddress+"assets/mtg/general/green.png";
 	
+	//cards color count
+
+	var colorsVisual = {"W":515,"U":555,"B":595,"R":635,"G":675};
+	colorCardsNumber = {"W":0,"U":0,"B":0,"R":0,"G":0};
+	for (i in colorsVisual) {
+		if (colorsVisual.hasOwnProperty(i)) {
+			var cardsCountText = new Kinetic.Text({
+				  x: 195,
+				  y: colorsVisual[i],
+				  text: "0 " + i + " cards",
+				  fontSize: 12,
+				  fontFamily: "Calibri",
+				  textFill: "green",
+				  align: "center",
+				  verticalAlign: "middle",
+				  id: i+"Number"
+			});
+			layer.add(cardsCountText);
+		}
+	}
 	//sort buttons
+	//sort by color
 	var buttonSortColor = new Kinetic.Rect({
 	  x: 30,
 	  y: 380,
@@ -251,6 +309,7 @@ function loadFixedFrames() {
 	});
 	layer.add(buttonSortColorText);
 	
+	//sort by cmc
 	var buttonSortCMC = new Kinetic.Rect({
 	  x: 130,
 	  y: 380,
@@ -276,14 +335,41 @@ function loadFixedFrames() {
 	});
 	layer.add(buttonSortCMCText);
 	
+	//sort by rarity
+
+	var buttonSortRarity = new Kinetic.Rect({
+	  x: 30,
+	  y: 410,
+	  width: 80,
+	  height: 20,
+	  fill: "#00D2FF",
+	  stroke: "black",
+	  strokeWidth: 2
+	});
+	buttonSortRarity.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonSortRarity.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonSortRarity.on("click",sortByRarity);//sortByCMC;
+	layer.add(buttonSortRarity);
+	var buttonSortRarityText = new Kinetic.Text({
+	  x: 70,
+	  y: 420,
+	  text: "RaritySort",
+	  fontSize: 12,
+	  fontFamily: "Calibri",
+	  textFill: "black",
+	  align: "center",
+	  verticalAlign: "middle"
+	});
+	layer.add(buttonSortRarityText);
+
 	//add land button
 	
 	var buttonAddLand = new Kinetic.Rect({
-	  x: 40,
+	  x: 130,
 	  y: 410,
-	  width: 160,
+	  width: 80,
 	  height: 20,
-	  fill: "#00D2FF",
+	  fill: "#FFFF00",
 	  stroke: "black",
 	  strokeWidth: 2
 	});
@@ -293,9 +379,9 @@ function loadFixedFrames() {
 	});
 	layer.add(buttonAddLand);
 	var buttonAddLandText = new Kinetic.Text({
-	  x: 120,
+	  x: 170,
 	  y: 420,
-	  text: "Add Basic Lands",
+	  text: "Add Lands",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
 	  textFill: "black",
@@ -304,6 +390,45 @@ function loadFixedFrames() {
 	});
 	layer.add(buttonAddLandText);
 	
+	//card count
+	var cardCountHardCodedText = new Kinetic.Text({
+	  x: 110,
+	  y: 470,
+	  text: "Main board:        Side Board:",
+	  fontSize: 12,
+	  fontFamily: "Calibri",
+	  textFill: "black",
+	  align: "center",
+	  verticalAlign: "middle"
+	});
+	layer.add(cardCountHardCodedText);
+
+	var cardCountMBText = new Kinetic.Text({
+	  x: 110,
+	  y: 470,
+	  text: "",
+	  fontSize: 12,
+	  fontFamily: "Calibri",
+	  textFill: "black",
+	  align: "center",
+	  verticalAlign: "middle",
+	  id: "cardCountMBText"
+	});
+	layer.add(cardCountMBText);
+
+	var cardCountSBText = new Kinetic.Text({
+	  x: 220,
+	  y: 470,
+	  text: "",
+	  fontSize: 12,
+	  fontFamily: "Calibri",
+	  textFill: "black",
+	  align: "center",
+	  verticalAlign: "middle",
+	  id: "cardCountSBText"
+	});
+	layer.add(cardCountSBText);
+
 	//finalize
 	stage.add(timerLayer);
 	stage.add(cardLayer);
@@ -521,6 +646,116 @@ function sortMBByColor()
 				mbCards[i].displayOrder = a;
 				mbDisplayOrderArray[a] = i;
 				a++;
+		}
+	}
+}
+
+function sortSBByRarity()
+{
+	var i;
+	var c=u=r=m=0;
+	sbDisplayOrderArray = new Array();
+	//get the total number of wubrgas
+	for (i in sbCards){
+		switch (sbCards[i].card.rarity){
+			case 1:
+				c++;
+				break;
+			case 2:
+				u++;
+				break;
+			case 3:
+				r++;
+				break;
+			case 4:
+				m++;
+				break;
+			default:
+		}
+	}
+	//accumulate
+	u+=c;
+	r+=u;
+	//assign the order
+	z = 0;
+	for (i in sbCards){
+		switch (sbCards[i].card.rarity){
+			case 1:
+				sbCards[i].displayOrder = z;
+				sbDisplayOrderArray[z] = i;
+				z++;
+				break;
+			case 2:
+				sbCards[i].displayOrder = c;
+				sbDisplayOrderArray[c] = i;
+				c++;
+				break;
+			case 3:
+				sbCards[i].displayOrder = u;
+				sbDisplayOrderArray[u] = i;
+				u++;
+				break;
+			case 4:
+				sbCards[i].displayOrder = r;
+				sbDisplayOrderArray[r] = i;
+				r++;
+				break;
+			default:
+		}
+	}
+}
+
+function sortMBByRarity()
+{
+	var i;
+	var c=u=r=m=0;
+	mbDisplayOrderArray = new Array();
+	//get the total number of wubrgas
+	for (i in mbCards){
+		switch (mbCards[i].card.rarity){
+			case 1:
+				c++;
+				break;
+			case 2:
+				u++;
+				break;
+			case 3:
+				r++;
+				break;
+			case 4:
+				m++;
+				break;
+			default:
+		}
+	}
+	//accumulate
+	u+=c;
+	r+=u;
+	//assign the order
+	z = 0;
+	for (i in mbCards){
+		switch (mbCards[i].card.rarity){
+			case 1:
+				mbCards[i].displayOrder = z;
+				mbDisplayOrderArray[z] = i;
+				z++;
+				break;
+			case 2:
+				mbCards[i].displayOrder = c;
+				mbDisplayOrderArray[c] = i;
+				c++;
+				break;
+			case 3:
+				mbCards[i].displayOrder = u;
+				mbDisplayOrderArray[u] = i;
+				u++;
+				break;
+			case 4:
+				mbCards[i].displayOrder = r;
+				mbDisplayOrderArray[r] = i;
+				r++;
+				break;
+			default:
 		}
 	}
 }
@@ -782,7 +1017,7 @@ function cardToMB(cuid,oldimage)
 	{
 		if (sbCards[i].uid == cuid) break;
 	}
-	thisCard = sbCards[i];
+	var thisCard = sbCards[i];
 	mbCards.push(thisCard);
 	sbCards.splice(i,1);
 	//visually add this image to MB
@@ -870,6 +1105,24 @@ function cardToMB(cuid,oldimage)
 			return false;
 		});
 		cardLayer.add(image);
+		stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
+		stage.get("#cardCountSBText")[0].setText(sbCards.length.toString());
+		cardColor = (thisCard.card.color & 16) ? 'W' : '';
+		if (cardColor!='') colorCardsNumber[cardColor]++;
+		cardColor = (thisCard.card.color & 8) ? 'U' : '';
+		if (cardColor!='') colorCardsNumber[cardColor]++;
+		cardColor = (thisCard.card.color & 4) ? 'B' : '';
+		if (cardColor!='') colorCardsNumber[cardColor]++;
+		cardColor = (thisCard.card.color & 2) ? 'R' : '';
+		if (cardColor!='') colorCardsNumber[cardColor]++;
+		cardColor = (thisCard.card.color & 1) ? 'G' : '';
+		if (cardColor!='') colorCardsNumber[cardColor]++;
+		stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
+		stage.get("#UNumber")[0].setText(colorCardsNumber['U'].toString() + " " + 'U' + " cards");
+		stage.get("#BNumber")[0].setText(colorCardsNumber['B'].toString() + " " + 'B' + " cards");
+		stage.get("#RNumber")[0].setText(colorCardsNumber['R'].toString() + " " + 'R' + " cards");
+		stage.get("#GNumber")[0].setText(colorCardsNumber['G'].toString() + " " + 'G' + " cards");
+		layer.draw();
 		cardLayer.draw();
 	}
 	imageObj.src = thisCard.card.engSRC;
@@ -971,6 +1224,24 @@ function cardToSB(cuid,oldimage)
 			return false;
 		});
 		cardLayer.add(image);
+		stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
+		stage.get("#cardCountSBText")[0].setText(sbCards.length.toString());
+		cardColor = (thisCard.card.color & 16) ? 'W' : '';
+		if (cardColor!='') colorCardsNumber[cardColor]--;
+		cardColor = (thisCard.card.color & 8) ? 'U' : '';
+		if (cardColor!='') colorCardsNumber[cardColor]--;
+		cardColor = (thisCard.card.color & 4) ? 'B' : '';
+		if (cardColor!='') colorCardsNumber[cardColor]--;
+		cardColor = (thisCard.card.color & 2) ? 'R' : '';
+		if (cardColor!='') colorCardsNumber[cardColor]--;
+		cardColor = (thisCard.card.color & 1) ? 'G' : '';
+		if (cardColor!='') colorCardsNumber[cardColor]--;
+		stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
+		stage.get("#UNumber")[0].setText(colorCardsNumber['U'].toString() + " " + 'U' + " cards");
+		stage.get("#BNumber")[0].setText(colorCardsNumber['B'].toString() + " " + 'B' + " cards");
+		stage.get("#RNumber")[0].setText(colorCardsNumber['R'].toString() + " " + 'R' + " cards");
+		stage.get("#GNumber")[0].setText(colorCardsNumber['G'].toString() + " " + 'G' + " cards");
+		layer.draw();
 		cardLayer.draw();
 	}
 	imageObj.src = thisCard.card.engSRC;
@@ -1008,11 +1279,21 @@ function sortByCMC()
 	loadAllCards();
 };
 
+function sortByRarity()
+{
+	sortSBByRarity();
+	sortMBByRarity();
+	cardLayer.removeChildren();
+	loadAllCards();
+};
+
 //call this function upon receiving of cards
 function initCardDisplay()
 {
 	//init
 	sbCards = cards;
+	stage.get("#cardCountSBText")[0].setText(sbCards.length.toString());
+	layer.draw();
 	sortByColor();
 	log('Info : All cards rendered. Please build your deck before the time runs out.\n\n');
 };
