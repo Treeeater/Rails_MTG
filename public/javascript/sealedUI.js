@@ -19,10 +19,12 @@ var addLands = function(l){
 		  id: l+"Number"
 		});
 		layer.add(landText);
+		stage.get("#"+l+"Number")[0].attrs.number = number;
 	}
 	else
 	{
 		stage.get("#"+l+"Number")[0].attrs.text=number + " " + l;
+		stage.get("#"+l+"Number")[0].attrs.number=number;
 	}
 	layer.draw();
 };

@@ -12,13 +12,26 @@ displayOrderArray = new Array();
 //mbDisplayOrderArray = new Array();
 gotpacks = false;
 
+function prepareCardsToSend(cards)
+{
+	var i;
+	var returnString = "";
+	for (i in cards)
+	{
+		returnString += (cards[i].card.expansion.toString() + "/" + cards[i].card.idInSet.toString()+"+");
+	}
+	return returnString;
+}
+
 function start(){
 	//var ws = 0;				//uncomment this line in production.
 	var myUsername = $('#account').attr('uname');
 	var myUID = $('#account').attr('uid');
 	var bothPlayersConnected = 0;
 	var bothPlayersReady = 0;
-	var bothPlayersSubmittedDecks = 0;
+	var ISubmitted = false;
+	var OppoSubmitted = false;
+	var redirect_URL = "";
 	var init_status = false;
 	function Message(type, username, uid, body)
 	{
@@ -73,6 +86,54 @@ function start(){
 		if (gotpacks) {log("Sorry man, you already got your packs, hitting me doesn't give you extra cards!\n\n");return;};
 		var msg = new Message("initPacks",myUsername,myUID,"");
 		ws.send(JSON.stringify(msg));
+	}
+	
+	submitDeck = function()
+	{
+		if (mbCards==undefined)
+		{
+			log("Do you even HAVE a main board??\n\n");
+			return;
+		}
+		toSubmit = new Array();
+		for (i=0;i<mbCards.length;i++)
+		{
+			toSubmit.push(mbCards[i].card.expansion + "/" + mbCards[i].card.idInSet);
+		}
+		cardsCount = toSubmit.length;
+		if (stage.get("#plainsNumber")[0])
+		{
+			toSubmit.push("plains" + "/" + stage.get("#plainsNumber")[0].attrs.number.toString());
+			cardsCount+=parseInt(stage.get("#plainsNumber")[0].attrs.number);
+		}
+		if (stage.get("#islandNumber")[0])
+		{
+			toSubmit.push("island" + "/" + stage.get("#islandNumber")[0].attrs.number.toString());
+			cardsCount+=parseInt(stage.get("#islandNumber")[0].attrs.number);
+		}
+		if (stage.get("#swampNumber")[0])
+		{
+			toSubmit.push("swamp" + "/" + stage.get("#swampNumber")[0].attrs.number.toString());
+			cardsCount+=parseInt(stage.get("#swampNumber")[0].attrs.number);
+		}
+		if (stage.get("#mountainNumber")[0])
+		{
+			toSubmit.push("mountain" + "/" + stage.get("#mountainNumber")[0].attrs.number.toString());
+			cardsCount+=parseInt(stage.get("#mountainNumber")[0].attrs.number);
+		}
+		if (stage.get("#forestNumber")[0])
+		{
+			toSubmit.push("forest" + "/" + stage.get("#forestNumber")[0].attrs.number.toString());
+			cardsCount+=parseInt(stage.get("#forestNumber")[0].attrs.number);
+		}
+		if (cardsCount < 40)
+		{
+			log("please make sure your deck has at least 40 cards in the main board before submitting your deck.\n\n");
+			return;
+		}
+		var msg = new Message("submitDeck",myUsername,myUID,JSON.stringify(toSubmit));
+		ws.send(JSON.stringify(msg));
+		log("Submitted the deck, waiting for server reply...\n\n");
 	}
 	
 	function processMessage(s)
@@ -147,6 +208,48 @@ function start(){
 				gotpacks = true;
 				log('Info : packs received, rendering card images...\n\n');
 				initCardDisplay();		//hand control over to sealedUI.js
+				break;
+			case "submitted":
+				if (msg.uid == myUID)
+				{
+					ISubmitted = true;
+					if (msg.body!="")
+					{
+						log('Server ACK OK\n\n');
+					}
+					redirect_URL = "http://"+document.domain+":"+window.location.port+"/"+msg.body;
+					if (ISubmitted&&OppoSubmitted)
+					{
+						$('#hiddenInputMB')[0].value=prepareCardsToSend(mbCards);
+						$('#hiddenInputSB')[0].value=prepareCardsToSend(sbCards);
+						if (stage.get("#plainsNumber").length>0) $('#hiddenInputL1')[0].value=stage.get("#plainsNumber")[0].attrs.number.toString();
+						if (stage.get("#islandNumber").length>0) $('#hiddenInputL2')[0].value=stage.get("#islandNumber")[0].attrs.number.toString();
+						if (stage.get("#swampNumber").length>0) $('#hiddenInputL3')[0].value=stage.get("#swampNumber")[0].attrs.number.toString();
+						if (stage.get("#mountainNumber").length>0) $('#hiddenInputL4')[0].value=stage.get("#mountainNumber")[0].attrs.number.toString();
+						if (stage.get("#forestNumber").length>0) $('#hiddenInputL5')[0].value=stage.get("#forestNumber")[0].attrs.number.toString();
+						$('#hiddenForm')[0].action=redirect_URL;
+						$('#hiddenForm')[0].submit();
+					}
+				}
+				else{
+					OppoSubmitted = true;
+					if (msg.body!="")
+					{
+						log('Opponent submitted their deck\n\n');
+					}
+					if (ISubmitted&&OppoSubmitted)
+					{
+						$('#hiddenInputMB')[0].value=prepareCardsToSend(mbCards);
+						$('#hiddenInputSB')[0].value=prepareCardsToSend(sbCards);
+						if (stage.get("#plainsNumber").length>0) $('#hiddenInputL1')[0].value=stage.get("#plainsNumber")[0].attrs.number.toString();
+						if (stage.get("#islandNumber").length>0) $('#hiddenInputL2')[0].value=stage.get("#islandNumber")[0].attrs.number.toString();
+						if (stage.get("#swampNumber").length>0) $('#hiddenInputL3')[0].value=stage.get("#swampNumber")[0].attrs.number.toString();
+						if (stage.get("#mountainNumber").length>0) $('#hiddenInputL4')[0].value=stage.get("#mountainNumber")[0].attrs.number.toString();
+						if (stage.get("#forestNumber").length>0) $('#hiddenInputL5')[0].value=stage.get("#forestNumber")[0].attrs.number.toString();
+						$('#hiddenForm')[0].action=redirect_URL;
+						$('#hiddenForm')[0].submit();
+					}
+				}
 			default:
 		}
 	}

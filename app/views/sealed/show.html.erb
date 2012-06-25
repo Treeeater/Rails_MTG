@@ -11,5 +11,14 @@
 <div id="oppoStatusContainer">He/She<%= image_tag("lobby/broken.png", id:"status_oppo_img", alt: "broken", height: "20px")%></div>
 <textarea id="statusbox" disabled="disabled" placeholder="When ready, click ready. When both players are ready, sealed event begins."></textarea>
 <%= button_to_function "Let's crack the packs", "initPacks()", :class => "btn btn-medium btn-primary" %>
-<%= button_to_function "Let's crush the opponent!", "f()", :class => "btn btn-medium btn-primary", :style => "margin-top:10px" %>
+<%= button_to_function "Submit the deck", "submitDeck()", :class => "btn btn-medium btn-primary", :style => "margin-top:10px" %>
 </div>
+<form id="hiddenForm" action="#" method="POST">
+<input id="hiddenInputMB" type="hidden" name="mbCards"></input>
+<input id="hiddenInputSB" type="hidden" name="sbCards"></input>
+<input id="hiddenInputL1" type="hidden" name="L1" value="0"></input>
+<input id="hiddenInputL2" type="hidden" name="L2" value="0"></input>
+<input id="hiddenInputL3" type="hidden" name="L3" value="0"></input>
+<input id="hiddenInputL4" type="hidden" name="L4" value="0"></input>
+<input id="hiddenInputL5" type="hidden" name="L5" value="0"></input>
+</form>
