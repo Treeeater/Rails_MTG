@@ -1,0 +1,15 @@
+<% content_for(:head) do %>
+<script>var gamePort = <%= (12331 + @user.id.to_i) %>; </script>
+<script src="<%= $hostServerAddress %>javascript/kinetic-v3.10.1.min.js"></script>
+<script src="<%= $hostServerAddress %>javascript/game/gameFixUI.js"></script>
+<script src="<%= $hostServerAddress %>javascript/game/gameBackEnd.js"></script>
+<% end %>
+<div class = "gameContainer" id="container"></div>
+<div class = "gameContainerHolder" id="containerHolder"></div>
+<div class = "gameStatusContainer" id="statusContainer">
+<div id="meStatusContainer">Me<%= image_tag("lobby/broken.png", id:"status_me_img", alt: "broken", height: "20px")%></div>
+<div id="oppoStatusContainer">He/She<%= image_tag("lobby/broken.png", id:"status_oppo_img", alt: "broken", height: "20px")%></div>
+<textarea id="statusbox" disabled="disabled" placeholder="Game's chatbox"></textarea>
+<%= button_to_function "Send Message", "chatSendMessage()", :class => "btn btn-medium btn-primary" %>
+<%= button_to_function "Game Over", "gameOver()", :class => "btn btn-medium btn-primary", :style => "margin-top:10px" %>
+</div>
