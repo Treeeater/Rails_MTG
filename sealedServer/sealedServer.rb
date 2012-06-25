@@ -219,8 +219,6 @@ EventMachine.run {
 							end
 						else
 							#A regular card
-							p mbcExp
-							p mbcId
 							curCardPool.each{|c|
 								if (c.expansion.to_s == mbcExp.to_s)&&(c.idInSet.to_s == mbcId.to_s)
 									thisCard = c
@@ -237,12 +235,17 @@ EventMachine.run {
 					}
 					if (mbCardPool.length() >= 40)
 						#valid
-						redirect_URL = "gameServer/#{ARGV[0]}"
-						response = ResponseMessage.new("submitted",msgUsername,msgUID,redirect_URL)
+						response = ResponseMessage.new("submitted",msgUsername,msgUID,"")
 						$game.wsID_wsHash.each_value{|w|
 							response.send(w)
 						}
 					end
+				when "startGame"
+					redirect_URL = "game/#{ARGV[0]}"
+					response = ResponseMessage.new("startGame",msgUsername,msgUID,redirect_URL)
+					$game.wsID_wsHash.each_value{|w|
+						response.send(w)
+					}
 				else
 			end
 		}

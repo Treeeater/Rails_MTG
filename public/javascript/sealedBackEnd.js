@@ -11,6 +11,7 @@ displayOrderArray = new Array();
 //sbDisplayOrderArray = new Array();
 //mbDisplayOrderArray = new Array();
 gotpacks = false;
+isGameHost = false;
 
 function prepareCardsToSend(cards)
 {
@@ -24,16 +25,17 @@ function prepareCardsToSend(cards)
 }
 
 function start(){
-	//var ws = 0;				//uncomment this line in production.
-	var myUsername = $('#account').attr('uname');
-	var myUID = $('#account').attr('uid');
+	myUsername = $('#account').attr('uname');
+	myUID = $('#account').attr('uid');
 	var bothPlayersConnected = 0;
 	var bothPlayersReady = 0;
 	var ISubmitted = false;
 	var OppoSubmitted = false;
 	var redirect_URL = "";
 	var init_status = false;
-	function Message(type, username, uid, body)
+	var url = document.URL
+	isGameHost = (myUID==(url.substr(url.indexOf('ed/')+3,url.length)));
+	Message = function(type, username, uid, body)
 	{
 		this.type = type;
 		this.username = username;
@@ -213,43 +215,36 @@ function start(){
 				if (msg.uid == myUID)
 				{
 					ISubmitted = true;
-					if (msg.body!="")
-					{
-						log('Server ACK OK\n\n');
-					}
-					redirect_URL = "http://"+document.domain+":"+window.location.port+"/"+msg.body;
-					if (ISubmitted&&OppoSubmitted)
-					{
-						$('#hiddenInputMB')[0].value=prepareCardsToSend(mbCards);
-						$('#hiddenInputSB')[0].value=prepareCardsToSend(sbCards);
-						if (stage.get("#plainsNumber").length>0) $('#hiddenInputL1')[0].value=stage.get("#plainsNumber")[0].attrs.number.toString();
-						if (stage.get("#islandNumber").length>0) $('#hiddenInputL2')[0].value=stage.get("#islandNumber")[0].attrs.number.toString();
-						if (stage.get("#swampNumber").length>0) $('#hiddenInputL3')[0].value=stage.get("#swampNumber")[0].attrs.number.toString();
-						if (stage.get("#mountainNumber").length>0) $('#hiddenInputL4')[0].value=stage.get("#mountainNumber")[0].attrs.number.toString();
-						if (stage.get("#forestNumber").length>0) $('#hiddenInputL5')[0].value=stage.get("#forestNumber")[0].attrs.number.toString();
-						$('#hiddenForm')[0].action=redirect_URL;
-						$('#hiddenForm')[0].submit();
-					}
+					log('Server ACK OK. If you are the last player to submit the deck, the game should start right away.\n\n');
 				}
 				else{
 					OppoSubmitted = true;
-					if (msg.body!="")
-					{
-						log('Opponent submitted their deck\n\n');
-					}
-					if (ISubmitted&&OppoSubmitted)
-					{
-						$('#hiddenInputMB')[0].value=prepareCardsToSend(mbCards);
-						$('#hiddenInputSB')[0].value=prepareCardsToSend(sbCards);
-						if (stage.get("#plainsNumber").length>0) $('#hiddenInputL1')[0].value=stage.get("#plainsNumber")[0].attrs.number.toString();
-						if (stage.get("#islandNumber").length>0) $('#hiddenInputL2')[0].value=stage.get("#islandNumber")[0].attrs.number.toString();
-						if (stage.get("#swampNumber").length>0) $('#hiddenInputL3')[0].value=stage.get("#swampNumber")[0].attrs.number.toString();
-						if (stage.get("#mountainNumber").length>0) $('#hiddenInputL4')[0].value=stage.get("#mountainNumber")[0].attrs.number.toString();
-						if (stage.get("#forestNumber").length>0) $('#hiddenInputL5')[0].value=stage.get("#forestNumber")[0].attrs.number.toString();
-						$('#hiddenForm')[0].action=redirect_URL;
-						$('#hiddenForm')[0].submit();
+					log('Opponent submitted their deck. If you already submitted your deck, the game should start right away.\n\n');
+				}
+				if (ISubmitted&&OppoSubmitted&&isGameHost)
+				{
+					var xhr = new XMLHttpRequest();
+					xhr.open('GET', hostServerAddress+"/game/new", false);  		//hostServerAddress is derived from index.html.erb, must
+					//use this under rails framework.
+					log("Sending initialize game command...\n\n");
+					xhr.send();
+					if (xhr.status == 200) {
+						log("Game server initialized, starting the game...\n\n");
+						setTimeout('message = new Message("startGame", myUsername, myUID, "");ws.send(JSON.stringify(message));',2000);
 					}
 				}
+				break;
+			case "startGame":
+				redirect_URL = "http://"+document.domain+":"+window.location.port+"/"+msg.body;
+				$('#hiddenInputMB')[0].value=prepareCardsToSend(mbCards);
+				$('#hiddenInputSB')[0].value=prepareCardsToSend(sbCards);
+				if (stage.get("#plainsNumber").length>0) $('#hiddenInputL1')[0].value=stage.get("#plainsNumber")[0].attrs.number.toString();
+				if (stage.get("#islandNumber").length>0) $('#hiddenInputL2')[0].value=stage.get("#islandNumber")[0].attrs.number.toString();
+				if (stage.get("#swampNumber").length>0) $('#hiddenInputL3')[0].value=stage.get("#swampNumber")[0].attrs.number.toString();
+				if (stage.get("#mountainNumber").length>0) $('#hiddenInputL4')[0].value=stage.get("#mountainNumber")[0].attrs.number.toString();
+				if (stage.get("#forestNumber").length>0) $('#hiddenInputL5')[0].value=stage.get("#forestNumber")[0].attrs.number.toString();
+				$('#hiddenForm')[0].action=redirect_URL;
+				$('#hiddenForm')[0].submit();
 			default:
 		}
 	}
