@@ -33,7 +33,7 @@ function start(){
 	var OppoSubmitted = false;
 	var redirect_URL = "";
 	var init_status = false;
-	var url = document.URL
+	var url = document.URL;
 	isGameHost = (myUID==(url.substr(url.indexOf('ed/')+3,url.length)));
 	Message = function(type, username, uid, body)
 	{
