@@ -12,6 +12,7 @@ swampCount = "<%= params[:L3] %>";
 mountainCount = "<%= params[:L4] %>";
 forestCount = "<%= params[:L5] %>";
 </script>
+<script>var gamePort = <%= (12331 + @user.id.to_i) %>; </script>
 <% end %>
 <div class = "gameContainer" id="container"></div>
 <div class = "gameContainerHolder" id="containerHolder"></div>
