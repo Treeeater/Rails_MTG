@@ -10,7 +10,7 @@ Mtg::Application.routes.draw do
 
   root :to => 'static_pages#home' 
   match '/game/new', to:'game#new'
-  match '/game/:id', to:'game#show', :via => :post
+  match '/game/:id', to:'game#show', :via => [:post, :get]
   match '/signup',  to: 'users#new'
   match '/signin',  to: 'sessions#new'
   match '/signout', to: 'sessions#destroy', via: :delete		#Use the DELETE http verb
