@@ -50,6 +50,11 @@ function init()
 	ws.onmessage = processMessage;
 }
 
+function processGameMessage(s)
+{
+	alert(s.type + s.body);
+}
+
 function processMessage(s)
 {
 	msg = JSON.parse(s.data);
@@ -98,6 +103,9 @@ function processMessage(s)
 					log("Your session is not yet fully initialized, please wait.\n\n");
 				}
 			}
+			break;
+		case "game":
+			processGameMessage(msg.body);
 			break;
 		default:
 	}

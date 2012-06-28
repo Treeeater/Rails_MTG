@@ -2,6 +2,7 @@
 
 require './sealedServer/card.rb'
 require 'sqlite3'
+require 'active_support'
 
 class Game
 	attr_accessor :users, :wsID_userHash, :wsID_wsHash
@@ -34,6 +35,19 @@ class Game
 			end
 		}
 		return i
+	end
+end
+
+class GameMessage
+	attr_accessor :type, :body
+
+	def initialize(t,b)
+		@type = t
+		@body = b
+	end
+
+	def to_s()
+		return ActiveSupport::JSON.encode(self)
 	end
 end
 

@@ -62,6 +62,9 @@ EventMachine.run {
 						$game.users[msgUID] = user
 						$game.wsID_userHash[ws.object_id] = user
 						$game.wsID_wsHash[ws.object_id] = ws
+						gM = GameMessage.new("setLibraryNumber",user.mainBoardCards.length)
+						response = ResponseMessage.new("game",msgUsername,msgUID,gM)
+						response.send(ws)
 					end
 					response = ResponseMessage.new("init",msgUsername,msgUID,((bothPlayersConnected?) ? "ready" : "" ))
 					$game.wsID_wsHash.each_value{|w|
