@@ -50,6 +50,7 @@ class User
 				srcString = r.to_s
 			end
 			srcObj = JSON.parse(srcString)
+			srcObj = JSON.parse(srcObj[0])
 			mbCardString = srcObj["cards"]
 			sbCardString = srcObj["sbCards"]
 			l1 = srcObj["L1"].to_i
