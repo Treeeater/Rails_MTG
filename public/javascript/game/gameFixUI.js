@@ -19,7 +19,7 @@ function loadFixedFrames() {
 	});
 	
 	var blueLine2 = new Kinetic.Line({
-	  points: [240, 0, 240, 700],
+	  points: [240, 0, 240, 900],
 	  stroke: "blue",
 	  strokeWidth: 3,
 	  lineCap: "round",
@@ -59,7 +59,7 @@ function loadFixedFrames() {
 	});
 
 	var blueLine7 = new Kinetic.Line({
-	  points: [70, 490, 70, 700],
+	  points: [70, 490, 70, 900],
 	  stroke: "blue",
 	  strokeWidth: 3,
 	  lineCap: "round",
@@ -270,40 +270,75 @@ function loadFixedFrames() {
 
 	var libraryImage = new Image();
 	libraryImage.onload = function() {
-		var image = new Kinetic.Image({x: 80,y: 500,image: libraryImage,width: 50,height: 50,id: "libraryImage"});
+		var image = new Kinetic.Image({x: 80,y: 710,image: libraryImage,width: 50,height: 50,id: "libraryImage"});
 		FixedLayer.add(image);
 		FixedLayer.draw();
 	}
 	libraryImage.src = hostServerAddress+"assets/game/general/library.jpg";
-	var libraryCountText = new Kinetic.Text({x: 180,y: 525,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"libraryCountText"});
+	var libraryCountText = new Kinetic.Text({x: 180,y: 735,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"libraryCountText"});
 	FixedLayer.add(libraryCountText);
 
 	var grvyImage = new Image();
 	grvyImage.onload = function() {
-		var image = new Kinetic.Image({x: 80,y: 570,image: grvyImage,width: 50,height: 50,id: "grvyImage"});
+		var image = new Kinetic.Image({x: 80,y: 775,image: grvyImage,width: 50,height: 50,id: "grvyImage"});
 		FixedLayer.add(image);
 		FixedLayer.draw();
 	}
 	grvyImage.src = hostServerAddress+"assets/game/general/grvy.jpg";
-	var grvyCountText = new Kinetic.Text({x: 180,y: 595,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"grvyCountText"});
+	var grvyCountText = new Kinetic.Text({x: 180,y: 800,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"grvyCountText"});
 	FixedLayer.add(grvyCountText);
-
+libraryCountText
 	var exileImage = new Image();
 	exileImage.onload = function() {
-		var image = new Kinetic.Image({x: 80,y: 640,image: exileImage,width: 50,height: 50,id: "exileImage"});
+		var image = new Kinetic.Image({x: 80,y: 840,image: exileImage,width: 50,height: 50,id: "exileImage"});
 		FixedLayer.add(image);
 		FixedLayer.draw();
 	}
 	exileImage.src = hostServerAddress+"assets/game/general/exile.jpg";
-	var exileCountText = new Kinetic.Text({x: 180,y: 665,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"exileCountText"});
+	var exileCountText = new Kinetic.Text({x: 180,y: 865,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"exileCountText"});
 	FixedLayer.add(exileCountText);
+
+//oppo library, grvy and exile
+
+	var oppoLibraryImage = new Image();
+	oppoLibraryImage.onload = function() {
+		var image = new Kinetic.Image({x: 80,y: 500,image: libraryImage,width: 50,height: 50,id: "oppoLibraryImage"});
+		FixedLayer.add(image);
+		FixedLayer.draw();
+	}
+	oppoLibraryImage.src = hostServerAddress+"assets/game/general/library.jpg";
+	var oppoLibraryCountText = new Kinetic.Text({x: 180,y: 525,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoLibraryCountText"});
+	FixedLayer.add(oppoLibraryCountText);
+
+	var oppoGrvyImage = new Image();
+	oppoGrvyImage.onload = function() {
+		var image = new Kinetic.Image({x: 80,y: 570,image: grvyImage,width: 50,height: 50,id: "oppoGrvyImage"});
+		FixedLayer.add(image);
+		FixedLayer.draw();
+	}
+	oppoGrvyImage.src = hostServerAddress+"assets/game/general/grvy.jpg";
+	var oppoGrvyCountText = new Kinetic.Text({x: 180,y: 590,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoGrvyCountText"});
+	FixedLayer.add(oppoGrvyCountText);
+
+	var oppoExileImage = new Image();
+	oppoExileImage.onload = function() {
+		var image = new Kinetic.Image({x: 80,y: 640,image: exileImage,width: 50,height: 50,id: "oppoExileImage"});
+		FixedLayer.add(image);
+		FixedLayer.draw();
+	}
+	oppoExileImage.src = hostServerAddress+"assets/game/general/exile.jpg";
+	var oppoExileCountText = new Kinetic.Text({x: 180,y: 675,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoExileCountText"});
+	FixedLayer.add(oppoExileCountText);
+
 
 	//finalize
 	stage.add(FixedLayer);
 	document.getElementById('container').firstChild.children[2].oncontextmenu = function() {
 		return false;
 	}
-
+	
+	//call backend init
+	initBackEndJS();
 };
 
 window.addEventListener("load",loadFixedFrames);

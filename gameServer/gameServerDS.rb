@@ -5,7 +5,7 @@ require 'sqlite3'
 require 'active_support'
 
 class Game
-	attr_accessor :users, :wsID_userHash, :wsID_wsHash
+	attr_accessor :users, :wsID_userHash, :wsID_wsHash, :initiated
 	
 	def userDelete(uID,wsID)
 		@users.delete(leavingUID)
@@ -52,9 +52,9 @@ class GameMessage
 end
 
 class User
-	attr_accessor :uid, :username, :wsObjectID, :mainBoardCards, :sideBoardCards, :connectionStatus, :cardStatus
+	attr_accessor :uid, :username, :wsObjectID, :mainBoardCards, :sideBoardCards, :connectionStatus, :cardStatus, :oppo
 	
-	def initialize(uid,username,wsObjectID)
+	def initialize(uid,username,wsObjectID, op=nil)
 		begin
 			db = SQLite3::Database.open "./db/development.sqlite3"
 			stmt = db.prepare "SELECT Deck_info FROM users WHERE Id='" + uid + "'"
@@ -77,6 +77,7 @@ class User
 			@wsObjectID = wsObjectID
 			@mainBoardCards = parseCards(mbCardString,db)
 			@sideBoardCards = parseCards(sbCardString,db)
+			@oppo = op
 			basicLands = getBasicLands();
 			for i in 1..l1
 				mainBoardCards.push(basicLands[0])

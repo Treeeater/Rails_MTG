@@ -25,7 +25,7 @@ function handShake()
 	ws.send(JSON.stringify(msg));
 }
 
-function init()
+function initBackEndJS()
 {
 	//Global vars
 	myUsername = $('#account').attr('uname');
@@ -50,9 +50,17 @@ function init()
 	ws.onmessage = processMessage;
 }
 
-function processGameMessage(s)
+function processGameMessage(s,msgUID,msgUserName)
 {
-	alert(s.type + s.body);
+	switch(s.type)
+	{
+	case "setLibraryNumber":
+		if (msgUID==myUID) stage.get("#libraryCountText")[0].attrs.text = s.body;
+		else stage.get("#oppoLibraryCountText")[0].attrs.text=s.body;
+		FixedLayer.draw();
+		break;
+	default:
+	}
 }
 
 function processMessage(s)
@@ -104,11 +112,16 @@ function processMessage(s)
 				}
 			}
 			break;
+		case "disconnect":
+			// this is gotta be opponent disconnect, so no worries.
+			bothPlayersConnected--;
+			$("#status_oppo_img").attr("src",'/assets/lobby/broken.png');
+			log("Just FYI your opponent has disconnected, you can continue deck building regardless. He/She can resume deck building once reconnected.\n\n")
+			break;
 		case "game":
-			processGameMessage(msg.body);
+			processGameMessage(msg.body,msg.uid,msg.username);
 			break;
 		default:
 	}
 }
 
-window.addEventListener("load",init);
