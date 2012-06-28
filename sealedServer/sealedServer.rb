@@ -63,7 +63,7 @@ class Game
 end
 
 class User
-	attr_accessor :uid, :username, :wsObjectID, :packReadyStatus, :connectionStatus, :cardPool
+	attr_accessor :uid, :username, :wsObjectID, :packReadyStatus, :connectionStatus, :cardPool, :verified
 	
 	def initialize(uid,username,wsObjectID)
 		@uid = uid
@@ -71,6 +71,7 @@ class User
 		@wsObjectID = wsObjectID
 		@packReadyStatus = false
 		@connectionStatus = true
+		@verified = false
 		@cardPool = Array.new
 	end
 end
@@ -186,60 +187,68 @@ EventMachine.run {
 							end
 						end
 					end
-				when "submitDeck"
-					basicLands = getBasicLands()
-					curCardPool = $game.wsID_userHash[ws.object_id].cardPool
-					mbCards = JSON.parse(msgBody)
-					mbCardPool = Array.new
-					#puts "Submitted " + mbCards[0]
-					mbCards.each{|mbc|
-						mbcExp = mbc[0..mbc.index('/')-1]
-						mbcId = mbc[mbc.index('/')+1..-1]
-						thisCard = nil
-						case mbcExp
-						when 'plains'
-							for i in 1..mbcId.to_i
-								mbCardPool.push(basicLands[0])
-							end
-						when 'island'
-							for i in 1..mbcId.to_i
-								mbCardPool.push(basicLands[1])
-							end
-						when 'swamp'
-							for i in 1..mbcId.to_i
-								mbCardPool.push(basicLands[2])
-							end
-						when 'mountain'
-							for i in 1..mbcId.to_i
-								mbCardPool.push(basicLands[3])
-							end
-						when 'forest'
-							for i in 1..mbcId.to_i
-								mbCardPool.push(basicLands[4])
-							end
-						else
-							#A regular card
-							curCardPool.each{|c|
-								if (c.expansion.to_s == mbcExp.to_s)&&(c.idInSet.to_s == mbcId.to_s)
-									thisCard = c
-									curCardPool.delete(c)
-									break
+				when "verifyDeck"
+					if !$game.wsID_userHash[ws.object_id].verified
+						$game.wsID_userHash[ws.object_id].verified = true
+						basicLands = getBasicLands()
+						curCardPool = $game.wsID_userHash[ws.object_id].cardPool
+						mbCards = JSON.parse(msgBody)
+						mbCardPool = Array.new
+						#puts "Submitted " + mbCards[0]
+						mbCards.each{|mbc|
+							mbcExp = mbc[0..mbc.index('/')-1]
+							mbcId = mbc[mbc.index('/')+1..-1]
+							thisCard = nil
+							case mbcExp
+							when 'plains'
+								for i in 1..mbcId.to_i
+									mbCardPool.push(basicLands[0])
 								end
-							}
-							if (thisCard == nil)
-								#cheated by submitting an illegal card
-								return
+							when 'island'
+								for i in 1..mbcId.to_i
+									mbCardPool.push(basicLands[1])
+								end
+							when 'swamp'
+								for i in 1..mbcId.to_i
+									mbCardPool.push(basicLands[2])
+								end
+							when 'mountain'
+								for i in 1..mbcId.to_i
+									mbCardPool.push(basicLands[3])
+								end
+							when 'forest'
+								for i in 1..mbcId.to_i
+									mbCardPool.push(basicLands[4])
+								end
+							else
+								#A regular card
+								curCardPool.each{|c|
+									if (c.expansion.to_s == mbcExp.to_s)&&(c.idInSet.to_s == mbcId.to_s)
+										thisCard = c
+										curCardPool.delete(c)
+										break
+									end
+								}
+								if (thisCard == nil)
+									#cheated by submitting an illegal card
+									return
+								end
+								mbCardPool.push(thisCard)
 							end
-							mbCardPool.push(thisCard)
-						end
-					}
-					if (mbCardPool.length() >= 40)
-						#valid
-						response = ResponseMessage.new("submitted",msgUsername,msgUID,"")
-						$game.wsID_wsHash.each_value{|w|
-							response.send(w)
 						}
+						if (mbCardPool.length() >= 40)
+							#valid
+							response = ResponseMessage.new("verified",msgUsername,msgUID,"")
+							$game.wsID_wsHash.each_value{|w|
+								response.send(w)
+							}
+						end
 					end
+				when "submitDeck"
+					response = ResponseMessage.new("submitted",msgUsername,msgUID,"")
+					$game.wsID_wsHash.each_value{|w|
+						response.send(w)
+					}
 				when "startGame"
 					redirect_URL = "game/#{ARGV[0]}"
 					response = ResponseMessage.new("startGame",msgUsername,msgUID,redirect_URL)

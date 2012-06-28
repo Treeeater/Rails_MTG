@@ -58,7 +58,7 @@ EventMachine.run {
 						#this user is reconnecting.
 						$game.userReconnect(msgUID,ws)
 					else
-						user = User.new(msgUID,msgUsername,ws.object_id,msgBody)
+						user = User.new(msgUID,msgUsername,ws.object_id)
 						$game.users[msgUID] = user
 						$game.wsID_userHash[ws.object_id] = user
 						$game.wsID_wsHash[ws.object_id] = ws

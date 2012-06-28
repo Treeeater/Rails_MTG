@@ -133,9 +133,9 @@ function start(){
 			log("please make sure your deck has at least 40 cards in the main board before submitting your deck.\n\n");
 			return;
 		}
-		var msg = new Message("submitDeck",myUsername,myUID,JSON.stringify(toSubmit));
+		var msg = new Message("verifyDeck",myUsername,myUID,JSON.stringify(toSubmit));
 		ws.send(JSON.stringify(msg));
-		log("Submitted the deck, waiting for server reply...\n\n");
+		log("Verifying the deck, waiting for server reply...\n\n");
 	}
 	
 	function processMessage(s)
@@ -211,6 +211,24 @@ function start(){
 				log('Info : packs received, rendering card images...\n\n');
 				initCardDisplay();		//hand control over to sealedUI.js
 				break;
+			case "verified":
+				if (msg.uid == myUID)
+				{
+					//actually submit the deck
+					var xhr = new XMLHttpRequest();
+					xhr.open('POST', hostServerAddress+"/users/submitDeck", false);  		//hostServerAddress is derived from index.html.erb, must
+					//use this under rails framework.
+					log("Sending initialize game command...\n\n");
+					xhr.setRequestHeader('Content-Type','application/json')
+					POSTload = {"cards":prepareCardsToSend(mbCards),"sbCards":prepareCardsToSend(sbCards),"L1":(stage.get("#plainsNumber").length==0)?0:stage.get("#plainsNumber")[0].attrs.number.toString(),"L2":(stage.get("#islandNumber").length==0)?0:stage.get("#islandNumber")[0].attrs.number.toString(),"L3":(stage.get("#swampNumber").length==0)?0:stage.get("#swampNumber")[0].attrs.number.toString(),"L4":(stage.get("#mountainNumber").length==0)?0:stage.get("#mountainNumber")[0].attrs.number.toString(),"L5":(stage.get("#forestNumber").length==0)?0:stage.get("#forestNumber")[0].attrs.number.toString()}
+					xhr.send(JSON.stringify(POSTload));
+					if (xhr.status == 200) {
+						log("Deck submitted, waiting to start the game...\n\n");
+						var msg = new Message("submitDeck",myUsername,myUID,"");
+						ws.send(JSON.stringify(msg));
+					}
+				}
+				break;
 			case "submitted":
 				if (msg.uid == myUID)
 				{
@@ -221,6 +239,7 @@ function start(){
 					OppoSubmitted = true;
 					log('Opponent submitted their deck. If you already submitted your deck, the game should start right away.\n\n');
 				}
+				
 				if (ISubmitted&&OppoSubmitted&&isGameHost)
 				{
 					var xhr = new XMLHttpRequest();
@@ -236,7 +255,7 @@ function start(){
 				break;
 			case "startGame":
 				redirect_URL = "http://"+document.domain+":"+window.location.port+"/"+msg.body;
-				$('#hiddenInputMB')[0].value=prepareCardsToSend(mbCards);
+				/*$('#hiddenInputMB')[0].value=prepareCardsToSend(mbCards);
 				$('#hiddenInputSB')[0].value=prepareCardsToSend(sbCards);
 				if (stage.get("#plainsNumber").length>0) $('#hiddenInputL1')[0].value=stage.get("#plainsNumber")[0].attrs.number.toString();
 				if (stage.get("#islandNumber").length>0) $('#hiddenInputL2')[0].value=stage.get("#islandNumber")[0].attrs.number.toString();
@@ -244,7 +263,8 @@ function start(){
 				if (stage.get("#mountainNumber").length>0) $('#hiddenInputL4')[0].value=stage.get("#mountainNumber")[0].attrs.number.toString();
 				if (stage.get("#forestNumber").length>0) $('#hiddenInputL5')[0].value=stage.get("#forestNumber")[0].attrs.number.toString();
 				$('#hiddenForm')[0].action=redirect_URL;
-				$('#hiddenForm')[0].submit();
+				$('#hiddenForm')[0].submit();*/
+				window.location = redirect_URL;				//get request.
 			default:
 		}
 	}

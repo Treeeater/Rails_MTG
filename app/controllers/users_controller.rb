@@ -1,3 +1,5 @@
+require 'sqlite3'
+
 class UsersController < ApplicationController
   
   before_filter :signed_in_user, only: [:edit, :update, :index, :show]		#before_filter runs before any other code.
@@ -49,7 +51,25 @@ class UsersController < ApplicationController
     redirect_to home_path
   end
 
-
+  def submitDeck
+    if !signed_in?
+		redirect_to signin_path
+	else
+		stringToStore = ActiveSupport::JSON.encode(params[:_json])
+		begin
+			db = SQLite3::Database.open "./db/development.sqlite3"
+			stmt = db.prepare "UPDATE users SET Deck_info='"+stringToStore+"' WHERE Id='"+current_user.id.to_s+"'"
+			rs = stmt.execute
+		rescue SQLite3::Exception => e
+			p "Exception occured : "+e.to_s
+		ensure
+			stmt.close if stmt
+			db.close if db
+		end
+		#current_user.deck_info = stringToStore
+		#current_user.save
+	end
+  end
 
 private
 

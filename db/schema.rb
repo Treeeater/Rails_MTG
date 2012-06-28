@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120608182456) do
+ActiveRecord::Schema.define(:version => 20120628065653) do
 
   create_table "mtg_cards", :force => true do |t|
     t.integer  "idInSet"
@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(:version => 20120608182456) do
     t.string   "password_digest"
     t.string   "remember_token"
     t.boolean  "admin",           :default => false
+    t.string   "deck_info"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true

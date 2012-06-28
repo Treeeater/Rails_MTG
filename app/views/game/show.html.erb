@@ -3,6 +3,7 @@
 <script src="<%= $hostServerAddress %>javascript/kinetic-v3.10.1.min.js"></script>
 <script src="<%= $hostServerAddress %>javascript/game/gameFixUI.js"></script>
 <script src="<%= $hostServerAddress %>javascript/game/gameBackEnd.js"></script>
+<!--
 <script>
 cards = "<%= params[:mbCards] %>";
 sbCards = "<%= params[:sbCards] %>";
@@ -11,7 +12,7 @@ islandCount = "<%= params[:L2] %>";
 swampCount = "<%= params[:L3] %>";
 mountainCount = "<%= params[:L4] %>";
 forestCount = "<%= params[:L5] %>";
-</script>
+</script>-->
 <script>var gamePort = <%= (12331 + @user.id.to_i) %>; </script>
 <% end %>
 <div class = "gameContainer" id="container"></div>

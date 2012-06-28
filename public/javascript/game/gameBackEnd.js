@@ -1,13 +1,3 @@
-/*
-cards = "<%= params[:mbCards] %>";
-sbCards = "<%= params[:sbCards] %>";
-plainsCount = "<%= params[:L1] %>";
-islandCount = "<%= params[:L2] %>";
-swampCount = "<%= params[:L3] %>";
-mountainCount = "<%= params[:L4] %>";
-forestCount = "<%= params[:L5] %>";
-*/
-
 //Global functions
 log = function (s)
 {
@@ -29,8 +19,9 @@ Message = function(type, username, uid, body)
 
 function handShake()
 {
-	var stringMSGObj = {"cards":cards,"sbCards":sbCards,"L1":plainsCount,"L2":islandCount,"L3":swampCount,"L4":mountainCount,"L5":forestCount};
-	var msg = new Message("init",myUsername,myUID,JSON.stringify(stringMSGObj));
+	//var stringMSGObj = {"cards":cards,"sbCards":sbCards,"L1":plainsCount,"L2":islandCount,"L3":swampCount,"L4":mountainCount,"L5":forestCount};
+	//var msg = new Message("init",myUsername,myUID,JSON.stringify(stringMSGObj));
+	var msg = new Message("init",myUsername,myUID,"");
 	ws.send(JSON.stringify(msg));
 }
 
@@ -40,7 +31,7 @@ function init()
 	myUsername = $('#account').attr('uname');
 	myUID = $('#account').attr('uid');
 	url = document.URL;
-	isGameHost = (myUID==(url.substr(url.indexOf('ed/')+3,url.length)));
+	isGameHost = (myUID==(url.substr(url.indexOf('game/')+3,url.length)));
 	bothPlayersConnected = 0;
 	init_status = false;
 

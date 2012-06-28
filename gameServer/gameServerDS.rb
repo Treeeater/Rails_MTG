@@ -40,55 +40,62 @@ end
 class User
 	attr_accessor :uid, :username, :wsObjectID, :mainBoardCards, :sideBoardCards, :connectionStatus, :cardStatus
 	
-	def initialize(uid,username,wsObjectID,srcString)
-		srcObj = JSON.parse(srcString)
-		mbCardString = srcObj["cards"]
-		sbCardString = srcObj["sbCards"]
-		l1 = srcObj["L1"].to_i
-		l2 = srcObj["L2"].to_i
-		l3 = srcObj["L3"].to_i
-		l4 = srcObj["L4"].to_i
-		l5 = srcObj["L5"].to_i
-		@uid = uid
-		@username = username
-		@wsObjectID = wsObjectID
-		@mainBoardCards = parseCards(mbCardString)
-		@sideBoardCards = parseCards(sbCardString)
-		basicLands = getBasicLands();
-		for i in 1..l1
-			mainBoardCards.push(basicLands[0])
-		end
-		for i in 1..l2
-			mainBoardCards.push(basicLands[1])
-		end
-		for i in 1..l3
-			mainBoardCards.push(basicLands[2])
-		end
-		for i in 1..l4
-			mainBoardCards.push(basicLands[3])
-		end
-		for i in 1..l5
-			mainBoardCards.push(basicLands[4])
-		end
-		@connectionStatus = true
-	end
-	
-	def parseCards(srcString)
+	def initialize(uid,username,wsObjectID)
 		begin
 			db = SQLite3::Database.open "./db/development.sqlite3"
-			returnArray = Array.new
-			srcString.split('+').each{|m|
-				exp = m[0..m.index('/')-1]
-				idInSet = m[m.index('/')+1..-1]
-				card = searchForCard(exp, idInSet, db)
-				if (card == nil) then puts "error" else returnArray.push(card) end
-			}
-			return returnArray
+			stmt = db.prepare "SELECT Deck_info FROM users WHERE Id='" + uid + "'"
+			rs = stmt.execute
+			srcString = ""
+			rs.each do |r|
+				srcString = r.to_s
+			end
+			srcObj = JSON.parse(srcString)
+			mbCardString = srcObj["cards"]
+			sbCardString = srcObj["sbCards"]
+			l1 = srcObj["L1"].to_i
+			l2 = srcObj["L2"].to_i
+			l3 = srcObj["L3"].to_i
+			l4 = srcObj["L4"].to_i
+			l5 = srcObj["L5"].to_i
+			@uid = uid
+			@username = username
+			@wsObjectID = wsObjectID
+			@mainBoardCards = parseCards(mbCardString,db)
+			@sideBoardCards = parseCards(sbCardString,db)
+			basicLands = getBasicLands();
+			for i in 1..l1
+				mainBoardCards.push(basicLands[0])
+			end
+			for i in 1..l2
+				mainBoardCards.push(basicLands[1])
+			end
+			for i in 1..l3
+				mainBoardCards.push(basicLands[2])
+			end
+			for i in 1..l4
+				mainBoardCards.push(basicLands[3])
+			end
+			for i in 1..l5
+				mainBoardCards.push(basicLands[4])
+			end
+			@connectionStatus = true
 		rescue SQLite3::Exception => e
 			p "Exception occured : "+e.to_s
 		ensure
+			stmt.close if stmt
 			db.close if db
 		end
+	end
+	
+	def parseCards(srcString,db)
+		returnArray = Array.new
+		srcString.split('+').each{|m|
+			exp = m[0..m.index('/')-1]
+			idInSet = m[m.index('/')+1..-1]
+			card = searchForCard(exp, idInSet, db)
+			if (card == nil) then puts "error" else returnArray.push(card) end
+		}
+		return returnArray
 	end
 
 end
