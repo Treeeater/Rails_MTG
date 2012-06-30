@@ -6,26 +6,6 @@ require 'em-websocket'
 require 'json'
 require './gameServer/gameServerDS.rb'
 
-class ResponseMessage
-	attr_accessor :type, :username, :uid, :body
-	
-	def serialize
-		return ActiveSupport::JSON.encode(self)
-	end
-	
-	def initialize(t="",n="",i="",b="")
-		@type = t
-		@username = n
-		@uid = i
-		@body = b
-	end
-	
-	def send(ws)
-		ws.send(self.serialize)
-		puts "sending message to "+$game.wsID_userHash[ws.object_id].username+", "+ self.serialize
-	end
-end
-
 def bothPlayersConnected?
 	return $game.connectedUserNumber()==2
 end
@@ -33,12 +13,34 @@ end
 def restartUser(user)
 	ws = $game.wsID_wsHash[user.wsObjectID]
 	oppo = user.oppo
-	gM = GameMessage.new("setLibraryNumber",user.mainBoardCards.length)
+	gM = GameMessage.new("setLibraryNumber",user.username,user.uid,user.mainBoardCards.length)
 	response = ResponseMessage.new("game",user.username,user.uid,gM)
 	response.send(ws)						#self's library to self
-	gM = GameMessage.new("setLibraryNumber",user.oppo.mainBoardCards.length)
+	gM = GameMessage.new("setLibraryNumber",user.oppo.username,user.oppo.uid,user.oppo.mainBoardCards.length)
 	response = ResponseMessage.new("game",user.oppo.username,user.oppo.uid,gM)
 	response.send(ws)						#oppo's lib to self
+end
+
+def processGameMessage(gb)
+	msgType = gb["type"]
+	msgUID = gb["uid"]
+	msgUsername = gb["username"]
+	msgBody = gb["body"]
+	case msgType
+		when "chooseColor"
+			gameResponse = GameMessage.new("chooseColor",msgUsername,msgUID,msgBody)
+			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+			$game.wsID_wsHash.each_value{|w|
+				response.send(w)
+			}
+		when "removeColor"
+			gameResponse = GameMessage.new("removeColor",msgUsername,msgUID,msgBody)
+			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+			$game.wsID_wsHash.each_value{|w|
+				response.send(w)
+			}
+		else
+	end
 end
 
 EventMachine.run {
@@ -101,17 +103,17 @@ EventMachine.run {
 					if (!$game.initiated)
 						#this is the first time this user connects
 						if (!bothPlayersConnected?)
-							gM = GameMessage.new("setLibraryNumber",user.mainBoardCards.length)
+							gM = GameMessage.new("setLibraryNumber",msgUsername,msgUID,user.mainBoardCards.length)
 							response = ResponseMessage.new("game",msgUsername,msgUID,gM)
 							response.send(ws)
 						else
 							#both players connected.
 							user.oppo.oppo = user						#set oppo's oppo
-							gM = GameMessage.new("setLibraryNumber",user.mainBoardCards.length)
+							gM = GameMessage.new("setLibraryNumber",msgUsername,msgUID,user.mainBoardCards.length)
 							response = ResponseMessage.new("game",msgUsername,msgUID,gM)
 							response.send(ws)						#self's library to self
 							response.send($game.wsID_wsHash[user.oppo.wsObjectID])		#self's library to oppo
-							gM = GameMessage.new("setLibraryNumber",user.oppo.mainBoardCards.length)
+							gM = GameMessage.new("setLibraryNumber",msgUsername,msgUID,user.oppo.mainBoardCards.length)
 							response = ResponseMessage.new("game",user.oppo.username,user.oppo.uid,gM)
 							response.send(ws)						#oppo's lib to self
 							$game.initiated = true
@@ -122,6 +124,9 @@ EventMachine.run {
 						#don't need to send the other player any message except for the 'init' message, which we already sent
 						restartUser(user)
 					end
+				when "game"
+					gameBody = JSON.parse(msgBody)
+					processGameMessage(gameBody)
 				else
 			end
 		}

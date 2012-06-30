@@ -38,11 +38,33 @@ class Game
 	end
 end
 
-class GameMessage
-	attr_accessor :type, :body
-
-	def initialize(t,b)
+class ResponseMessage
+	attr_accessor :type, :username, :uid, :body
+	
+	def serialize
+		return ActiveSupport::JSON.encode(self)
+	end
+	
+	def initialize(t="",n="",i="",b="")
 		@type = t
+		@username = n
+		@uid = i
+		@body = b
+	end
+	
+	def send(ws)
+		ws.send(self.serialize)
+		puts "sending message to "+$game.wsID_userHash[ws.object_id].username+", "+ self.serialize
+	end
+end
+
+class GameMessage
+	attr_accessor :type, :username, :uid, :body
+
+	def initialize(t="",n="",i="",b="")
+		@type = t
+		@username = n
+		@uid = i
 		@body = b
 	end
 

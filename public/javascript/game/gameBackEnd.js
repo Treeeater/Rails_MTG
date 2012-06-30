@@ -9,6 +9,14 @@ clearStatusBox = function ()
 	$('#statusbox').val('');
 }
 
+GameMessage = function(type, username, uid, body)
+{
+	this.type = type;
+	this.username = username;
+	this.uid = uid;
+	this.body = body;
+}
+
 Message = function(type, username, uid, body)
 {
 	this.type = type;
@@ -58,6 +66,14 @@ function processGameMessage(s,msgUID,msgUserName)
 		if (msgUID==myUID) stage.get("#libraryCountText")[0].attrs.text = s.body;
 		else stage.get("#oppoLibraryCountText")[0].attrs.text=s.body;
 		FixedLayer.draw();
+		break;
+	case "chooseColor":
+		log(s.username + " chose " + s.body + ".\n\n");
+		chooseColorVisual(s.body);
+		break;
+	case "removeColor":
+		log(s.username + " removed " + s.body + ".\n\n");
+		removeColorVisual(s.body);
 		break;
 	default:
 	}
@@ -125,3 +141,18 @@ function processMessage(s)
 	}
 }
 
+function chooseColor(l)
+//when user clicks on any of the five color symbols
+{
+	var gameMsg = new GameMessage("chooseColor",myUsername,myUID,l)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
+function removeColor(l)
+//when user clicks on the tick on the five color symbols, trying to remove it
+{
+	var gameMsg = new GameMessage("removeColor",myUsername,myUID,l)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}

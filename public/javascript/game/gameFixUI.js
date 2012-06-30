@@ -1,6 +1,67 @@
 //helpers:
-var chooseColor = function(l){
+var chooseColorVisual = function(l){
+	var xx,yy;
+	switch (l){
+		case "plains":
+			xx = 20;
+			yy = 500;
+			break;
+		case "island":
+			xx = 20;
+			yy = 540;
+			break;
+		case "swamp":
+			xx = 20;
+			yy = 580;
+			break;
+		case "mountain":
+			xx = 20;
+			yy = 620;
+			break;
+		case "forest":
+			xx = 20;
+			yy = 660;
+			break;
+		default:
+	}
+	var tickImage = new Image();
+	tickImage.onload = function() {
+		var image = new Kinetic.Image({x: xx, y: yy, image: tickImage, width: 30, height: 30, id: "tickImage"+l});
+		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
+		image.on("mouseout",function(){document.body.style.cursor = "default";});
+		image.on("click",removeColor.bind(window,l))
+		FixedLayer.add(image);
+		FixedLayer.draw();
+	}
+	tickImage.src = hostServerAddress+"assets/game/general/greenTick.png";
 };
+var removeColorVisual = function (l){FixedLayer.remove(stage.get("#tickImage"+l)[0]);FixedLayer.draw();};
+
+var rightClickOwnLibrary = function (evt){
+	var drawACard = function(){
+		log("drawed a card");
+	};
+	var drawXCard = function(){
+		log("drawed x card");
+	};
+	var peekCards = function(){
+		log("peeked x card");
+	};
+	var shuffle = function(){
+		log("shuffled");
+	};
+	items = [{text:"draw a card",func:drawACard},{text:"draw x cards",func:drawXCard},{text:"look at the top x card",func:peekCards},{text:"shuffle library",func:shuffle}];
+	mousePosition = stage.getMousePosition();
+	x = mousePosition.x;
+	y = mousePosition.y;
+	if (evt.which == 3)
+	{
+		//right click
+		createContextMenu(x,y,items);
+	}
+}
+
+
 //onload:
 function loadFixedFrames() {
 	stage = new Kinetic.Stage({
@@ -266,11 +327,12 @@ function loadFixedFrames() {
 	FixedLayer.add(endTurnPhaseBox);
 	FixedLayer.add(endTurnPhase);
 
-//library, grvy and exile
+//oppo library, grvy and exile
 
 	var libraryImage = new Image();
 	libraryImage.onload = function() {
 		var image = new Kinetic.Image({x: 80,y: 710,image: libraryImage,width: 50,height: 50,id: "libraryImage"});
+		image.on("click",rightClickOwnLibrary);
 		FixedLayer.add(image);
 		FixedLayer.draw();
 	}
@@ -287,7 +349,7 @@ function loadFixedFrames() {
 	grvyImage.src = hostServerAddress+"assets/game/general/grvy.jpg";
 	var grvyCountText = new Kinetic.Text({x: 180,y: 800,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"grvyCountText"});
 	FixedLayer.add(grvyCountText);
-libraryCountText
+
 	var exileImage = new Image();
 	exileImage.onload = function() {
 		var image = new Kinetic.Image({x: 80,y: 840,image: exileImage,width: 50,height: 50,id: "exileImage"});
@@ -298,42 +360,59 @@ libraryCountText
 	var exileCountText = new Kinetic.Text({x: 180,y: 865,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"exileCountText"});
 	FixedLayer.add(exileCountText);
 
-//oppo library, grvy and exile
+//library, grvy and exile
 
 	var oppoLibraryImage = new Image();
 	oppoLibraryImage.onload = function() {
-		var image = new Kinetic.Image({x: 80,y: 500,image: libraryImage,width: 50,height: 50,id: "oppoLibraryImage"});
+		var image = new Kinetic.Image({x: 80,y: 495,image: oppoLibraryImage,width: 50,height: 50,id: "oppoLibraryImage"});
 		FixedLayer.add(image);
 		FixedLayer.draw();
 	}
 	oppoLibraryImage.src = hostServerAddress+"assets/game/general/library.jpg";
-	var oppoLibraryCountText = new Kinetic.Text({x: 180,y: 525,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoLibraryCountText"});
+	var oppoLibraryCountText = new Kinetic.Text({x: 180,y: 520,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoLibraryCountText"});
 	FixedLayer.add(oppoLibraryCountText);
 
 	var oppoGrvyImage = new Image();
 	oppoGrvyImage.onload = function() {
-		var image = new Kinetic.Image({x: 80,y: 570,image: grvyImage,width: 50,height: 50,id: "oppoGrvyImage"});
+		var image = new Kinetic.Image({x: 80,y: 545,image: oppoGrvyImage,width: 50,height: 50,id: "oppoGrvyImage"});
 		FixedLayer.add(image);
 		FixedLayer.draw();
 	}
 	oppoGrvyImage.src = hostServerAddress+"assets/game/general/grvy.jpg";
-	var oppoGrvyCountText = new Kinetic.Text({x: 180,y: 590,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoGrvyCountText"});
+	var oppoGrvyCountText = new Kinetic.Text({x: 180,y: 570,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoGrvyCountText"});
 	FixedLayer.add(oppoGrvyCountText);
 
 	var oppoExileImage = new Image();
 	oppoExileImage.onload = function() {
-		var image = new Kinetic.Image({x: 80,y: 640,image: exileImage,width: 50,height: 50,id: "oppoExileImage"});
+		var image = new Kinetic.Image({x: 80,y: 595,image: oppoExileImage,width: 50,height: 50,id: "oppoExileImage"});
 		FixedLayer.add(image);
 		FixedLayer.draw();
 	}
 	oppoExileImage.src = hostServerAddress+"assets/game/general/exile.jpg";
-	var oppoExileCountText = new Kinetic.Text({x: 180,y: 675,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoExileCountText"});
+	var oppoExileCountText = new Kinetic.Text({x: 180,y: 620,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoExileCountText"});
 	FixedLayer.add(oppoExileCountText);
 
+	var oppoHandCardImage = new Image();
+	oppoHandCardImage.onload = function() {
+		var image = new Kinetic.Image({x: 80,y: 645,image: oppoHandCardImage,width: 50,height: 50,id: "oppoHandCardImage"});
+		FixedLayer.add(image);
+		FixedLayer.draw();
+	}
+	oppoHandCardImage.src = hostServerAddress+"assets/game/general/handCard.jpg";
+	var oppoHandCardCountText = new Kinetic.Text({x: 180,y: 670,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoHandCardCountText"});
+	FixedLayer.add(oppoHandCardCountText);
 
 	//finalize
 	stage.add(FixedLayer);
-	document.getElementById('container').firstChild.children[2].oncontextmenu = function() {
+	ContextLayer = new Kinetic.Layer();
+	stage.add(ContextLayer);
+	ContextLayer.draw();
+	//this hidden box is for click detection, workaround for kineticjs not supporting 'on' method on layer
+	var contextMenuHiddenBox = new Kinetic.Rect({x: 0, y: 0, width: 1280, height: 900, stroke: "black",strokeWidth: 0,id: "contextMenuHiddenBox"});
+	contextMenuHiddenBox.on("click",clickedContextHiddenBox);
+	FixedLayer.add(contextMenuHiddenBox);
+	FixedLayer.draw();
+	document.getElementById('container').firstChild.children[3].oncontextmenu = function() {
 		return false;
 	}
 	
