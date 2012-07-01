@@ -40,15 +40,19 @@ var removeColorVisual = function (l){FixedLayer.remove(stage.get("#tickImage"+l)
 var rightClickOwnLibrary = function (evt){
 	var drawACard = function(){
 		log("drawed a card");
+		clickedContextHiddenBox();
 	};
 	var drawXCard = function(){
 		log("drawed x card");
+		clickedContextHiddenBox();
 	};
 	var peekCards = function(){
 		log("peeked x card");
+		clickedContextHiddenBox();
 	};
 	var shuffle = function(){
 		log("shuffled");
+		clickedContextHiddenBox();
 	};
 	items = [{text:"draw a card",func:drawACard},{text:"draw x cards",func:drawXCard},{text:"look at the top x card",func:peekCards},{text:"shuffle library",func:shuffle}];
 	mousePosition = stage.getMousePosition();
