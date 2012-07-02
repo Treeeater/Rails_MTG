@@ -22,6 +22,7 @@ forestCount = "<%= params[:L5] %>";
 <div id="meStatusContainer">Me<%= image_tag("lobby/broken.png", id:"status_me_img", alt: "broken", height: "20px")%></div>
 <div id="oppoStatusContainer">He/She<%= image_tag("lobby/broken.png", id:"status_oppo_img", alt: "broken", height: "20px")%></div>
 <textarea id="statusbox" disabled="disabled" placeholder="Game's chatbox"></textarea>
+<input id="chatInput" type="text" disabled="disabled" onkeydown="testAndSendChatMsg(event);" value="Hi"></input>
 <%= button_to_function "Send Message", "chatSendMessage()", :class => "btn btn-medium btn-primary" %>
 <%= button_to_function "Go to sideboard", "gameOver()", :class => "btn btn-medium btn-primary", :style => "margin-top:10px" %>
 </div>

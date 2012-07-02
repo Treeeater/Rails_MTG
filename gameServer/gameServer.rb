@@ -30,11 +30,51 @@ def processGameMessage(gb)
 		when "chooseColor"
 			gameResponse = GameMessage.new("chooseColor",msgUsername,msgUID,msgBody)
 			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+			case msgBody
+				when "plains"
+					$game.gameState.w = true
+				when "island"
+					$game.gameState.u = true
+				when "swamp"
+					$game.gameState.b = true
+				when "mountain"
+					$game.gameState.r = true
+				when "forest"
+					$game.gameState.g = true
+				else
+			end
 			$game.wsID_wsHash.each_value{|w|
 				response.send(w)
 			}
 		when "removeColor"
 			gameResponse = GameMessage.new("removeColor",msgUsername,msgUID,msgBody)
+			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+			case msgBody
+				when "plains"
+					$game.gameState.w = false
+				when "island"
+					$game.gameState.u = false
+				when "swamp"
+					$game.gameState.b = false
+				when "mountain"
+					$game.gameState.r = false
+				when "forest"
+					$game.gameState.g = false
+				else
+			end
+			$game.wsID_wsHash.each_value{|w|
+				response.send(w)
+			}
+		when "choosePhase"
+			gameResponse = GameMessage.new("choosePhase",msgUsername,msgUID,msgBody)
+			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+			$game.gameState.phase = msgBody
+			$game.wsID_wsHash.each_value{|w|
+				response.send(w)
+			}
+		when "adjustLifeTotal"
+			$game.users[msgUID].lifeTotal += msgBody.to_i
+			gameResponse = GameMessage.new("adjustLifeTotal",msgUsername,msgUID,$game.users[msgUID].lifeTotal.to_s)
 			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
 			$game.wsID_wsHash.each_value{|w|
 				response.send(w)
@@ -49,6 +89,7 @@ EventMachine.run {
 	$game.wsID_userHash = Hash.new
 	$game.wsID_wsHash = Hash.new
 	$game.initiated = false
+	$game.gameState = GameState.new
 	puts "Game server opened at localhost on port " + (12331+ARGV[0].to_i).to_s + "!"
 	EventMachine::WebSocket.start(:host => "localhost", :port => (12331+ARGV[0].to_i) ) do |ws|
 	
@@ -84,7 +125,7 @@ EventMachine.run {
 					user = nil
 					if ($game.users.has_key?(msgUID))
 						#this user is reconnecting.
-						$game.userReconnect(msgUID,ws)
+						$game.userReconnect(msgUID,msgUsername,ws)
 						user = $game.users[msgUID]
 					else
 						if ($game.users.first!=nil)
@@ -127,6 +168,11 @@ EventMachine.run {
 				when "game"
 					gameBody = JSON.parse(msgBody)
 					processGameMessage(gameBody)
+				when "chat"
+					response = ResponseMessage.new("chat",msgUsername,msgUID,msgBody)
+					$game.wsID_wsHash.each_value{|w|
+						response.send(w)
+					}
 				else
 			end
 		}

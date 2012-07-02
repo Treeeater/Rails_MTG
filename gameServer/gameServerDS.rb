@@ -4,8 +4,12 @@ require './sealedServer/card.rb'
 require 'sqlite3'
 require 'active_support'
 
+class GameState
+	attr_accessor :w, :u, :b, :r, :g, :phase
+end
+
 class Game
-	attr_accessor :users, :wsID_userHash, :wsID_wsHash, :initiated
+	attr_accessor :users, :wsID_userHash, :wsID_wsHash, :initiated, :gameState
 	
 	def userDelete(uID,wsID)
 		@users.delete(leavingUID)
@@ -20,11 +24,12 @@ class Game
 		@users[uID].wsObjectID = 0
 	end
 
-	def userReconnect(uID,ws)
+	def userReconnect(uID,userName,ws)
 		@users[uID].connectionStatus = true
 		@users[uID].wsObjectID = ws.object_id
 		@wsID_userHash[ws.object_id] = @users[uID]
 		@wsID_wsHash[ws.object_id] = ws
+		reconstructGameState(uID,userName,ws)
 	end
 	
 	def connectedUserNumber()
@@ -36,6 +41,48 @@ class Game
 		}
 		return i
 	end
+	
+	def reconstructGameState(uID,userName,ws)
+		#set my life total
+		gameResponse = GameMessage.new("adjustLifeTotal",userName,uID,$game.users[uID].lifeTotal.to_s)
+		response = ResponseMessage.new("game",userName,uID,gameResponse)
+		response.send(ws)
+		#set oppo life total
+		gameResponse = GameMessage.new("adjustLifeTotal",$game.users[uID].oppo.username,$game.users[uID].oppo.uid,$game.users[$game.users[uID].oppo.uid].lifeTotal.to_s)
+		response = ResponseMessage.new("game",$game.users[uID].oppo.username,$game.users[uID].oppo.uid,gameResponse)
+		response.send(ws)
+		#set current phase
+		gameResponse = GameMessage.new("choosePhase",userName,uID,$game.gameState.phase)
+		response = ResponseMessage.new("game",userName,uID,gameResponse)
+		response.send(ws)
+		#set all chosen colors
+		if ($game.gameState.w)
+			gameResponse = GameMessage.new("chooseColor",userName,uID,"plains")
+			response = ResponseMessage.new("game",userName,uID,gameResponse)
+			response.send(ws)
+		end
+		if ($game.gameState.u)
+			gameResponse = GameMessage.new("chooseColor",userName,uID,"island")
+			response = ResponseMessage.new("game",userName,uID,gameResponse)
+			response.send(ws)
+		end
+		if ($game.gameState.b)
+			gameResponse = GameMessage.new("chooseColor",userName,uID,"swamp")
+			response = ResponseMessage.new("game",userName,uID,gameResponse)
+			response.send(ws)
+		end
+		if ($game.gameState.r)
+			gameResponse = GameMessage.new("chooseColor",userName,uID,"mountain")
+			response = ResponseMessage.new("game",userName,uID,gameResponse)
+			response.send(ws)
+		end
+		if ($game.gameState.g)
+			gameResponse = GameMessage.new("chooseColor",userName,uID,"forest")
+			response = ResponseMessage.new("game",userName,uID,gameResponse)
+			response.send(ws)
+		end
+	end
+	
 end
 
 class ResponseMessage
@@ -74,7 +121,7 @@ class GameMessage
 end
 
 class User
-	attr_accessor :uid, :username, :wsObjectID, :mainBoardCards, :sideBoardCards, :connectionStatus, :cardStatus, :oppo
+	attr_accessor :uid, :username, :wsObjectID, :mainBoardCards, :sideBoardCards, :connectionStatus, :cardStatus, :oppo, :lifeTotal
 	
 	def initialize(uid,username,wsObjectID, op=nil)
 		begin
@@ -100,6 +147,7 @@ class User
 			@mainBoardCards = parseCards(mbCardString,db)
 			@sideBoardCards = parseCards(sbCardString,db)
 			@oppo = op
+			@lifeTotal = 20
 			basicLands = getBasicLands();
 			for i in 1..l1
 				mainBoardCards.push(basicLands[0])

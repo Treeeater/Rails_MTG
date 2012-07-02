@@ -103,9 +103,9 @@ function timeOut()
 
 function testAndSend(e)
 {
-	if (e.keyCode==13)
+	if (e.keyCode==13){
 		sendChatMsg($('#chatInput').val());
-	end
+	}
 }
 function sendChatMsg(s)
 {

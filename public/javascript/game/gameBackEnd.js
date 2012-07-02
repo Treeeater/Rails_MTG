@@ -2,11 +2,22 @@
 log = function (s)
 {
 	$('#statusbox').val($('#statusbox').val() + s);
+	var textArea = document.getElementById('statusbox');
+	textArea.scrollTop = textArea.scrollHeight;
 }
 
 clearStatusBox = function ()
 {
 	$('#statusbox').val('');
+}
+
+function testAndSendChatMsg(e)
+{
+	if (e.keyCode==13)
+	{
+		var msg = new Message("chat",myUsername,myUID,$('#chatInput').val());
+		ws.send(JSON.stringify(msg));
+	}
 }
 
 GameMessage = function(type, username, uid, body)
@@ -75,6 +86,13 @@ function processGameMessage(s,msgUID,msgUserName)
 		log(s.username + " removed " + s.body + ".\n\n");
 		removeColorVisual(s.body);
 		break;
+	case "choosePhase":
+		log(s.username + " set the current phase to " + s.body.substr(0,s.body.length-3) + ".\n\n");
+		choosePhaseVisual(s.body);
+		break;
+	case "adjustLifeTotal":
+		log(s.username + " changed their life total to " + s.body + " life.\n\n");
+		adjustLifeTotalVisual(s.body, msgUID == myUID);
 	default:
 	}
 }
@@ -93,6 +111,7 @@ function processMessage(s)
 				if (bothPlayersConnected==2)
 				{
 					log("Both players ready, you can start to draw 7 cards.\n\n");
+					$('#chatInput').removeAttr('disabled');
 					init_status = true;
 				}
 				else if (bothPlayersConnected==1)
@@ -101,6 +120,7 @@ function processMessage(s)
 						bothPlayersConnected++;
 						init_status = true;
 						log("Both players ready, you can start to draw 7 cards.\n\n");
+						$('#chatInput').removeAttr('disabled');
 						$("#status_oppo_img").attr("src",'/assets/lobby/connected.jpg');
 					}
 					else {log("Please wait for your opponent to connect to the game server.\n\n");}
@@ -114,12 +134,14 @@ function processMessage(s)
 					if (init_status==false)
 					{
 						log("Both players ready, you can start to draw 7 cards.\n\n");
+						$('#chatInput').removeAttr('disabled');
 						init_status = true;
 					}
 					else
 					{
 						//your opponent has just reconnected.
 						log("Just FYI your opponent has reconnected. Enjoy your game.\n\n");
+						$('#chatInput').removeAttr('disabled');
 					}
 				}
 				else if (bothPlayersConnected==1)
@@ -132,11 +154,15 @@ function processMessage(s)
 			// this is gotta be opponent disconnect, so no worries.
 			bothPlayersConnected--;
 			$("#status_oppo_img").attr("src",'/assets/lobby/broken.png');
-			log("Just FYI your opponent has disconnected, you can continue deck building regardless. He/She can resume deck building once reconnected.\n\n")
+			log("Just FYI your opponent has disconnected, you can continue deck building regardless. He/She can resume deck building once reconnected.\n\n");
+			$('#chatInput').attr('disabled','disabled');
 			break;
 		case "game":
 			processGameMessage(msg.body,msg.uid,msg.username);
 			break;
+		case "chat":
+			log(msg.username + ": " + msg.body+"\n\n");
+			if (msg.uid == myUID) $('#chatInput').val("");
 		default:
 	}
 }
@@ -149,10 +175,26 @@ function chooseColor(l)
 	ws.send(JSON.stringify(msg));
 }
 
+function choosePhase(l)
+//when user clicks on any of the phase boxes
+{
+	var gameMsg = new GameMessage("choosePhase",myUsername,myUID,l)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
 function removeColor(l)
 //when user clicks on the tick on the five color symbols, trying to remove it
 {
 	var gameMsg = new GameMessage("removeColor",myUsername,myUID,l)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
+function adjustLifeTotal(l)
+//Adjust life total, argument can be negative
+{
+	var gameMsg = new GameMessage("adjustLifeTotal",myUsername,myUID,l)
 	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
 	ws.send(JSON.stringify(msg));
 }
