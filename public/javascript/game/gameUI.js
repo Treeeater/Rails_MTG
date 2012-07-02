@@ -7,6 +7,34 @@ var clickedContextHiddenBox = function(evt)
 		ContextLayer.draw();
 	}	
 }
+var displayCard = function(card)
+{
+	switch(card.position.zone)
+	{	
+	case "hand":
+		handCardDisplayer.display(card);
+		break;
+	default:
+	}
+}
+
+var HandCardDisplayer = function()
+{
+	if (!this.hasOwnProperty("number")) this.number = 0;
+	this.display = function(card)
+	{
+		var handCard = new Image();
+		handCard.onload = function() {
+			number = handCard.getAttribute("number")
+			var image = new Kinetic.Image({x: 250 + 130*number,y: 710,image: handCard,width: 120, draggable:true, height: 160,id: "handCard"+card.cardID.toString()});
+			VisibleCardLayer.add(image);
+			VisibleCardLayer.draw();
+		};
+		handCard.src = card.engSRC;
+		handCard.setAttribute("number",this.number);
+		this.number++;
+	};
+};
 
 var createContextMenu = function (xx,yy,items)
 {
@@ -53,4 +81,9 @@ var createContextMenu = function (xx,yy,items)
 	}
 	ContextLayer.add(contextMenuGroup);
 	ContextLayer.draw();
-}
+};
+
+(function initUICards()
+{
+	handCardDisplayer = new HandCardDisplayer();
+})();

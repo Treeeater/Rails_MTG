@@ -45,19 +45,27 @@ var choosePhaseVisual = function(l){
 };
 
 var adjustLifeTotalVisual = function(l,me){
-	var adjustment = parseInt(l);
-	if (me) stage.get("#yourLife")[0].attrs.text = "Your life: "+adjustment.toString();
-	else stage.get("#oppoLife")[0].attrs.text = "Oppo life: "+adjustment.toString();
+	if (me) stage.get("#yourLife")[0].attrs.text = "Your life: "+l;
+	else stage.get("#oppoLife")[0].attrs.text = "Oppo life: "+l;
 	FixedLayer.draw();
 };
 
+var adjustOppoHandCardVisual = function(l){
+	stage.get("#oppoHandCardCountText")[0].attrs.text = l;
+	FixedLayer.draw();
+}
+
 var rightClickOwnLibrary = function (evt){
 	var drawACard = function(){
-		log("drawed a card");
+		//log("drawed a card");
+		drawCards(1);
 		clickedContextHiddenBox();
 	};
 	var drawXCard = function(){
-		log("drawed x card");
+		//log("drawed x card");
+		var x = prompt("How many cards would you like to draw?");
+		x = parseInt(x);
+		if (x!=NaN) drawCards(x);
 		clickedContextHiddenBox();
 	};
 	var peekCards = function(){
@@ -89,13 +97,15 @@ var rightClickOwnLifeBox = function (evt){
 		clickedContextHiddenBox();
 	};
 	var addXLife = function(){
-		var x = prompt("How many life do you want to gain?")
-		adjustLifeTotal(x);
+		var x = prompt("How many life do you want to gain?");
+		x = parseInt(x);
+		if (x!=NaN) adjustLifeTotal(x);
 		clickedContextHiddenBox();
 	};
 	var deductXLife = function(){
-		var x = prompt("How many life do you want to deduct?")
-		adjustLifeTotal(-x);
+		var x = prompt("How many life do you want to deduct?");
+		x = parseInt(x);
+		if (x!=NaN) adjustLifeTotal(-x);
 		clickedContextHiddenBox();
 	};
 	items = [{text:"Add 1 life",func:add1Life},{text:"Deduct 1 life",func:deduct1Life},{text:"Add X life",func:addXLife},{text:"Deduct X life",func:deductXLife}];
@@ -377,12 +387,14 @@ function loadFixedFrames() {
 	cur_phase = undefined;
 	//finalize
 	stage.add(FixedLayer);
+	VisibleCardLayer = new Kinetic.Layer();
+	stage.add(VisibleCardLayer);
 	ContextLayer = new Kinetic.Layer();
 	stage.add(ContextLayer);
 	ContextLayer.draw();
 	//this hidden box is for click detection, workaround for kineticjs not supporting 'on' method on layer
 	FixedLayer.draw();
-	document.getElementById('container').firstChild.children[3].oncontextmenu = function() {
+	document.getElementById('container').firstChild.children[4].oncontextmenu = function() {
 		return false;
 	}
 	

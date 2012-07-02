@@ -10,15 +10,61 @@ def bothPlayersConnected?
 	return $game.connectedUserNumber()==2
 end
 
-def restartUser(user)
-	ws = $game.wsID_wsHash[user.wsObjectID]
+def reconstructGameState(user)
 	oppo = user.oppo
-	gM = GameMessage.new("setLibraryNumber",user.username,user.uid,user.mainBoardCards.length)
-	response = ResponseMessage.new("game",user.username,user.uid,gM)
-	response.send(ws)						#self's library to self
-	gM = GameMessage.new("setLibraryNumber",user.oppo.username,user.oppo.uid,user.oppo.mainBoardCards.length)
-	response = ResponseMessage.new("game",user.oppo.username,user.oppo.uid,gM)
-	response.send(ws)						#oppo's lib to self
+	uID = user.uid
+	userName = user.username
+	ws = $game.wsID_wsHash[user.wsObjectID]
+	#set my lib total
+	gameResponse = GameMessage.new("setLibraryNumber",userName,uID,user.library.cards.length)
+	response = ResponseMessage.new("game",userName,uID,gameResponse)
+	response.send(ws)
+	#set oppo lib total
+	gameResponse = GameMessage.new("setLibraryNumber",oppo.username,oppo.uid,oppo.library.cards.length)
+	response = ResponseMessage.new("game",userName,uID,gameResponse)
+	response.send(ws)
+	#set oppo hand total
+	gameResponse = GameMessage.new("setOppoHandNumber",oppo.username,oppo.uid,oppo.hand.cards.length)
+	response = ResponseMessage.new("game",userName,uID,gameResponse)
+	response.send(ws)
+	#set my life total
+	gameResponse = GameMessage.new("adjustLifeTotal",userName,uID,$game.users[uID].lifeTotal.to_s)
+	response = ResponseMessage.new("game",userName,uID,gameResponse)
+	response.send(ws)
+	#set oppo life total
+	gameResponse = GameMessage.new("adjustLifeTotal",oppo.username,oppo.uid,$game.users[oppo.uid].lifeTotal.to_s)
+	response = ResponseMessage.new("game",oppo.username,oppo.uid,gameResponse)
+	response.send(ws)
+	#set current phase
+	gameResponse = GameMessage.new("choosePhase",userName,uID,$game.gameState.phase)
+	response = ResponseMessage.new("game",userName,uID,gameResponse)
+	response.send(ws)
+	#set all chosen colors
+	if ($game.gameState.w)
+		gameResponse = GameMessage.new("chooseColor",userName,uID,"plains")
+		response = ResponseMessage.new("game",userName,uID,gameResponse)
+		response.send(ws)
+	end
+	if ($game.gameState.u)
+		gameResponse = GameMessage.new("chooseColor",userName,uID,"island")
+		response = ResponseMessage.new("game",userName,uID,gameResponse)
+		response.send(ws)
+	end
+	if ($game.gameState.b)
+		gameResponse = GameMessage.new("chooseColor",userName,uID,"swamp")
+		response = ResponseMessage.new("game",userName,uID,gameResponse)
+		response.send(ws)
+	end
+	if ($game.gameState.r)
+		gameResponse = GameMessage.new("chooseColor",userName,uID,"mountain")
+		response = ResponseMessage.new("game",userName,uID,gameResponse)
+		response.send(ws)
+	end
+	if ($game.gameState.g)
+		gameResponse = GameMessage.new("chooseColor",userName,uID,"forest")
+		response = ResponseMessage.new("game",userName,uID,gameResponse)
+		response.send(ws)
+	end
 end
 
 def processGameMessage(gb)
@@ -79,6 +125,21 @@ def processGameMessage(gb)
 			$game.wsID_wsHash.each_value{|w|
 				response.send(w)
 			}
+		when "drawCards"
+			drawnCards = $game.users[msgUID].library.drawCards(msgBody.to_i)
+			gameResponse = GameMessage.new("drawCards",msgUsername,msgUID,ActiveSupport::JSON.encode(drawnCards))
+			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+			response.send($game.wsID_wsHash[$game.users[msgUID].wsObjectID])		#only send this card info to self
+			
+			gameResponse = GameMessage.new("drawCards",msgUsername,msgUID,ActiveSupport::JSON.encode([drawnCards.length,$game.users[msgUID].hand.cards.length]))
+			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+			response.send($game.wsID_wsHash[$game.users[msgUID].oppo.wsObjectID])		#send how many cards drawn to oppo
+			
+			gameResponse = GameMessage.new("setLibraryNumber",msgUsername,msgUID,$game.users[msgUID].library.cards.length)
+			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+			$game.wsID_wsHash.each_value{|w|
+				response.send(w)		#change library number.
+			}														
 		else
 	end
 end
@@ -90,6 +151,7 @@ EventMachine.run {
 	$game.wsID_wsHash = Hash.new
 	$game.initiated = false
 	$game.gameState = GameState.new
+	$cardHash = Hash.new
 	puts "Game server opened at localhost on port " + (12331+ARGV[0].to_i).to_s + "!"
 	EventMachine::WebSocket.start(:host => "localhost", :port => (12331+ARGV[0].to_i) ) do |ws|
 	
@@ -125,7 +187,7 @@ EventMachine.run {
 					user = nil
 					if ($game.users.has_key?(msgUID))
 						#this user is reconnecting.
-						$game.userReconnect(msgUID,msgUsername,ws)
+						$game.userReconnect(msgUID,ws)
 						user = $game.users[msgUID]
 					else
 						if ($game.users.first!=nil)
@@ -147,6 +209,10 @@ EventMachine.run {
 							gM = GameMessage.new("setLibraryNumber",msgUsername,msgUID,user.mainBoardCards.length)
 							response = ResponseMessage.new("game",msgUsername,msgUID,gM)
 							response.send(ws)
+							#set current phase
+							gameResponse = GameMessage.new("choosePhase",msgUsername,msgUID,$game.gameState.phase)
+							response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+							response.send(ws)
 						else
 							#both players connected.
 							user.oppo.oppo = user						#set oppo's oppo
@@ -154,16 +220,20 @@ EventMachine.run {
 							response = ResponseMessage.new("game",msgUsername,msgUID,gM)
 							response.send(ws)						#self's library to self
 							response.send($game.wsID_wsHash[user.oppo.wsObjectID])		#self's library to oppo
-							gM = GameMessage.new("setLibraryNumber",msgUsername,msgUID,user.oppo.mainBoardCards.length)
-							response = ResponseMessage.new("game",user.oppo.username,user.oppo.uid,gM)
+							gM = GameMessage.new("setLibraryNumber",user.oppo.username,user.oppo.uid,user.oppo.mainBoardCards.length)
+							response = ResponseMessage.new("game",msgUsername,msgUID,gM)
 							response.send(ws)						#oppo's lib to self
+							#set current phase
+							gameResponse = GameMessage.new("choosePhase",msgUsername,msgUID,$game.gameState.phase)
+							response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+							response.send(ws)
 							$game.initiated = true
 						end
 					else
 						#this player reconnected.
 						#let's assume the player is the second player (program should have exited if both player disconnects.
 						#don't need to send the other player any message except for the 'init' message, which we already sent
-						restartUser(user)
+						reconstructGameState(user)
 					end
 				when "game"
 					gameBody = JSON.parse(msgBody)

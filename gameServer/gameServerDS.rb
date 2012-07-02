@@ -5,7 +5,18 @@ require 'sqlite3'
 require 'active_support'
 
 class GameState
-	attr_accessor :w, :u, :b, :r, :g, :phase
+	attr_accessor :w, :u, :b, :r, :g, :phase, :cardCount
+	
+	def initialize()
+		@w = false
+		@u = false
+		@b = false
+		@r = false
+		@g = false
+		@phase = "upkeepPhaseBox"
+		@cardCount = 0
+	end
+	
 end
 
 class Game
@@ -24,12 +35,11 @@ class Game
 		@users[uID].wsObjectID = 0
 	end
 
-	def userReconnect(uID,userName,ws)
+	def userReconnect(uID,ws)
 		@users[uID].connectionStatus = true
 		@users[uID].wsObjectID = ws.object_id
 		@wsID_userHash[ws.object_id] = @users[uID]
 		@wsID_wsHash[ws.object_id] = ws
-		reconstructGameState(uID,userName,ws)
 	end
 	
 	def connectedUserNumber()
@@ -40,47 +50,6 @@ class Game
 			end
 		}
 		return i
-	end
-	
-	def reconstructGameState(uID,userName,ws)
-		#set my life total
-		gameResponse = GameMessage.new("adjustLifeTotal",userName,uID,$game.users[uID].lifeTotal.to_s)
-		response = ResponseMessage.new("game",userName,uID,gameResponse)
-		response.send(ws)
-		#set oppo life total
-		gameResponse = GameMessage.new("adjustLifeTotal",$game.users[uID].oppo.username,$game.users[uID].oppo.uid,$game.users[$game.users[uID].oppo.uid].lifeTotal.to_s)
-		response = ResponseMessage.new("game",$game.users[uID].oppo.username,$game.users[uID].oppo.uid,gameResponse)
-		response.send(ws)
-		#set current phase
-		gameResponse = GameMessage.new("choosePhase",userName,uID,$game.gameState.phase)
-		response = ResponseMessage.new("game",userName,uID,gameResponse)
-		response.send(ws)
-		#set all chosen colors
-		if ($game.gameState.w)
-			gameResponse = GameMessage.new("chooseColor",userName,uID,"plains")
-			response = ResponseMessage.new("game",userName,uID,gameResponse)
-			response.send(ws)
-		end
-		if ($game.gameState.u)
-			gameResponse = GameMessage.new("chooseColor",userName,uID,"island")
-			response = ResponseMessage.new("game",userName,uID,gameResponse)
-			response.send(ws)
-		end
-		if ($game.gameState.b)
-			gameResponse = GameMessage.new("chooseColor",userName,uID,"swamp")
-			response = ResponseMessage.new("game",userName,uID,gameResponse)
-			response.send(ws)
-		end
-		if ($game.gameState.r)
-			gameResponse = GameMessage.new("chooseColor",userName,uID,"mountain")
-			response = ResponseMessage.new("game",userName,uID,gameResponse)
-			response.send(ws)
-		end
-		if ($game.gameState.g)
-			gameResponse = GameMessage.new("chooseColor",userName,uID,"forest")
-			response = ResponseMessage.new("game",userName,uID,gameResponse)
-			response.send(ws)
-		end
 	end
 	
 end
@@ -121,7 +90,7 @@ class GameMessage
 end
 
 class User
-	attr_accessor :uid, :username, :wsObjectID, :mainBoardCards, :sideBoardCards, :connectionStatus, :cardStatus, :oppo, :lifeTotal
+	attr_accessor :uid, :username, :wsObjectID, :mainBoardCards, :sideBoardCards, :connectionStatus, :oppo, :lifeTotal, :library, :hand
 	
 	def initialize(uid,username,wsObjectID, op=nil)
 		begin
@@ -148,22 +117,23 @@ class User
 			@sideBoardCards = parseCards(sbCardString,db)
 			@oppo = op
 			@lifeTotal = 20
-			basicLands = getBasicLands();
 			for i in 1..l1
-				mainBoardCards.push(basicLands[0])
+				mainBoardCards.push(getBasicLands(0))
 			end
 			for i in 1..l2
-				mainBoardCards.push(basicLands[1])
+				mainBoardCards.push(getBasicLands(1))
 			end
 			for i in 1..l3
-				mainBoardCards.push(basicLands[2])
+				mainBoardCards.push(getBasicLands(2))
 			end
 			for i in 1..l4
-				mainBoardCards.push(basicLands[3])
+				mainBoardCards.push(getBasicLands(3))
 			end
 			for i in 1..l5
-				mainBoardCards.push(basicLands[4])
+				mainBoardCards.push(getBasicLands(4))
 			end
+			@library = Library.new(mainBoardCards,@uid)		#already shuffled during initialization
+			@hand = Hand.new(@uid)
 			@connectionStatus = true
 		rescue SQLite3::Exception => e
 			p "Exception occured : "+e.to_s
@@ -184,33 +154,134 @@ class User
 		return returnArray
 	end
 
+	#helper functions
+	def searchForCard(exp, idInSet, db)
+		begin
+			card = nil
+			card = db.get_first_row "SELECT * FROM mtg_cards WHERE Expansion='"+exp+"' AND IdInSet='" + idInSet.to_s + "'"
+			if (card==nil) then return nil end
+			c = Card.new(card[1],card[2],card[3],card[4],card[5],card[6],card[7],card[8],card[9],card[10],card[11],card[12])
+			return CardVisible.new(c,@uid)
+		rescue SQLite3::Exception => e
+			p "Exception occured : "+e.to_s
+		end
+	end
+	
+	def getBasicLands(l)
+		case l
+			when 0
+				return CardVisible.new(Card.new("1000","plains","16", "http://magiccards.info/scans/en/avr/230.jpg", "http://magiccards.info/scans/cn/avr/230.jpg", nil, nil, "0", "0", "0", "1", "AVR"),@uid)
+			when 1
+				return CardVisible.new(Card.new("1001","island","16", "http://magiccards.info/scans/en/avr/235.jpg", "http://magiccards.info/scans/cn/avr/235.jpg", nil, nil, "0", "0", "0", "1", "AVR"),@uid)
+			when 2
+				return CardVisible.new(Card.new("1001","swamp","16", "http://magiccards.info/scans/en/avr/236.jpg", "http://magiccards.info/scans/cn/avr/236.jpg", nil, nil, "0", "0", "0", "1", "AVR"),@uid)
+			when 3
+				return CardVisible.new(Card.new("1001","mountain","16", "http://magiccards.info/scans/en/avr/239.jpg", "http://magiccards.info/scans/cn/avr/239.jpg", nil, nil, "0", "0", "0", "1", "AVR"),@uid)
+			when 4
+				return CardVisible.new(Card.new("1001","forest","16", "http://magiccards.info/scans/en/avr/244.jpg", "http://magiccards.info/scans/cn/avr/244.jpg", nil, nil, "0", "0", "0", "1", "AVR"),@uid)
+			else
+		end
+	end
+	
 end
 
-def searchForCard(exp, idInSet, db)
-	begin
-		stmt = db.prepare "SELECT * FROM mtg_cards WHERE Expansion='"+exp+"' AND IdInSet='" + idInSet.to_s + "'"
-		rs = stmt.execute
-		resultLength = 0
-		card = nil
-		rs.each do |r|
-			resultLength+=1
-			card = r
-		end
-		if (resultLength!=1) then return nil end
-		return Card.new(card[1],card[2],card[3],card[4],card[5],card[6],card[7],card[8],card[9],card[10],card[11],card[12])
-	rescue SQLite3::Exception => e
-		p "Exception occured : "+e.to_s
-	ensure
-		stmt.close if stmt
+class Position
+	attr_accessor :zone, :x, :y, :order, :facedown, :tapped, :transformed, :flipped
+	
+	def initialize()
+		@zone = "lib"
+		@x = 0
+		@y = 0
+		@order = 0
+		@facedown = false
+		@tapped = false
+		@transformed = false
+		@flipped = false
 	end
 end
 
-def getBasicLands()
-	basicLands = Array.new
-	basicLands[0] = Card.new("1000","plains","16", "http://magiccards.info/scans/en/avr/230.jpg", "http://magiccards.info/scans/cn/avr/230.jpg", nil, nil, "0", "0", "0", "1", "AVR")
-	basicLands[1] = Card.new("1001","island","16", "http://magiccards.info/scans/en/avr/235.jpg", "http://magiccards.info/scans/cn/avr/235.jpg", nil, nil, "0", "0", "0", "1", "AVR")
-	basicLands[2] = Card.new("1001","swamp","16", "http://magiccards.info/scans/en/avr/236.jpg", "http://magiccards.info/scans/cn/avr/236.jpg", nil, nil, "0", "0", "0", "1", "AVR")
-	basicLands[3] = Card.new("1001","mountain","16", "http://magiccards.info/scans/en/avr/239.jpg", "http://magiccards.info/scans/cn/avr/239.jpg", nil, nil, "0", "0", "0", "1", "AVR")
-	basicLands[4] = Card.new("1001","forest","16", "http://magiccards.info/scans/en/avr/244.jpg", "http://magiccards.info/scans/cn/avr/244.jpg", nil, nil, "0", "0", "0", "1", "AVR")
-	return basicLands
+class Counter
+	attr_accessor :type, :number
+	
+	def initialize(t,n)
+		@type = t
+		@number = n
+	end
+	
 end
+
+class CardVisible < Card
+	attr_accessor :cardID, :position, :counters, :ownerUID
+
+	def initialize(c,uid)
+		super(c.idInSet, c.cardName, c.cardType, c.engSRC, c.chiSRC, c.power, c.toughness, c.color, c.cmc, c.level, c.rarity, c.expansion)
+		@cardID = $game.gameState.cardCount
+		@position = Position.new
+		@counters = Array.new
+		@ownerUID = uid
+		$cardHash[@cardID.to_s] = self
+		$game.gameState.cardCount+=1
+	end
+	
+	def to_Client()
+		toReturn = Hash.new
+		toReturn["cardID"] = @cardID
+		toReturn["cardName"] = @cardName
+		toReturn["engSRC"] = @engSRC
+		toReturn["chiSRC"] = @chiSRC
+		toReturn["position"] = @position
+		toReturn["counters"] = @counters
+		toReturn["ownerUID"] = @ownerUID
+		return toReturn
+	end
+end
+
+class Library
+	attr_accessor :cards, :uid
+	#cards is an array which ONLY stores the cardID of each card. If we want to retrieve the real card, refer to $cardHash[]
+	
+	def initialize(mbCards,u)
+		@cards = Array.new
+		mbCards.each{|c|
+			@cards.push(c.cardID)
+		}
+		shuffle()
+		@uid = u
+	end
+	
+	def shuffle()
+		@cards.shuffle!
+		@cards.each_index{|i|
+			$cardHash[@cards[i].to_s].position.order = i
+		}
+	end
+	
+	def drawCards(n)
+		if (n>@cards.length) then return [] end
+		drawnCards = @cards.slice!(0,n)
+		toReturn = Array.new
+		drawnCards.each{|c|
+			$cardHash[c.to_s].position.zone = "hand"
+			$game.users[@uid].hand.cards.push(c)
+			toReturn.push($cardHash[c.to_s].to_Client())
+		}
+		return toReturn
+	end
+end
+
+class Hand
+	attr_accessor :cards, :uid
+	#cards is an array which ONLY stores the cardID of each card.
+	
+	def initialize(u)
+		@cards = Array.new
+		@uid = u
+	end
+	
+	def discard()
+	end
+	
+	def revealCard()
+	end
+end
+

@@ -78,7 +78,7 @@ function processGameMessage(s,msgUID,msgUserName)
 	switch(s.type)
 	{
 	case "setLibraryNumber":
-		if (msgUID==myUID) stage.get("#libraryCountText")[0].attrs.text = s.body;
+		if (s.uid==myUID) stage.get("#libraryCountText")[0].attrs.text = s.body;
 		else stage.get("#oppoLibraryCountText")[0].attrs.text=s.body;
 		FixedLayer.draw();
 		break;
@@ -96,7 +96,30 @@ function processGameMessage(s,msgUID,msgUserName)
 		break;
 	case "adjustLifeTotal":
 		log(s.username + " changed their life total to " + s.body + " life.\n\n");
-		adjustLifeTotalVisual(s.body, msgUID == myUID);
+		adjustLifeTotalVisual(s.body, s.uid == myUID);
+		break;
+	case "drawCards":
+		if (s.uid == myUID)
+		{
+			var drawnCards = JSON.parse(s.body);
+			log(s.username + " drawed " + drawnCards.length.toString() + " card(s).\n\n");
+			var i = 0;
+			for (i = 0; i<drawnCards.length; i++)
+			{
+				displayCard(drawnCards[i]);
+			}
+		}
+		else{
+			//oppo drawed some cards, we need to update oppo hand card number
+			//array of two elements are passed back, the first contains the number of cards drawn, the second contains all the cards in oppo's hand.
+			var drawnCards = JSON.parse(s.body);
+			log(s.username + " drawed " + drawnCards[0] + " card(s).\n\n");
+			adjustOppoHandCardVisual(drawnCards[1])
+		}
+		break;
+	case "setOppoHandNumber":
+		adjustOppoHandCardVisual(s.body)
+		break;
 	default:
 	}
 }
@@ -199,6 +222,13 @@ function adjustLifeTotal(l)
 //Adjust life total, argument can be negative
 {
 	var gameMsg = new GameMessage("adjustLifeTotal",myUsername,myUID,l)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
+function drawCards(l)
+{
+	var gameMsg = new GameMessage("drawCards",myUsername,myUID,l)
 	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
 	ws.send(JSON.stringify(msg));
 }
