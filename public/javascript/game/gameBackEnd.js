@@ -13,11 +13,13 @@ clearStatusBox = function ()
 
 function testAndSendChatMsg(e)
 {
-	if (e.keyCode==13)
-	{
-		var msg = new Message("chat",myUsername,myUID,$('#chatInput').val());
-		ws.send(JSON.stringify(msg));
-	}
+	if (e.keyCode==13) sendChatMsg();
+}
+
+function sendChatMsg()
+{
+	var msg = new Message("chat",myUsername,myUID,$('#chatInput').val());
+	ws.send(JSON.stringify(msg));
 }
 
 GameMessage = function(type, username, uid, body)
@@ -46,6 +48,7 @@ function handShake()
 
 function initBackEndJS()
 {
+	$('#chatInput').attr('disabled','disabled');
 	//Global vars
 	myUsername = $('#account').attr('uname');
 	myUID = $('#account').attr('uid');
@@ -65,6 +68,7 @@ function initBackEndJS()
 		log("Game server disconnected.\n\n");
 		$("#status_oppo_img").attr("src",'/assets/lobby/broken.png');
 		$("#status_me_img").attr("src",'/assets/lobby/broken.png');
+		$('#chatInput').attr('disabled','disabled');
 	}
 	ws.onmessage = processMessage;
 }
