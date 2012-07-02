@@ -65,6 +65,14 @@ def reconstructGameState(user)
 		response = ResponseMessage.new("game",userName,uID,gameResponse)
 		response.send(ws)
 	end
+	#recover your hand cards visually
+	toSend = Array.new
+	user.hand.cards.each{|cID|
+		toSend.push($cardHash[cID.to_s].to_Client())
+	}
+	gameResponse = GameMessage.new("drawCards",userName,uID,ActiveSupport::JSON.encode(toSend))
+	response = ResponseMessage.new("game",userName,uID,gameResponse)
+	response.send(ws)
 end
 
 def processGameMessage(gb)

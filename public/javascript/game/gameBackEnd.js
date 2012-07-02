@@ -181,7 +181,7 @@ function processMessage(s)
 			// this is gotta be opponent disconnect, so no worries.
 			bothPlayersConnected--;
 			$("#status_oppo_img").attr("src",'/assets/lobby/broken.png');
-			log("Just FYI your opponent has disconnected, you can continue deck building regardless. He/She can resume deck building once reconnected.\n\n");
+			log("Just FYI your opponent has disconnected. However, as long as you don't disconnect, game state is preserved. Game will be automatically continued after your opponent reconnects.\n\n");
 			$('#chatInput').attr('disabled','disabled');
 			break;
 		case "game":
