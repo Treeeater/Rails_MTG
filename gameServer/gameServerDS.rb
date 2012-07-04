@@ -5,7 +5,7 @@ require 'sqlite3'
 require 'active_support'
 
 class GameState
-	attr_accessor :w, :u, :b, :r, :g, :phase, :cardCount
+	attr_accessor :w, :u, :b, :r, :g, :phase, :cardCount, :stack
 	
 	def initialize()
 		@w = false
@@ -15,6 +15,7 @@ class GameState
 		@g = false
 		@phase = "upkeepPhaseBox"
 		@cardCount = 0
+		@stack = Stack.new(@uid)
 	end
 	
 end
@@ -90,7 +91,7 @@ class GameMessage
 end
 
 class User
-	attr_accessor :uid, :username, :wsObjectID, :mainBoardCards, :sideBoardCards, :connectionStatus, :oppo, :lifeTotal, :library, :hand
+	attr_accessor :uid, :username, :wsObjectID, :mainBoardCards, :sideBoardCards, :connectionStatus, :oppo, :lifeTotal, :library, :hand, :battlefield
 	
 	def initialize(uid,username,wsObjectID, op=nil)
 		begin
@@ -134,6 +135,7 @@ class User
 			end
 			@library = Library.new(mainBoardCards,@uid)		#already shuffled during initialization
 			@hand = Hand.new(@uid)
+			@battlefield = Battlefield.new(@uid)
 			@connectionStatus = true
 		rescue SQLite3::Exception => e
 			p "Exception occured : "+e.to_s
@@ -186,7 +188,7 @@ class User
 end
 
 class Position
-	attr_accessor :zone, :x, :y, :order, :facedown, :tapped, :transformed, :flipped
+	attr_accessor :zone, :x, :y, :order, :facedown, :tapped, :transformed, :flipped, :scaleX, :scaleY
 	
 	def initialize()
 		@zone = "lib"
@@ -197,6 +199,8 @@ class Position
 		@tapped = false
 		@transformed = false
 		@flipped = false
+		@scaleX = 120
+		@scaleY = 160
 	end
 end
 
@@ -219,7 +223,7 @@ class CardVisible < Card
 		@position = Position.new
 		@counters = Array.new
 		@ownerUID = uid
-		$cardHash[@cardID.to_s] = self
+		$cardArray[@cardID.to_i] = self
 		$game.gameState.cardCount+=1
 	end
 	
@@ -238,7 +242,7 @@ end
 
 class Library
 	attr_accessor :cards, :uid
-	#cards is an array which ONLY stores the cardID of each card. If we want to retrieve the real card, refer to $cardHash[]
+	#cards is an array which ONLY stores the cardID of each card. If we want to retrieve the real card, refer to $cardArray[]
 	
 	def initialize(mbCards,u)
 		@cards = Array.new
@@ -252,7 +256,7 @@ class Library
 	def shuffle()
 		@cards.shuffle!
 		@cards.each_index{|i|
-			$cardHash[@cards[i].to_s].position.order = i
+			$cardArray[@cards[i]].position.order = i
 		}
 	end
 	
@@ -261,9 +265,9 @@ class Library
 		drawnCards = @cards.slice!(0,n)
 		toReturn = Array.new
 		drawnCards.each{|c|
-			$cardHash[c.to_s].position.zone = "hand"
+			$cardArray[c.to_i].position.zone = "hand"
 			$game.users[@uid].hand.cards.push(c)
-			toReturn.push($cardHash[c.to_s].to_Client())
+			toReturn.push($cardArray[c.to_i].to_Client())
 		}
 		return toReturn
 	end
@@ -279,9 +283,84 @@ class Hand
 	end
 	
 	def discard()
+		@cards.delete(cardID)
 	end
 	
 	def revealCard()
+		@cards.delete(cardID)
 	end
+	
+	def putCardOntoBattlefield(cardID)
+		if (@cards.include? cardID)
+			@cards.delete(cardID)
+			$game.users[@uid].battlefield.cards.push(cardID)
+			$cardArray[cardID].position.zone = "battlefield"
+			$cardArray[cardID].position.x = 250
+			$cardArray[cardID].position.y = 375
+			$cardArray[cardID].position.scaleX = 90
+			$cardArray[cardID].position.scaleY = 120
+			return true
+		end
+		return false
+	end
+	
+	def putCardOntoStack(cardID)
+		if (@cards.include? cardID)
+			@cards.delete(cardID)
+			$game.gameState.stack.cards.push(cardID)
+			$cardArray[cardID].position.zone = "stack"
+			$cardArray[cardID].position.x = 175 - (($game.gameState.stack.cards.length > 4) ? 0 : 32 * $game.gameState.stack.cards.length)
+			$cardArray[cardID].position.y = 325
+			$cardArray[cardID].position.scaleX = 90
+			$cardArray[cardID].position.scaleY = 120
+			return true
+		end
+		return false
+	end
+	
 end
 
+class Battlefield
+	attr_accessor :cards, :uid
+	#cards is an array which ONLY stores the cardID of each card.
+	
+	def initialize(u)
+		@cards = Array.new
+		@uid = u
+	end
+	
+	def destroy()
+		@cards.delete(cardID)
+	end
+	
+	def exile()
+		@cards.delete(cardID)
+	end
+	
+	def returnToHand(cardID)
+		@cards.delete(cardID)
+	end
+	
+	def putCardOntoLibrary()
+		@cards.delete(cardID)
+	end
+	
+end
+
+class Stack
+	attr_accessor :cards, :uid
+	#cards is an array which ONLY stores the cardID of each card.
+	
+	def initialize(u)
+		@cards = Array.new
+		@uid = u
+	end
+	
+	def resolve()
+		@cards.delete(cardID)
+	end
+	
+	def countered()
+		@cards.delete(cardID)
+	end
+end

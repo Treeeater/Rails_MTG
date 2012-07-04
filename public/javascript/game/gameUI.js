@@ -7,14 +7,76 @@ var clickedContextHiddenBox = function(evt)
 		ContextLayer.draw();
 	}	
 }
-var displayCard = function(card)
+var displayCard = function(card,mine)
 {
 	switch(card.position.zone)
 	{	
 	case "hand":
 		handCardDisplayer.display(card);
 		break;
+	case "battlefield":
+		battlefieldCardDisplayer.display(card,mine);
+		break;
+	case "stack":
+		stackCardDisplayer.display(card,mine);
+		break;
 	default:
+	}
+}
+
+var BattlefieldCardDisplayer = function()
+{
+	var rightClickBattlefieldCard = function(){};
+	var dblClickBattlefieldCard = function(){};
+	
+	this.display = function(card,mine){
+		if (stage.get("#handCard"+card.cardID).length>0)
+		{
+			VisibleCardLayer.remove(stage.get("#handCard"+card.cardID)[0]);
+		}
+		var BattlefieldCard = new Image();
+		BattlefieldCard.onload = function() {
+			if (mine)
+			{
+				var image = new Kinetic.Image({x: card.position.x,y: card.position.y,image: BattlefieldCard, width: card.position.scaleX, height: card.position.scaleY, draggable:true, dragBounds: {top: 375 ,left: 250, right: 1180, bottom: 570}, id: "BattlefieldCard"+card.cardID.toString()});
+				image.attrs.mine = mine;
+				image.on("click",function(e){rightClickBattlefieldCard.apply(window,[e,image]);});
+				image.on("dblclick",function(e){dblClickBattlefieldCard.apply(window,[e,image]);});
+				VisibleCardLayer.add(image);
+			}
+			else{
+				var image = new Kinetic.Image({x: card.position.x,y: (700-card.position.y) - card.position.scaleY,image: BattlefieldCard, width: card.position.scaleX, height: card.position.scaleY ,id: "BattlefieldCard"+card.cardID.toString()});
+				image.attrs.mine = mine;
+				image.on("click",function(e){rightClickBattlefieldCard.apply(window,[e,image]);});
+				image.on("dblclick",function(e){dblClickBattlefieldCard.apply(window,[e,image]);});
+				VisibleCardLayer.add(image);
+			}
+			VisibleCardLayer.draw();
+		};
+		BattlefieldCard.src = card.engSRC;
+	}
+};
+
+var StackCardDisplayer = function()
+{
+	var rightClickStackCard = function(){};
+	var dblClickStackCard = function(){};
+	this.display = function(card,mine)
+	{
+		if (stage.get("#handCard"+card.cardID).length>0)
+		{
+			VisibleCardLayer.remove(stage.get("#handCard"+card.cardID)[0]);
+		}
+		var stackCard = new Image();
+		stackCard.onload = function() {
+			var image = new Kinetic.Image({x: card.position.x,y: card.position.y,image: stackCard, width: card.position.scaleX, height: card.position.scaleY, id: "stackCard"+card.cardID.toString()});
+			image.attrs.mine = mine;
+			image.on("click",function(e){rightClickStackCard.apply(window,[e,image]);});
+			image.on("dblclick",function(e){dblClickStackCard.apply(window,[e,image]);});
+			VisibleCardLayer.add(image);
+			VisibleCardLayer.draw();
+		};
+		stackCard.src = card.engSRC;
 	}
 }
 
@@ -25,14 +87,58 @@ var HandCardDisplayer = function()
 	{
 		var handCard = new Image();
 		handCard.onload = function() {
-			number = handCard.getAttribute("number")
-			var image = new Kinetic.Image({x: 250 + 130*number,y: 710,image: handCard,width: 120, draggable:true, height: 160,id: "handCard"+card.cardID.toString()});
+			number = handCard.getAttribute("number");
+			offsetX = (number < 7) ? 130*number : 910;
+			var image = new Kinetic.Image({x: 250 + offsetX,y: 710,image: handCard,width: 120, draggable:true, dragBounds: {top: 700 ,left: 250, right: 1160, bottom: 730}, height: 160,id: "handCard"+card.cardID.toString()});
+			image.on("click",function(e){rightClickHandCard.apply(window,[e,image]);});
+			image.on("dblclick",function(e){dblClickHandCard.apply(window,[e,image]);});
 			VisibleCardLayer.add(image);
 			VisibleCardLayer.draw();
 		};
 		handCard.src = card.engSRC;
 		handCard.setAttribute("number",this.number);
 		this.number++;
+	};
+	var dblClickHandCard = function (evt,image){
+		//log("play this");
+		playHandCardBE(cardID);
+		cardID = image.attrs.id.substr(8,99);		//99 big enuf
+	};
+	var rightClickHandCard = function (evt,image){
+		cardID = image.attrs.id.substr(8,99);		//99 big enuf
+		var playHandCard = function(){
+			playHandCardBE(cardID);
+			clickedContextHiddenBox();
+		};
+		var putCardOntoBattlefield = function(){
+			putCardOntoBattlefieldBE(cardID);
+			clickedContextHiddenBox();
+		};
+		var putCardOntoTopOfLibrary = function(){
+			putCardOntoTopOfLibraryBE(cardID);
+			clickedContextHiddenBox();
+		};
+		var discard = function(){
+			discardBE(cardID);
+			clickedContextHiddenBox();
+		};
+		var exile = function(){
+			exileBE(cardID);
+			clickedContextHiddenBox();
+		};
+		var reveal = function(){
+			revealBE(cardID);
+			clickedContextHiddenBox();
+		};
+		items = [{text:"Play this card",func:playHandCard},{text:"Put this onto battlefield",func:putCardOntoBattlefield},{text:"put this on top of the library",func:putCardOntoTopOfLibrary},{text:"Discard this card",func:discard},{text:"Exile this card",func:exile},{text:"Reveal this card",func:reveal}];
+		mousePosition = stage.getMousePosition();
+		x = mousePosition.x;
+		y = mousePosition.y;
+		if (evt.which == 3)
+		{
+			//right click
+			createContextMenu(x,y,items);
+		}
 	};
 };
 
@@ -47,6 +153,10 @@ var createContextMenu = function (xx,yy,items)
 		id: "contextMenuGroup"
 	});
 	yLength = 25 * items.length;
+	if (yy+yLength>900)
+	{
+		yy-=yLength;		//display like a pro
+	}
 	var i = 0;
 	var maxLength = -1;
 	for (i = 0; i < items.length; i++)
@@ -54,6 +164,10 @@ var createContextMenu = function (xx,yy,items)
 		if (maxLength < items[i].text.length) maxLength = items[i].text.length;
 	}
 	xLength = maxLength * 15;
+	if (xx+xLength>1280)
+	{
+		xx-=xLength;		//display like a pro
+	}
 	var contextMenuBox = new Kinetic.Rect({x: xx, y: yy, width: xLength, height: yLength, fill: "#FFFFFF",stroke: "black",strokeWidth: 1,id: "contextMenuBox"});
 	contextMenuGroup.add(contextMenuBox);
 	var contextMenuItems = new Array();
@@ -86,4 +200,6 @@ var createContextMenu = function (xx,yy,items)
 (function initUICards()
 {
 	handCardDisplayer = new HandCardDisplayer();
+	stackCardDisplayer = new StackCardDisplayer();
+	battlefieldCardDisplayer = new BattlefieldCardDisplayer();
 })();

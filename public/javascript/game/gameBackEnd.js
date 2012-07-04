@@ -99,26 +99,31 @@ function processGameMessage(s,msgUID,msgUserName)
 		adjustLifeTotalVisual(s.body, s.uid == myUID);
 		break;
 	case "drawCards":
-		if (s.uid == myUID)
-		{
-			var drawnCards = JSON.parse(s.body);
-			log(s.username + " drawed " + drawnCards.length.toString() + " card(s).\n\n");
-			var i = 0;
-			for (i = 0; i<drawnCards.length; i++)
-			{
-				displayCard(drawnCards[i]);
-			}
-		}
-		else{
-			//oppo drawed some cards, we need to update oppo hand card number
-			//array of two elements are passed back, the first contains the number of cards drawn, the second contains all the cards in oppo's hand.
-			var drawnCards = JSON.parse(s.body);
-			log(s.username + " drawed " + drawnCards[0] + " card(s).\n\n");
-			adjustOppoHandCardVisual(drawnCards[1])
-		}
+		drawCardsVisual(s);
 		break;
 	case "setOppoHandNumber":
 		adjustOppoHandCardVisual(s.body)
+		break;
+	case "putCardFromHandOntoStack":
+		card = JSON.parse(s.body);
+		if (s.uid==myUID) handCardDisplayer.number--;
+		log(s.username + " put " + card.cardName + " onto the stack.\n\n");
+		displayCard(card,s.uid == myUID);
+		break;
+	case "putCardFromHandOntoBattlefield":
+		card = JSON.parse(s.body);
+		if (s.uid==myUID) handCardDisplayer.number--;
+		log(s.username + " put " + card.cardName + " onto the battlefield.\n\n");
+		displayCard(card,s.uid == myUID);
+		break;
+	case "displayCard":
+		//used to recover the game state on reconnection
+		var cards = JSON.parse(s.body);
+		var i = 0;
+		for (i = 0; i<cards.length; i++)
+		{
+			displayCard(cards[i],cards[i].ownerUID == myUID);
+		}
 		break;
 	default:
 	}
@@ -194,7 +199,7 @@ function processMessage(s)
 	}
 }
 
-function chooseColor(l)
+function chooseColorBE(l)
 //when user clicks on any of the five color symbols
 {
 	var gameMsg = new GameMessage("chooseColor",myUsername,myUID,l)
@@ -202,7 +207,7 @@ function chooseColor(l)
 	ws.send(JSON.stringify(msg));
 }
 
-function choosePhase(l)
+function choosePhaseBE(l)
 //when user clicks on any of the phase boxes
 {
 	var gameMsg = new GameMessage("choosePhase",myUsername,myUID,l)
@@ -210,7 +215,7 @@ function choosePhase(l)
 	ws.send(JSON.stringify(msg));
 }
 
-function removeColor(l)
+function removeColorBE(l)
 //when user clicks on the tick on the five color symbols, trying to remove it
 {
 	var gameMsg = new GameMessage("removeColor",myUsername,myUID,l)
@@ -218,7 +223,7 @@ function removeColor(l)
 	ws.send(JSON.stringify(msg));
 }
 
-function adjustLifeTotal(l)
+function adjustLifeTotalBE(l)
 //Adjust life total, argument can be negative
 {
 	var gameMsg = new GameMessage("adjustLifeTotal",myUsername,myUID,l)
@@ -226,9 +231,51 @@ function adjustLifeTotal(l)
 	ws.send(JSON.stringify(msg));
 }
 
-function drawCards(l)
+function drawCardsBE(l)
 {
 	var gameMsg = new GameMessage("drawCards",myUsername,myUID,l)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
+function playHandCardBE(cardID)
+{
+	var gameMsg = new GameMessage("playHandCard",myUsername,myUID,cardID)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
+function putCardOntoBattlefieldBE(cardID)
+{
+	var gameMsg = new GameMessage("putCardOntoBattlefield",myUsername,myUID,cardID)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
+function putCardOntoTopOfLibraryBE(cardID)
+{
+	var gameMsg = new GameMessage("putCardOntoTopOfLibrary",myUsername,myUID,cardID)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
+function discardBE(cardID)
+{
+	var gameMsg = new GameMessage("discard",myUsername,myUID,cardID)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
+function exileBE(cardID)
+{
+	var gameMsg = new GameMessage("exile",myUsername,myUID,cardID)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
+function revealBE(cardID)
+{
+	var gameMsg = new GameMessage("reveal",myUsername,myUID,cardID)
 	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
 	ws.send(JSON.stringify(msg));
 }

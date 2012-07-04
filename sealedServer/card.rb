@@ -18,8 +18,13 @@ class Card
 		@expansion = exp
 	end
 	
-	def to_hash()
-		return {"idInSet" => @idInSet, "cardName" => @cardName, "cardType" => @cardType, "engSRC" => @engSRC, "chiSRC" => @chiSRC, "power" => @power, "toughness" => @toughness, "color" => @color, "cmc" => @cmc, "level" => @level, "rarity" => @rarity, "expansion" => @expansion}
-	end
+	#def to_hash()
+		#return {"idInSet" => @idInSet, "cardName" => @cardName, "cardType" => @cardType, "engSRC" => @engSRC, "chiSRC" => @chiSRC, "power" => @power, "toughness" => @toughness, "color" => @color, "cmc" => @cmc, "level" => @level, "rarity" => @rarity, "expansion" => @expansion}
+	#end
 	
+	def to_hash()
+		hash = {}
+		instance_variables.each {|var| hash[var.to_s.delete("@")] = instance_variable_get(var) }
+		return hash
+	end
 end

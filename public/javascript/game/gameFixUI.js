@@ -29,7 +29,7 @@ var chooseColorVisual = function(l){
 		var image = new Kinetic.Image({x: xx, y: yy, image: tickImage, width: 30, height: 30, id: "tickImage"+l});
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
-		image.on("click",removeColor.bind(window,l))
+		image.on("click",removeColorBE.bind(window,l))
 		FixedLayer.add(image);
 		FixedLayer.draw();
 	}
@@ -55,17 +55,37 @@ var adjustOppoHandCardVisual = function(l){
 	FixedLayer.draw();
 }
 
-var rightClickOwnLibrary = function (evt){
+var drawCardsVisual = function(s){
+	if (s.uid == myUID)
+	{
+		var drawnCards = JSON.parse(s.body);
+		log(s.username + " drawed " + drawnCards.length.toString() + " card(s).\n\n");
+		var i = 0;
+		for (i = 0; i<drawnCards.length; i++)
+		{
+			displayCard(drawnCards[i]);
+		}
+	}
+	else{
+		//oppo drawed some cards, we need to update oppo hand card number
+		//array of two elements are passed back, the first contains the number of cards drawn, the second contains all the cards in oppo's hand.
+		var drawnCards = JSON.parse(s.body);
+		log(s.username + " drawed " + drawnCards[0] + " card(s).\n\n");
+		adjustOppoHandCardVisual(drawnCards[1])
+	}
+};
+
+var clickOwnLibrary = function (evt){
 	var drawACard = function(){
 		//log("drawed a card");
-		drawCards(1);
+		drawCardsBE(1);
 		clickedContextHiddenBox();
 	};
 	var drawXCard = function(){
 		//log("drawed x card");
 		var x = prompt("How many cards would you like to draw?");
 		x = parseInt(x);
-		if (x!=NaN) drawCards(x);
+		if (x!=NaN) drawCardsBE(x);
 		clickedContextHiddenBox();
 	};
 	var peekCards = function(){
@@ -85,27 +105,32 @@ var rightClickOwnLibrary = function (evt){
 		//right click
 		createContextMenu(x,y,items);
 	}
+	if (evt.which == 1)
+	{
+		//left click
+		drawCardsBE(1);
+	}
 }
 
 var rightClickOwnLifeBox = function (evt){
 	var add1Life = function(){
-		adjustLifeTotal(1);
+		adjustLifeTotalBE(1);
 		clickedContextHiddenBox();
 	};
 	var deduct1Life = function(){
-		adjustLifeTotal(-1);
+		adjustLifeTotalBE(-1);
 		clickedContextHiddenBox();
 	};
 	var addXLife = function(){
 		var x = prompt("How many life do you want to gain?");
 		x = parseInt(x);
-		if (x!=NaN) adjustLifeTotal(x);
+		if (x!=NaN) adjustLifeTotalBE(x);
 		clickedContextHiddenBox();
 	};
 	var deductXLife = function(){
 		var x = prompt("How many life do you want to deduct?");
 		x = parseInt(x);
-		if (x!=NaN) adjustLifeTotal(-x);
+		if (x!=NaN) adjustLifeTotalBE(-x);
 		clickedContextHiddenBox();
 	};
 	items = [{text:"Add 1 life",func:add1Life},{text:"Deduct 1 life",func:deduct1Life},{text:"Add X life",func:addXLife},{text:"Deduct X life",func:deductXLife}];
@@ -178,7 +203,7 @@ function loadFixedFrames() {
 	var imageObj2 = new Image();
 	imageObj2.onload = function() {
 		var image = new Kinetic.Image({x: 20,y: 500,image: imageObj2,width: 30,height: 33});
-		image.on("click",chooseColor.bind(window,"plains"));
+		image.on("click",chooseColorBE.bind(window,"plains"));
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
 		FixedLayer.add(image);
@@ -187,7 +212,7 @@ function loadFixedFrames() {
 	var imageObj3 = new Image();
 	imageObj3.onload = function() {
 		var image = new Kinetic.Image({x: 20,y: 540,image: imageObj3,width: 30,height: 33});
-		image.on("click",chooseColor.bind(window,"island"));
+		image.on("click",chooseColorBE.bind(window,"island"));
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
 		FixedLayer.add(image);
@@ -196,7 +221,7 @@ function loadFixedFrames() {
 	var imageObj4 = new Image();
 	imageObj4.onload = function() {
 		var image = new Kinetic.Image({x: 20,y: 580,image: imageObj4,width: 30,height: 33});
-		image.on("click",chooseColor.bind(window,"swamp"));
+		image.on("click",chooseColorBE.bind(window,"swamp"));
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
 		FixedLayer.add(image);
@@ -205,7 +230,7 @@ function loadFixedFrames() {
 	var imageObj5 = new Image();
 	imageObj5.onload = function() {
 		var image = new Kinetic.Image({x: 20,y: 620,image: imageObj5,width: 30,height: 33});
-		image.on("click",chooseColor.bind(window,"mountain"));
+		image.on("click",chooseColorBE.bind(window,"mountain"));
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
 		FixedLayer.add(image);
@@ -214,7 +239,7 @@ function loadFixedFrames() {
 	var imageObj6 = new Image();
 	imageObj6.onload = function() {
 		var image = new Kinetic.Image({x: 20,y: 660,image: imageObj6,width: 30,height: 33});
-		image.on("click",chooseColor.bind(window,"forest"));
+		image.on("click",chooseColorBE.bind(window,"forest"));
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
 		FixedLayer.add(image);
@@ -240,7 +265,7 @@ function loadFixedFrames() {
 //Phases:
 	var upkeepPhase = new Kinetic.Text({x: 300,y: 350,text: "Upkeep",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var upkeepPhaseBox = new Kinetic.Rect({x: 260,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "upkeepPhaseBox"});
-	upkeepPhaseBox.on("click",choosePhase.bind(window,"upkeepPhaseBox"));
+	upkeepPhaseBox.on("click",choosePhaseBE.bind(window,"upkeepPhaseBox"));
 	upkeepPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	upkeepPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(upkeepPhaseBox);
@@ -248,7 +273,7 @@ function loadFixedFrames() {
 
 	var drawPhase = new Kinetic.Text({x: 400,y: 350,text: "Draw",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var drawPhaseBox = new Kinetic.Rect({x: 360,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "drawPhaseBox"});
-	drawPhaseBox.on("click",choosePhase.bind(window,"drawPhaseBox"));
+	drawPhaseBox.on("click",choosePhaseBE.bind(window,"drawPhaseBox"));
 	drawPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	drawPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(drawPhaseBox);
@@ -256,7 +281,7 @@ function loadFixedFrames() {
 
 	var mainPhase1 = new Kinetic.Text({x: 500,y: 350,text: "Main 1",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var mainPhase1Box = new Kinetic.Rect({x: 460,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "mainPhase1Box"});
-	mainPhase1Box.on("click",choosePhase.bind(window,"mainPhase1Box"));
+	mainPhase1Box.on("click",choosePhaseBE.bind(window,"mainPhase1Box"));
 	mainPhase1Box.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	mainPhase1Box.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(mainPhase1Box);
@@ -264,7 +289,7 @@ function loadFixedFrames() {
 
 	var BeginCombatPhase = new Kinetic.Text({x: 600,y: 350,text: "Beg.Cmbt",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var BeginCombatPhaseBox = new Kinetic.Rect({x: 560,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "BeginCombatPhaseBox"});
-	BeginCombatPhaseBox.on("click",choosePhase.bind(window,"BeginCombatPhaseBox"));
+	BeginCombatPhaseBox.on("click",choosePhaseBE.bind(window,"BeginCombatPhaseBox"));
 	BeginCombatPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	BeginCombatPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(BeginCombatPhaseBox);
@@ -272,7 +297,7 @@ function loadFixedFrames() {
 
 	var DeclareAttackerPhase = new Kinetic.Text({x: 700,y: 350,text: "Dec.Att",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var DeclareAttackerPhaseBox = new Kinetic.Rect({x: 660,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "DeclareAttackerPhaseBox"});
-	DeclareAttackerPhaseBox.on("click",choosePhase.bind(window,"DeclareAttackerPhaseBox"));
+	DeclareAttackerPhaseBox.on("click",choosePhaseBE.bind(window,"DeclareAttackerPhaseBox"));
 	DeclareAttackerPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	DeclareAttackerPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(DeclareAttackerPhaseBox);
@@ -280,7 +305,7 @@ function loadFixedFrames() {
 
 	var DeclareDefenderPhase = new Kinetic.Text({x: 800,y: 350,text: "Dec.Def",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var DeclareDefenderPhaseBox = new Kinetic.Rect({x: 760,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "DeclareDefenderPhaseBox"});
-	DeclareDefenderPhaseBox.on("click",choosePhase.bind(window,"DeclareDefenderPhaseBox"));
+	DeclareDefenderPhaseBox.on("click",choosePhaseBE.bind(window,"DeclareDefenderPhaseBox"));
 	DeclareDefenderPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	DeclareDefenderPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(DeclareDefenderPhaseBox);
@@ -288,7 +313,7 @@ function loadFixedFrames() {
 
 	var EndCombatPhase = new Kinetic.Text({x: 900,y: 350,text: "End.Cmbt",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var EndCombatPhaseBox = new Kinetic.Rect({x: 860,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "EndCombatPhaseBox"});
-	EndCombatPhaseBox.on("click",choosePhase.bind(window,"EndCombatPhaseBox"));
+	EndCombatPhaseBox.on("click",choosePhaseBE.bind(window,"EndCombatPhaseBox"));
 	EndCombatPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	EndCombatPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(EndCombatPhaseBox);
@@ -296,7 +321,7 @@ function loadFixedFrames() {
 
 	var mainPhase2 = new Kinetic.Text({x: 1000,y: 350,text: "Main 2",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var mainPhase2Box = new Kinetic.Rect({x: 960,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "mainPhase2Box"});
-	mainPhase2Box.on("click",choosePhase.bind(window,"mainPhase2Box"));
+	mainPhase2Box.on("click",choosePhaseBE.bind(window,"mainPhase2Box"));
 	mainPhase2Box.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	mainPhase2Box.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(mainPhase2Box);
@@ -304,7 +329,7 @@ function loadFixedFrames() {
 
 	var endTurnPhase = new Kinetic.Text({x: 1100,y: 350,text: "End Turn",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var endTurnPhaseBox = new Kinetic.Rect({x: 1060,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "endTurnPhaseBox"});
-	endTurnPhaseBox.on("click",choosePhase.bind(window,"endTurnPhaseBox"));
+	endTurnPhaseBox.on("click",choosePhaseBE.bind(window,"endTurnPhaseBox"));
 	endTurnPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	endTurnPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(endTurnPhaseBox);
@@ -315,7 +340,7 @@ function loadFixedFrames() {
 	var libraryImage = new Image();
 	libraryImage.onload = function() {
 		var image = new Kinetic.Image({x: 80,y: 710,image: libraryImage,width: 50,height: 50,id: "libraryImage"});
-		image.on("click",rightClickOwnLibrary);
+		image.on("click",clickOwnLibrary);
 		FixedLayer.add(image);
 		FixedLayer.draw();
 	}

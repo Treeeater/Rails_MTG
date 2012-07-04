@@ -23,7 +23,7 @@ module SessionsHelper
 
   def admin_user?
 	@current_user ||= User.find_by_remember_token(cookies[:remember_token])
-	current_user.admin?
+	if current_user then return current_user.admin? else return false end
   end
   
   def sign_out
