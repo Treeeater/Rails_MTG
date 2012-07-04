@@ -39,27 +39,29 @@ var BattlefieldCardDisplayer = function()
 		{
 			VisibleCardLayer.remove(stage.get("#handCard"+card.cardID)[0]);
 		}
-		var BattlefieldCard = new Image();
-		BattlefieldCard.onload = function() {
+		var battlefieldCard = new Image();
+		battlefieldCard.onload = function() {
 			if (mine)
 			{
-				var image = new Kinetic.Image({x: card.position.x,y: card.position.y,image: BattlefieldCard, width: card.position.scaleX, height: card.position.scaleY, draggable:true, dragBounds: {top: 375 ,left: 250, right: 1180, bottom: 570}, id: "battlefieldCard"+card.cardID.toString()});
+				var image = new Kinetic.Image({x: card.position.x,y: card.position.y,image: battlefieldCard, width: card.position.scaleX, height: card.position.scaleY, draggable:true, dragBounds: {top: 375 ,left: 250, right: 1180, bottom: 570}, id: "battlefieldCard"+card.cardID.toString()});
 				image.attrs.mine = mine;
 				image.on("click",function(e){rightClickBattlefieldCard.apply(window,[e,image]);});
 				image.on("dblclick",function(e){dblClickBattlefieldCard.apply(window,[e,image]);});
 				image.on("dragend",function(e){dragEndBattlefieldCard.apply(window,[e,image]);});
+				polishImageHandler(image,battlefieldCard);
 				VisibleCardLayer.add(image);
 			}
 			else{
-				var image = new Kinetic.Image({x: card.position.x, y: (700-card.position.y) - card.position.scaleY,image: BattlefieldCard, width: card.position.scaleX, height: card.position.scaleY ,id: "battlefieldCard"+card.cardID.toString()});
+				var image = new Kinetic.Image({x: card.position.x, y: (700-card.position.y) - card.position.scaleY,image: battlefieldCard, width: card.position.scaleX, height: card.position.scaleY ,id: "battlefieldCard"+card.cardID.toString()});
 				image.attrs.mine = mine;
 				image.on("click",function(e){rightClickBattlefieldCard.apply(window,[e,image]);});
 				image.on("dblclick",function(e){dblClickBattlefieldCard.apply(window,[e,image]);});
+				polishImageHandler(image,battlefieldCard);
 				VisibleCardLayer.add(image);
 			}
 			VisibleCardLayer.draw();
 		};
-		BattlefieldCard.src = card.engSRC;
+		battlefieldCard.src = card.engSRC;
 	}
 };
 
@@ -79,6 +81,7 @@ var StackCardDisplayer = function()
 			image.attrs.mine = mine;
 			image.on("click",function(e){rightClickStackCard.apply(window,[e,image]);});
 			image.on("dblclick",function(e){dblClickStackCard.apply(window,[e,image]);});
+			polishImageHandler(image,stackCard);
 			VisibleCardLayer.add(image);
 			VisibleCardLayer.draw();
 		};
@@ -98,6 +101,7 @@ var HandCardDisplayer = function()
 			var image = new Kinetic.Image({x: 250 + offsetX,y: 710,image: handCard,width: 120, draggable:true, dragBounds: {top: 700 ,left: 250, right: 1160, bottom: 730}, height: 160,id: "handCard"+card.cardID.toString()});
 			image.on("click",function(e){rightClickHandCard.apply(window,[e,image]);});
 			image.on("dblclick",function(e){dblClickHandCard.apply(window,[e,image]);});
+			polishImageHandler(image,handCard);
 			VisibleCardLayer.add(image);
 			VisibleCardLayer.draw();
 		};
@@ -107,8 +111,10 @@ var HandCardDisplayer = function()
 	};
 	var dblClickHandCard = function (evt,image){
 		//log("play this");
-		playHandCardBE(cardID);
-		cardID = image.attrs.id.substr(8,99);		//99 big enuf
+		if (evt.which==1){
+			playHandCardBE(cardID);
+			cardID = image.attrs.id.substr(8,99);		//99 big enuf
+		}
 	};
 	var rightClickHandCard = function (evt,image){
 		cardID = image.attrs.id.substr(8,99);		//99 big enuf

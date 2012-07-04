@@ -800,10 +800,13 @@ function loadAllCards()
 						var imageTooltip = stage.get("#tooltip")[0];
 						var p = image.getPosition();
 						if (p.x<1000){
-							imageTooltip.setX(p.x+130);
+							imageTooltip.setX(p.x+image.attrs.width+10);
 						}
 						else {imageTooltip.setX(p.x-250)};
-						imageTooltip.setY(p.y);
+						if (p.y>570){
+							imageTooltip.setY(p.y-320+image.attrs.height);
+						}
+						else {imageTooltip.setY(p.y);}
 						imageTooltip.setImage(imageObj);
 						imageTooltip.show();
 						layer.draw();
@@ -841,10 +844,13 @@ function loadAllCards()
 						var imageTooltip = stage.get("#tooltip")[0];
 						var p = image.getPosition();
 						if (p.x<1000){
-							imageTooltip.setX(p.x+130);
+							imageTooltip.setX(p.x+image.attrs.width+10);
 						}
 						else {imageTooltip.setX(p.x-250)};
-						imageTooltip.setY(p.y);
+						if (p.y>570){
+							imageTooltip.setY(p.y-320+image.attrs.height);
+						}
+						else {imageTooltip.setY(p.y);}
 						imageTooltip.setImage(imageObj);
 						imageTooltip.show();
 						imageTooltip.moveToTop();
@@ -948,10 +954,13 @@ function loadAllCards()
 						var imageTooltip = stage.get("#tooltip")[0];
 						var p = image.getPosition();
 						if (p.x<1000){
-							imageTooltip.setX(p.x+130);
+							imageTooltip.setX(p.x+image.attrs.width+10);
 						}
 						else {imageTooltip.setX(p.x-250)};
-						imageTooltip.setY(p.y);
+						if (p.y>570){
+							imageTooltip.setY(p.y-320+image.attrs.height);
+						}
+						else {imageTooltip.setY(p.y);}
 						imageTooltip.setImage(imageObj);
 						imageTooltip.show();
 						imageTooltip.moveToTop();
@@ -1060,10 +1069,13 @@ function cardToMB(cuid,oldimage)
 				var imageTooltip = stage.get("#tooltip")[0];
 				var p = image.getPosition();
 				if (p.x<1000){
-					imageTooltip.setX(p.x+130);
+					imageTooltip.setX(p.x+image.attrs.width+10);
 				}
 				else {imageTooltip.setX(p.x-250)};
-				imageTooltip.setY(p.y);
+				if (p.y>570){
+					imageTooltip.setY(p.y-320+image.attrs.height);
+				}
+				else {imageTooltip.setY(p.y);}
 				imageTooltip.setImage(imageObj);
 				imageTooltip.show();
 				imageTooltip.moveToTop();
@@ -1179,10 +1191,13 @@ function cardToSB(cuid,oldimage)
 				var imageTooltip = stage.get("#tooltip")[0];
 				var p = image.getPosition();
 				if (p.x<1000){
-					imageTooltip.setX(p.x+130);
+					imageTooltip.setX(p.x+image.attrs.width+10);
 				}
 				else {imageTooltip.setX(p.x-250)};
-				imageTooltip.setY(p.y);
+				if (p.y>570){
+					imageTooltip.setY(p.y-320+image.attrs.height);
+				}
+				else {imageTooltip.setY(p.y);}
 				imageTooltip.setImage(imageObj);
 				imageTooltip.show();
 				imageTooltip.moveToTop();

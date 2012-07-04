@@ -158,8 +158,13 @@ var rightClickOwnLifeBox = function (evt){
 
 //onload:
 function loadFixedFrames() {
+	middleMouseDown = false;
+	originalTipImage = null;
+	downLayer = null;
 	stage = new Kinetic.Stage({container: "container",width: 1280,height: 900});
 	FixedLayer = new Kinetic.Layer();
+	VisibleCardLayer = new Kinetic.Layer();
+	ContextLayer = new Kinetic.Layer();
 	//draw section division lines
 	var blueLine = new Kinetic.Line({points: [240, 330, 1280, 330],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round",});
 	
@@ -206,6 +211,9 @@ function loadFixedFrames() {
 	imageObj.onload = function() {
 		var image = new Kinetic.Image({x: 0,y: 0,image: imageObj,width: 240,height: 320,id: "detailed"});
 		FixedLayer.add(image);
+		var imageTooltip = new Kinetic.Image({x: 0,	y: 0, image: imageObj, width: 240, height: 320, visible: false, id: "tooltip"});
+		ContextLayer.add(imageTooltip);
+		imageTooltip.setZIndex(99999);
 		FixedLayer.draw();
 	}
 	//
@@ -423,9 +431,7 @@ function loadFixedFrames() {
 	cur_phase = undefined;
 	//finalize
 	stage.add(FixedLayer);
-	VisibleCardLayer = new Kinetic.Layer();
 	stage.add(VisibleCardLayer);
-	ContextLayer = new Kinetic.Layer();
 	stage.add(ContextLayer);
 	ContextLayer.draw();
 	//this hidden box is for click detection, workaround for kineticjs not supporting 'on' method on layer
@@ -436,6 +442,94 @@ function loadFixedFrames() {
 	
 	//call backend init
 	initBackEndJS();
+};
+
+var polishImageHandler = function(image,imagePrimitive)
+{
+	image.on("mouseover",function(){
+		stage.get("#detailed")[0].setImage(imagePrimitive);
+		FixedLayer.draw();
+		if (middleMouseDown)
+		{
+			var imageTooltip = stage.get("#tooltip")[0];
+			var p = image.getPosition();
+			if (p.x<1000){
+				imageTooltip.setX(p.x+image.attrs.width+10);
+			}
+			else {imageTooltip.setX(p.x-250)};
+			if (p.y>570){
+				imageTooltip.setY(p.y-320+image.attrs.height);
+			}
+			else {imageTooltip.setY(p.y);}
+			imageTooltip.setImage(imagePrimitive);
+			imageTooltip.show();
+			FixedLayer.draw();
+			ContextLayer.draw();
+		}
+	});
+
+	image.on("mouseout",function(evt){
+		if (evt.which == 2){
+			evt.stopPropagation();
+			evt.preventDefault(evt);
+			evt.cancelBubble = true;
+			stage.get("#tooltip")[0].hide();
+			if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+			FixedLayer.draw();
+			ContextLayer.draw();
+		}
+	});
+
+	image.on("mousedown",function(evt){
+		//console.log('downed');
+		if (evt.which==1) {
+			curMouseDownCardUID = image.cuid;		//global var
+			downLayer = image.getZIndex();
+			image.moveToTop();
+		}
+		if (evt.which==2)
+		{
+			evt.stopPropagation();
+			evt.preventDefault(evt);
+			evt.cancelBubble = true;
+			image.setDraggable(false);
+			middleMouseDown = true;				//this is used in mouseover event.
+			originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
+			var imageTooltip = stage.get("#tooltip")[0];
+			var p = image.getPosition();
+			if (p.x<1000){
+				imageTooltip.setX(p.x+image.attrs.width+10);
+			}
+			else {imageTooltip.setX(p.x-250)};
+			if (p.y>570){
+				imageTooltip.setY(p.y-320+image.attrs.height);
+			}
+			else {imageTooltip.setY(p.y);}
+			imageTooltip.setImage(imagePrimitive);
+			imageTooltip.show();
+			imageTooltip.moveToTop();
+			FixedLayer.draw();
+			ContextLayer.draw();
+		}
+		return false;
+	});
+	image.on("mouseup",function(evt){
+		//console.log('uped');
+		if (evt.which==1){
+			if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+		}
+		if (evt.which==2){
+			evt.stopPropagation();
+			evt.preventDefault(evt);
+			evt.cancelBubble = true;
+			stage.get("#tooltip")[0].hide();
+			originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+			middleMouseDown = false;
+		}
+		FixedLayer.draw();
+		ContextLayer.draw();
+		return false;
+	});
 };
 
 window.addEventListener("load",loadFixedFrames);
