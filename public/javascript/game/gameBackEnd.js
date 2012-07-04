@@ -105,20 +105,24 @@ function processGameMessage(s,msgUID,msgUserName)
 		adjustOppoHandCardVisual(s.body)
 		break;
 	case "putCardFromHandOntoStack":
-		card = JSON.parse(s.body);
+		card = s.body;
 		if (s.uid==myUID) handCardDisplayer.number--;
 		log(s.username + " put " + card.cardName + " onto the stack.\n\n");
 		displayCard(card,s.uid == myUID);
 		break;
 	case "putCardFromHandOntoBattlefield":
-		card = JSON.parse(s.body);
+		card = s.body;
 		if (s.uid==myUID) handCardDisplayer.number--;
 		log(s.username + " put " + card.cardName + " onto the battlefield.\n\n");
 		displayCard(card,s.uid == myUID);
 		break;
+	case "dragEndBattlefieldCard":
+		card = s.body;
+		dragEndBattlefieldCardVisual(card);
+		break;			
 	case "displayCard":
 		//used to recover the game state on reconnection
-		var cards = JSON.parse(s.body);
+		var cards = s.body;
 		var i = 0;
 		for (i = 0; i<cards.length; i++)
 		{
@@ -276,6 +280,13 @@ function exileBE(cardID)
 function revealBE(cardID)
 {
 	var gameMsg = new GameMessage("reveal",myUsername,myUID,cardID)
+	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
+	ws.send(JSON.stringify(msg));
+}
+
+function dragEndBattlefieldCardBE(x,y,cardID)
+{
+	var gameMsg = new GameMessage("dragEndBattlefieldCard",myUsername,myUID,{"x":x,"y":y,"cardID":cardID})
 	var msg = new Message("game",myUsername,myUID,JSON.stringify(gameMsg));
 	ws.send(JSON.stringify(msg));
 }

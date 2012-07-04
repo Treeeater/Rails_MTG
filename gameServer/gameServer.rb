@@ -81,7 +81,7 @@ def reconstructGameState(user)
 	oppo.battlefield.cards.each{|cID|
 		toSend.push($cardArray[cID.to_i].to_hash())
 	}
-	gameResponse = GameMessage.new("displayCard",userName,uID,ActiveSupport::JSON.encode(toSend))
+	gameResponse = GameMessage.new("displayCard",userName,uID,toSend)
 	response = ResponseMessage.new("game",userName,uID,gameResponse)
 	response.send(ws)
 end
@@ -165,7 +165,7 @@ def processGameMessage(gb)
 			cardID = msgBody.to_i
 			if (($cardArray[cardID].cardType.to_i & 16) == 16)
 				if me.hand.putCardOntoBattlefield(cardID)
-					gameResponse = GameMessage.new("putCardFromHandOntoBattlefield",msgUsername,msgUID,ActiveSupport::JSON.encode($cardArray[cardID]))
+					gameResponse = GameMessage.new("putCardFromHandOntoBattlefield",msgUsername,msgUID,$cardArray[cardID])
 					response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
 					$game.wsID_wsHash.each_value{|w|
 						response.send(w)		#change library number.
@@ -173,7 +173,7 @@ def processGameMessage(gb)
 				end
 			else
 				if me.hand.putCardOntoStack(cardID)
-					gameResponse = GameMessage.new("putCardFromHandOntoStack",msgUsername,msgUID,ActiveSupport::JSON.encode($cardArray[cardID]))
+					gameResponse = GameMessage.new("putCardFromHandOntoStack",msgUsername,msgUID,$cardArray[cardID])
 					response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
 					$game.wsID_wsHash.each_value{|w|
 						response.send(w)		#change library number.
@@ -187,7 +187,7 @@ def processGameMessage(gb)
 		when "putCardOntoBattlefield"
 			cardID = msgBody.to_i
 			if me.hand.putCardOntoBattlefield(cardID)
-				gameResponse = GameMessage.new("putCardFromHandOntoBattlefield",msgUsername,msgUID,ActiveSupport::JSON.encode($cardArray[cardID]))
+				gameResponse = GameMessage.new("putCardFromHandOntoBattlefield",msgUsername,msgUID,$cardArray[cardID])
 				response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
 				$game.wsID_wsHash.each_value{|w|
 					response.send(w)		#change library number.
@@ -195,6 +195,13 @@ def processGameMessage(gb)
 			end
 			#notify oppo that your hand total is down 1
 			gameResponse = GameMessage.new("setOppoHandNumber",msgUsername,msgUID,me.hand.cards.length)
+			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
+			response.send($game.wsID_wsHash[oppo.wsObjectID])
+		when "dragEndBattlefieldCard"
+			cardID = msgBody["cardID"].to_i
+			$cardArray[cardID].position.x = msgBody["x"].to_i
+			$cardArray[cardID].position.y = msgBody["y"].to_i
+			gameResponse = GameMessage.new("dragEndBattlefieldCard",msgUsername,msgUID,$cardArray[cardID])
 			response = ResponseMessage.new("game",msgUsername,msgUID,gameResponse)
 			response.send($game.wsID_wsHash[oppo.wsObjectID])
 		else

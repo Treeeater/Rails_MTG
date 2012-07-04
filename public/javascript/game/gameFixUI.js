@@ -75,6 +75,17 @@ var drawCardsVisual = function(s){
 	}
 };
 
+var dragEndBattlefieldCardVisual = function (card)
+{
+	//oppo's card, we should do the conversion.
+	if (stage.get("#battlefieldCard"+card.cardID).length>0)
+	{
+		stage.get("#battlefieldCard"+card.cardID)[0].setX(card.position.x);
+		stage.get("#battlefieldCard"+card.cardID)[0].setY((700-card.position.y) - card.position.scaleY);
+	}
+	VisibleCardLayer.draw();
+}
+
 var clickOwnLibrary = function (evt){
 	var drawACard = function(){
 		//log("drawed a card");
