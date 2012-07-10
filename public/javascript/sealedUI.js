@@ -1,5 +1,5 @@
 //helpers:
-var landsVisual = {"plains":515,"island":555,"swamp":595,"mountain":635,"forest":675};
+var landsVisual = {"plains":510,"island":550,"swamp":590,"mountain":630,"forest":670};
 var middleMouseDown = false;
 var originalTipImage = null;
 var addLands = function(l){
@@ -8,7 +8,7 @@ var addLands = function(l){
 	if (stage.get("#"+l+"Number").length==0)
 	{
 		var landText = new Kinetic.Text({
-		  x: 95,
+		  x: 70,
 		  y: landsVisual[l],
 		  text: number + " " + l,
 		  fontSize: 12,
@@ -23,7 +23,7 @@ var addLands = function(l){
 	}
 	else
 	{
-		stage.get("#"+l+"Number")[0].attrs.text=number + " " + l;
+		stage.get("#"+l+"Number")[0].setText(number + " " + l);
 		stage.get("#"+l+"Number")[0].attrs.number=number;
 	}
 	layer.draw();
@@ -33,7 +33,7 @@ function timeDown(){
 	timer--;
 	minute = Math.floor(timer/60);
 	seconds = timer - minute*60;
-	stage.get("#timerText")[0].attrs.text = minute.toString()+":"+seconds.toString();
+	stage.get("#timerText")[0].setText(minute.toString()+":"+seconds.toString());
 	timerLayer.draw();
 }
 //onload:
@@ -126,8 +126,8 @@ function loadFixedFrames() {
 	
 	//add timer
 	var timerTitleText = new Kinetic.Text({
-	  x: 90,
-	  y: 340,
+	  x: 40,
+	  y: 335,
 	  text: "Time Remaining : ",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
@@ -140,7 +140,7 @@ function loadFixedFrames() {
 	timerLayer = new Kinetic.Layer();
 	var timerText = new Kinetic.Text({
 	  x: 170,
-	  y: 340,
+	  y: 335,
 	  text: "15:00",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
@@ -266,12 +266,12 @@ function loadFixedFrames() {
 	
 	//cards color count
 
-	var colorsVisual = {"W":515,"U":555,"B":595,"R":635,"G":675};
+	var colorsVisual = {"W":510,"U":550,"B":590,"R":630,"G":670};
 	colorCardsNumber = {"W":0,"U":0,"B":0,"R":0,"G":0};
 	for (i in colorsVisual) {
 		if (colorsVisual.hasOwnProperty(i)) {
 			var cardsCountText = new Kinetic.Text({
-				  x: 195,
+				  x: 165,
 				  y: colorsVisual[i],
 				  text: "0 " + i + " cards",
 				  fontSize: 12,
@@ -295,13 +295,10 @@ function loadFixedFrames() {
 	  stroke: "black",
 	  strokeWidth: 2
 	});
-	buttonSortColor.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonSortColor.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonSortColor.on("click",sortByColor);
 	layer.add(buttonSortColor);
 	var buttonSortColorText = new Kinetic.Text({
-	  x: 70,
-	  y: 390,
+	  x: 40,
+	  y: 385,
 	  text: "ColorSort",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
@@ -309,6 +306,9 @@ function loadFixedFrames() {
 	  align: "center",
 	  verticalAlign: "middle"
 	});
+	buttonSortColorText.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonSortColorText.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonSortColorText.on("click",sortByColor);
 	layer.add(buttonSortColorText);
 	
 	//sort by cmc
@@ -321,13 +321,10 @@ function loadFixedFrames() {
 	  stroke: "black",
 	  strokeWidth: 2
 	});
-	buttonSortCMC.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonSortCMC.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonSortCMC.on("click",sortByCMC);//sortByCMC;
 	layer.add(buttonSortCMC);
 	var buttonSortCMCText = new Kinetic.Text({
-	  x: 170,
-	  y: 390,
+	  x: 140,
+	  y: 385,
 	  text: "CMCSort",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
@@ -335,6 +332,9 @@ function loadFixedFrames() {
 	  align: "center",
 	  verticalAlign: "middle"
 	});
+	buttonSortCMCText.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonSortCMCText.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonSortCMCText.on("click",sortByCMC);//sortByCMC;
 	layer.add(buttonSortCMCText);
 	
 	//sort by rarity
@@ -348,13 +348,10 @@ function loadFixedFrames() {
 	  stroke: "black",
 	  strokeWidth: 2
 	});
-	buttonSortRarity.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonSortRarity.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonSortRarity.on("click",sortByRarity);//sortByCMC;
 	layer.add(buttonSortRarity);
 	var buttonSortRarityText = new Kinetic.Text({
-	  x: 70,
-	  y: 420,
+	  x: 38,
+	  y: 415,
 	  text: "RaritySort",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
@@ -362,6 +359,9 @@ function loadFixedFrames() {
 	  align: "center",
 	  verticalAlign: "middle"
 	});
+	buttonSortRarityText.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonSortRarityText.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonSortRarityText.on("click",sortByRarity);//sortByCMC;
 	layer.add(buttonSortRarityText);
 
 	//add land button
@@ -375,14 +375,10 @@ function loadFixedFrames() {
 	  stroke: "black",
 	  strokeWidth: 2
 	});
-	buttonAddLand.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonAddLand.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonAddLand.on("click",function(){alert("Basic Land sort not implemented!")//Add Basic Lands;
-	});
 	layer.add(buttonAddLand);
 	var buttonAddLandText = new Kinetic.Text({
-	  x: 170,
-	  y: 420,
+	  x: 135,
+	  y: 415,
 	  text: "Add Lands",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
@@ -390,12 +386,15 @@ function loadFixedFrames() {
 	  align: "center",
 	  verticalAlign: "middle"
 	});
+	buttonAddLand.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonAddLand.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonAddLand.on("click",function(){alert("Basic Land sort not implemented!")});
 	layer.add(buttonAddLandText);
 	
 	//card count
 	var cardCountHardCodedText = new Kinetic.Text({
-	  x: 110,
-	  y: 470,
+	  x: 20,
+	  y: 465,
 	  text: "Main board:        Side Board:",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
@@ -406,8 +405,8 @@ function loadFixedFrames() {
 	layer.add(cardCountHardCodedText);
 
 	var cardCountMBText = new Kinetic.Text({
-	  x: 110,
-	  y: 470,
+	  x: 100,
+	  y: 465,
 	  text: "",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
@@ -419,8 +418,8 @@ function loadFixedFrames() {
 	layer.add(cardCountMBText);
 
 	var cardCountSBText = new Kinetic.Text({
-	  x: 220,
-	  y: 470,
+	  x: 210,
+	  y: 465,
 	  text: "",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
@@ -435,7 +434,7 @@ function loadFixedFrames() {
 	stage.add(timerLayer);
 	stage.add(cardLayer);
 	stage.add(layer);
-	document.getElementById('container').firstChild.children[3].oncontextmenu = function() {
+	document.getElementById('container').firstChild.children[4].oncontextmenu = function() {
 		return false;
 	}
 };

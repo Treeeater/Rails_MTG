@@ -175,7 +175,7 @@ var createContextMenu = function (xx,yy,items)
 	{
 		if (maxLength < items[i].text.length) maxLength = items[i].text.length;
 	}
-	xLength = maxLength * 15;
+	xLength = maxLength * 11;
 	if (xx+xLength>1280)
 	{
 		xx-=xLength;		//display like a pro
@@ -195,12 +195,15 @@ var createContextMenu = function (xx,yy,items)
 	};
 	for (i = 0; i < items.length; i++)
 	{
-		
-		contextMenuItemsText[i] = new Kinetic.Text({x: xx + (xLength/2), y: cur_y + 12,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle", id:"contextMenuItemsText" + i.toString(), text:items[i].text});
+		var a = (items[i].text.length)*11/2;
+		contextMenuItemsText[i] = new Kinetic.Text({x: xx + xLength/2 - a, y: cur_y +2 ,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle", id:"contextMenuItemsText" + i.toString(), text:items[i].text});
 		contextMenuItems[i] = new Kinetic.Rect({x: xx, y: cur_y, width: xLength, height: 25, fill: "#99FF99",stroke: "black",strokeWidth: 1,id: "contextMenuItem"+i.toString()});
 		contextMenuItems[i].on("mouseover",highlightItem.bind(window,i));
 		contextMenuItems[i].on("mouseout",deHighlightItem.bind(window,i));
 		contextMenuItems[i].on("click",items[i].func);
+		contextMenuItemsText[i].on("mouseover",highlightItem.bind(window,i));
+		contextMenuItemsText[i].on("mouseout",deHighlightItem.bind(window,i));
+		contextMenuItemsText[i].on("click",items[i].func);
 		cur_y += 25;
 		contextMenuGroup.add(contextMenuItems[i]);
 		contextMenuGroup.add(contextMenuItemsText[i]);

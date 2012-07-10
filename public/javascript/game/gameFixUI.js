@@ -45,13 +45,13 @@ var choosePhaseVisual = function(l){
 };
 
 var adjustLifeTotalVisual = function(l,me){
-	if (me) stage.get("#yourLife")[0].attrs.text = "Your life: "+l;
-	else stage.get("#oppoLife")[0].attrs.text = "Oppo life: "+l;
+	if (me) stage.get("#yourLife")[0].setText("Your life: "+l);
+	else stage.get("#oppoLife")[0].setText("Oppo life: "+l);
 	FixedLayer.draw();
 };
 
 var adjustOppoHandCardVisual = function(l){
-	stage.get("#oppoHandCardCountText")[0].attrs.text = l;
+	stage.get("#oppoHandCardCountText")[0].setText(l.toString());
 	FixedLayer.draw();
 }
 
@@ -272,82 +272,110 @@ function loadFixedFrames() {
 	imageObj6.src = hostServerAddress+"assets/mtg/general/green.png";
 
 //life points text
-	var lifeText1 = new Kinetic.Text({x: 60, y: 470,text: "Your life: 20",fontSize: 12,fontFamily: "Calibri",textFill: "green",align: "center",verticalAlign: "middle",id: "yourLife"});
+	var lifeText1 = new Kinetic.Text({x: 20, y: 465,text: "Your life: 20",fontSize: 12,fontFamily: "Calibri",textFill: "green",align: "center",verticalAlign: "middle",id: "yourLife"});
 	var lifeTextBox = new Kinetic.Rect({x: 0,y: 450,width: 120,height: 40 ,stroke: "black",strokeWidth: 0,id: "lifeTextBox"});
+	lifeText1.on("click",rightClickOwnLifeBox);
 	lifeTextBox.on("click",rightClickOwnLifeBox);
 	FixedLayer.add(lifeTextBox);
 	FixedLayer.add(lifeText1);
 
-	var lifeText2 = new Kinetic.Text({x: 180,y: 470,text: "Oppo life: 20",fontSize: 12,fontFamily: "Calibri",textFill: "red",align: "center",verticalAlign: "middle",id: "oppoLife"});
+	var lifeText2 = new Kinetic.Text({x: 140,y: 465,text: "Oppo life: 20",fontSize: 12,fontFamily: "Calibri",textFill: "red",align: "center",verticalAlign: "middle",id: "oppoLife"});
 	FixedLayer.add(lifeText2);
 
 //Phases:
-	var upkeepPhase = new Kinetic.Text({x: 300,y: 350,text: "Upkeep",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
+	var upkeepPhase = new Kinetic.Text({x: 277,y: 345,text: "Upkeep",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var upkeepPhaseBox = new Kinetic.Rect({x: 260,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "upkeepPhaseBox"});
+	upkeepPhase.on("click",choosePhaseBE.bind(window,"upkeepPhaseBox"));
+	upkeepPhase.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	upkeepPhase.on("mouseout",function(){document.body.style.cursor = "default";});
 	upkeepPhaseBox.on("click",choosePhaseBE.bind(window,"upkeepPhaseBox"));
 	upkeepPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	upkeepPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(upkeepPhaseBox);
 	FixedLayer.add(upkeepPhase);
 
-	var drawPhase = new Kinetic.Text({x: 400,y: 350,text: "Draw",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
+	var drawPhase = new Kinetic.Text({x: 385,y: 345,text: "Draw",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var drawPhaseBox = new Kinetic.Rect({x: 360,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "drawPhaseBox"});
+	drawPhase.on("click",choosePhaseBE.bind(window,"drawPhaseBox"));
+	drawPhase.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	drawPhase.on("mouseout",function(){document.body.style.cursor = "default";});
 	drawPhaseBox.on("click",choosePhaseBE.bind(window,"drawPhaseBox"));
 	drawPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	drawPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(drawPhaseBox);
 	FixedLayer.add(drawPhase);
 
-	var mainPhase1 = new Kinetic.Text({x: 500,y: 350,text: "Main 1",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
+	var mainPhase1 = new Kinetic.Text({x: 477,y: 345,text: "Main 1",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var mainPhase1Box = new Kinetic.Rect({x: 460,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "mainPhase1Box"});
+	mainPhase1.on("click",choosePhaseBE.bind(window,"mainPhase1Box"));
+	mainPhase1.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	mainPhase1.on("mouseout",function(){document.body.style.cursor = "default";});
 	mainPhase1Box.on("click",choosePhaseBE.bind(window,"mainPhase1Box"));
 	mainPhase1Box.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	mainPhase1Box.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(mainPhase1Box);
 	FixedLayer.add(mainPhase1);
 
-	var BeginCombatPhase = new Kinetic.Text({x: 600,y: 350,text: "Beg.Cmbt",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
+	var BeginCombatPhase = new Kinetic.Text({x: 570,y: 345,text: "Beg.Cmbt",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var BeginCombatPhaseBox = new Kinetic.Rect({x: 560,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "BeginCombatPhaseBox"});
+	BeginCombatPhase.on("click",choosePhaseBE.bind(window,"BeginCombatPhaseBox"));
+	BeginCombatPhase.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	BeginCombatPhase.on("mouseout",function(){document.body.style.cursor = "default";});
 	BeginCombatPhaseBox.on("click",choosePhaseBE.bind(window,"BeginCombatPhaseBox"));
 	BeginCombatPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	BeginCombatPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(BeginCombatPhaseBox);
 	FixedLayer.add(BeginCombatPhase);
 
-	var DeclareAttackerPhase = new Kinetic.Text({x: 700,y: 350,text: "Dec.Att",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
+	var DeclareAttackerPhase = new Kinetic.Text({x: 677,y: 345,text: "Dec.Att",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var DeclareAttackerPhaseBox = new Kinetic.Rect({x: 660,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "DeclareAttackerPhaseBox"});
+	DeclareAttackerPhase.on("click",choosePhaseBE.bind(window,"DeclareAttackerPhaseBox"));
+	DeclareAttackerPhase.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	DeclareAttackerPhase.on("mouseout",function(){document.body.style.cursor = "default";});
 	DeclareAttackerPhaseBox.on("click",choosePhaseBE.bind(window,"DeclareAttackerPhaseBox"));
 	DeclareAttackerPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	DeclareAttackerPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(DeclareAttackerPhaseBox);
 	FixedLayer.add(DeclareAttackerPhase);
 
-	var DeclareDefenderPhase = new Kinetic.Text({x: 800,y: 350,text: "Dec.Def",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
+	var DeclareDefenderPhase = new Kinetic.Text({x: 775,y: 345,text: "Dec.Def",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var DeclareDefenderPhaseBox = new Kinetic.Rect({x: 760,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "DeclareDefenderPhaseBox"});
+	DeclareDefenderPhase.on("click",choosePhaseBE.bind(window,"DeclareDefenderPhaseBox"));
+	DeclareDefenderPhase.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	DeclareDefenderPhase.on("mouseout",function(){document.body.style.cursor = "default";});
 	DeclareDefenderPhaseBox.on("click",choosePhaseBE.bind(window,"DeclareDefenderPhaseBox"));
 	DeclareDefenderPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	DeclareDefenderPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(DeclareDefenderPhaseBox);
 	FixedLayer.add(DeclareDefenderPhase);
 
-	var EndCombatPhase = new Kinetic.Text({x: 900,y: 350,text: "End.Cmbt",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
+	var EndCombatPhase = new Kinetic.Text({x: 870,y: 345,text: "End.Cmbt",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var EndCombatPhaseBox = new Kinetic.Rect({x: 860,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "EndCombatPhaseBox"});
+	EndCombatPhase.on("click",choosePhaseBE.bind(window,"EndCombatPhaseBox"));
+	EndCombatPhase.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	EndCombatPhase.on("mouseout",function(){document.body.style.cursor = "default";});
 	EndCombatPhaseBox.on("click",choosePhaseBE.bind(window,"EndCombatPhaseBox"));
 	EndCombatPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	EndCombatPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(EndCombatPhaseBox);
 	FixedLayer.add(EndCombatPhase);
 
-	var mainPhase2 = new Kinetic.Text({x: 1000,y: 350,text: "Main 2",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
+	var mainPhase2 = new Kinetic.Text({x: 977,y: 345,text: "Main 2",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var mainPhase2Box = new Kinetic.Rect({x: 960,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "mainPhase2Box"});
+	mainPhase2.on("click",choosePhaseBE.bind(window,"mainPhase2Box"));
+	mainPhase2.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	mainPhase2.on("mouseout",function(){document.body.style.cursor = "default";});
 	mainPhase2Box.on("click",choosePhaseBE.bind(window,"mainPhase2Box"));
 	mainPhase2Box.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	mainPhase2Box.on("mouseout",function(){document.body.style.cursor = "default";});
 	FixedLayer.add(mainPhase2Box);
 	FixedLayer.add(mainPhase2);
 
-	var endTurnPhase = new Kinetic.Text({x: 1100,y: 350,text: "End Turn",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
+	var endTurnPhase = new Kinetic.Text({x: 1072,y: 345,text: "End Turn",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"});
 	var endTurnPhaseBox = new Kinetic.Rect({x: 1060,y: 335,width: 80,height: 30,fill: "#99FF99",stroke: "black",strokeWidth: 2,id: "endTurnPhaseBox"});
+	endTurnPhase.on("click",choosePhaseBE.bind(window,"endTurnPhaseBox"));
+	endTurnPhase.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	endTurnPhase.on("mouseout",function(){document.body.style.cursor = "default";});
 	endTurnPhaseBox.on("click",choosePhaseBE.bind(window,"endTurnPhaseBox"));
 	endTurnPhaseBox.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	endTurnPhaseBox.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -364,7 +392,7 @@ function loadFixedFrames() {
 		FixedLayer.draw();
 	}
 	libraryImage.src = hostServerAddress+"assets/game/general/library.jpg";
-	var libraryCountText = new Kinetic.Text({x: 180,y: 735,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"libraryCountText"});
+	var libraryCountText = new Kinetic.Text({x: 180,y: 730,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"libraryCountText"});
 	FixedLayer.add(libraryCountText);
 
 	var grvyImage = new Image();
@@ -374,7 +402,7 @@ function loadFixedFrames() {
 		FixedLayer.draw();
 	}
 	grvyImage.src = hostServerAddress+"assets/game/general/grvy.jpg";
-	var grvyCountText = new Kinetic.Text({x: 180,y: 800,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"grvyCountText"});
+	var grvyCountText = new Kinetic.Text({x: 180,y: 795,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"grvyCountText"});
 	FixedLayer.add(grvyCountText);
 
 	var exileImage = new Image();
@@ -384,7 +412,7 @@ function loadFixedFrames() {
 		FixedLayer.draw();
 	}
 	exileImage.src = hostServerAddress+"assets/game/general/exile.jpg";
-	var exileCountText = new Kinetic.Text({x: 180,y: 865,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"exileCountText"});
+	var exileCountText = new Kinetic.Text({x: 180,y: 860,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"exileCountText"});
 	FixedLayer.add(exileCountText);
 
 //library, grvy and exile
@@ -396,7 +424,7 @@ function loadFixedFrames() {
 		FixedLayer.draw();
 	}
 	oppoLibraryImage.src = hostServerAddress+"assets/game/general/library.jpg";
-	var oppoLibraryCountText = new Kinetic.Text({x: 180,y: 520,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoLibraryCountText"});
+	var oppoLibraryCountText = new Kinetic.Text({x: 180,y: 515,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoLibraryCountText"});
 	FixedLayer.add(oppoLibraryCountText);
 
 	var oppoGrvyImage = new Image();
@@ -406,7 +434,7 @@ function loadFixedFrames() {
 		FixedLayer.draw();
 	}
 	oppoGrvyImage.src = hostServerAddress+"assets/game/general/grvy.jpg";
-	var oppoGrvyCountText = new Kinetic.Text({x: 180,y: 570,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoGrvyCountText"});
+	var oppoGrvyCountText = new Kinetic.Text({x: 180,y: 565,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoGrvyCountText"});
 	FixedLayer.add(oppoGrvyCountText);
 
 	var oppoExileImage = new Image();
@@ -416,7 +444,7 @@ function loadFixedFrames() {
 		FixedLayer.draw();
 	}
 	oppoExileImage.src = hostServerAddress+"assets/game/general/exile.jpg";
-	var oppoExileCountText = new Kinetic.Text({x: 180,y: 620,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoExileCountText"});
+	var oppoExileCountText = new Kinetic.Text({x: 180,y: 615,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoExileCountText"});
 	FixedLayer.add(oppoExileCountText);
 
 	var oppoHandCardImage = new Image();
@@ -426,7 +454,7 @@ function loadFixedFrames() {
 		FixedLayer.draw();
 	}
 	oppoHandCardImage.src = hostServerAddress+"assets/game/general/handCard.jpg";
-	var oppoHandCardCountText = new Kinetic.Text({x: 180,y: 670,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoHandCardCountText"});
+	var oppoHandCardCountText = new Kinetic.Text({x: 180,y: 665,text: "0",fontSize: 20,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id:"oppoHandCardCountText"});
 	FixedLayer.add(oppoHandCardCountText);
 	cur_phase = undefined;
 	//finalize

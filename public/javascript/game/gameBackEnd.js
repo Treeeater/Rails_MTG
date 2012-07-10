@@ -78,8 +78,8 @@ function processGameMessage(s,msgUID,msgUserName)
 	switch(s.type)
 	{
 	case "setLibraryNumber":
-		if (s.uid==myUID) stage.get("#libraryCountText")[0].attrs.text = s.body;
-		else stage.get("#oppoLibraryCountText")[0].attrs.text=s.body;
+		if (s.uid==myUID) stage.get("#libraryCountText")[0].setText(s.body.toString());
+		else stage.get("#oppoLibraryCountText")[0].setText(s.body.toString());
 		FixedLayer.draw();
 		break;
 	case "chooseColor":
