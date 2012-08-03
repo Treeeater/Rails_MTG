@@ -464,9 +464,12 @@ function loadFixedFrames() {
 	ContextLayer.draw();
 	//this hidden box is for click detection, workaround for kineticjs not supporting 'on' method on layer
 	FixedLayer.draw();
-	document.getElementById('container').firstChild.children[4].oncontextmenu = function() {
+	//this prevents right click default handler
+	document.getElementById('container').firstChild.children[2].oncontextmenu = function() {
 		return false;
 	}
+	//this prevents doubleclick selecting all outside text.
+	document.getElementById('container').firstChild.children[2].onselectstart = function () { return false; }
 	
 	//call backend init
 	initBackEndJS();

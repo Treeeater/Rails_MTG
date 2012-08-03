@@ -3,6 +3,12 @@ var clickedContextHiddenBox = function(evt)
 	if (stage.get("#contextMenuGroup").length!=0)
 	{
 		if (evt) evt.stopPropagation();
+		//We must explicitly remove these eventhandlers.
+		for (i in stage.get("#contextMenuGroup")[0].children){
+			stage.get("#contextMenuGroup")[0].children[i].off("mouseout");
+			stage.get("#contextMenuGroup")[0].children[i].off("mouseover");
+			stage.get("#contextMenuGroup")[0].children[i].off("click");
+		}
 		ContextLayer.remove(stage.get("#contextMenuGroup")[0]);
 		ContextLayer.draw();
 	}	

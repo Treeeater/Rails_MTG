@@ -434,9 +434,11 @@ function loadFixedFrames() {
 	stage.add(timerLayer);
 	stage.add(cardLayer);
 	stage.add(layer);
-	document.getElementById('container').firstChild.children[4].oncontextmenu = function() {
+	document.getElementById('container').firstChild.children[2].oncontextmenu = function() {
 		return false;
 	}
+	//this prevents doubleclick selecting all outside text.
+	document.getElementById('container').firstChild.children[2].onselectstart = function () { return false; }
 };
 
 function sortSBByCMC()
