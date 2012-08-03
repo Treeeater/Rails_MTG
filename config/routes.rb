@@ -10,6 +10,8 @@ Mtg::Application.routes.draw do
   resources :sealed, only: [:show, :new]
 
   root :to => 'static_pages#home' 
+  match 'draft/new', to:'draft#new'
+  match 'draft/:id', to:'draft#show'
   match '/game/new', to:'game#new'
   match '/game/:id', to:'game#show', :via => [:post, :get]
   match '/signup',  to: 'users#new'

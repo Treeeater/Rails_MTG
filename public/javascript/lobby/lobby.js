@@ -28,6 +28,8 @@ function keys(obj)
 function log(s)
 {
 	$('#chatbox').val($('#chatbox').val() + s);
+	var textArea = document.getElementById('chatbox');
+	textArea.scrollTop = textArea.scrollHeight;
 }
 
 function Message(type, username, body, uid)
@@ -38,11 +40,12 @@ function Message(type, username, body, uid)
 	this.uid = uid;
 }
 
-function Game(hostName, hostUID, players)
+function Game(hostName, hostUID, players, type)
 {
 	this.hostName = hostName;
 	this.hostUID = hostUID;
 	this.players = players;
+	this.type = type;
 }
 
 function connectChatServer()
@@ -85,6 +88,8 @@ function closeConnection()
 	connecting = false;
 	initialization = true;
 	$('#status_img').attr('src','/assets/lobby/broken.png');
+	$("#createStartGame").val("Create a game!");
+	$("#createStartGame").attr('onclick', 'createGame()');
 	clearLists();
 }
 
@@ -125,16 +130,19 @@ function clearChatBox()
 
 function createGame()
 {
-	message = new Message("createGame", username, "", uid);
+	var draftOrSealed = confirm("Press OK for a draft game, press cancel for a sealed game.");
+	if (draftOrSealed) message = new Message("createDraftGame", username, "", uid);
+	else message = new Message("createSealedGame", username, "", uid);
 	chatws.send(JSON.stringify(message));
 	$("#createStartGame").val("Start game!");
-	$("#createStartGame").attr('onclick', 'initializeGame()');
+	if (draftOrSealed) $("#createStartGame").attr('onclick', 'initializeGame("draft")');
+	else $("#createStartGame").attr('onclick', 'initializeGame("sealed")');
 }
 
-function initializeGame()
+function initializeGame(draftOrSealed)
 {
 	xhr = new XMLHttpRequest();
-	xhr.open('GET', hostServerAddress+"/sealed/new", false);  		//hostServerAddress is derived from index.html.erb, must
+	xhr.open('GET', hostServerAddress+"/"+draftOrSealed+"/new", false);  		//hostServerAddress is derived from index.html.erb, must
 	//use this under rails framework.
 	log("Sending initialize game command...\n");
 	xhr.send();
@@ -185,7 +193,7 @@ function rerenderGamesList(g)
 	k = keys(g);
 	for (i = 0; i < k.length; i++)
 	{
-		$('#gameslist').append("<option id='game_"+g[k[i]].hostUID+"' onclick = 'rerenderPlayersList();'>Host:"+g[k[i]].hostName+"  "+g[k[i]].players.length+"/2</option>")
+		$('#gameslist').append("<option id='game_"+g[k[i]].hostUID+"' onclick = 'rerenderPlayersList();'>"+g[k[i]].type+":"+g[k[i]].hostName+"  ("+g[k[i]].players.length+(g[k[i]].type=="sealed"?"/2":"")+")</option>")
 	}
 }
 
@@ -241,8 +249,12 @@ function processMessage(s)
 			$('#user_'+id).remove();
 			log(time + " " + msg.username + " has left the room\n");
 			break;
-		case "createGame":
-			games[msg.uid] = new Game(msg.username,msg.uid,[[msg.uid,msg.username]]);
+		case "createSealedGame":
+			games[msg.uid] = new Game(msg.username,msg.uid,[[msg.uid,msg.username]],"sealed");
+			rerenderGamesList(games);
+			break;
+		case "createDraftGame":
+			games[msg.uid] = new Game(msg.username,msg.uid,[[msg.uid,msg.username]],"draft");
 			rerenderGamesList(games);
 			break;
 		case "gameList":
@@ -271,7 +283,7 @@ function processMessage(s)
 			else
 			{
 				log("Redirecting to new game page...\n");
-				window.setTimeout('window.location = host+"sealed/"+game.hostUID;',1000);
+				window.setTimeout('window.location = host+"'+game.type+'/"+game.hostUID;',1000);
 			}
 			break;
 		case "error":

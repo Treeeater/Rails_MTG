@@ -1,17 +1,17 @@
 <% content_for(:head) do %>
 <script>var gamePort = <%= (12341 + @user.id.to_i) %>; </script>
 <script src="<%= $hostServerAddress %>javascript/kinetic-v3.10.5.min.js"></script>
-<script src="<%= $hostServerAddress %>javascript/sealed/sealedUI.js"></script>
-<script src="<%= $hostServerAddress %>javascript/sealed/sealedBackEnd.js"></script>
+<script src="<%= $hostServerAddress %>javascript/draft/draftUI.js"></script>
+<script src="<%= $hostServerAddress %>javascript/draft/draftBackEnd.js"></script>
 <% end %>
-<div class = "sealedContainer" id="container"></div>
-<div class = "sealedContainerHolder" id="containerHolder"></div>
-<div class = "sealedStatusContainer" id="statusContainer">
+<div class = "draftContainer" id="container"></div>
+<div class = "draftContainerHolder" id="containerHolder"></div>
+<div class = "draftStatusContainer" id="statusContainer">
 <div id="meStatusContainer">Me<%= image_tag("lobby/broken.png", id:"status_me_img", alt: "broken", height: "20px")%></div>
 <div id="oppoStatusContainer">He/She<%= image_tag("lobby/broken.png", id:"status_oppo_img", alt: "broken", height: "20px")%></div>
-<textarea id="statusbox" disabled="disabled" placeholder="When ready, click ready. When both players are ready, sealed event begins."></textarea>
-<%= button_to_function "Let's crack the packs", "initPacks()", :class => "btn btn-medium btn-primary" %>
-<%= button_to_function "Submit the deck", "submitDeck()", :class => "btn btn-medium btn-primary", :style => "margin-top:10px" %>
+<textarea id="statusbox" disabled="disabled" placeholder="When ready, click ready. When both players are ready, draft event begins."></textarea>
+<%= button_to_function "Submit this pick", "initPacks()", :class => "btn btn-medium btn-primary" %>
+<%= button_to_function "Extra time", "submitDeck()", :class => "btn btn-medium btn-primary", :style => "margin-top:10px" %>
 </div>
 <form id="hiddenForm" action="#" method="POST">
 <input id="hiddenInputMB" type="hidden" name="mbCards"></input>

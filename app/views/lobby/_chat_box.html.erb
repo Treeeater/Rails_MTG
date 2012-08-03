@@ -1,6 +1,6 @@
 <div class="lobby_chatbox_wrapper">
 <h2> Your name: <span id="username" uid="<%= current_user.id %>"><%= current_user.name %></span> </h2>
-<script src="/javascript/lobby.js"></script>
+<script src="/javascript/lobby/lobby.js"></script>
 <textarea id = "chatbox" placeholder="Find lobby messages here!" rows="10" disabled="disabled"></textarea>
 <input id="chatInput" type="text" disabled="disabled" onkeydown="testAndSend(event);" value="Hi"></input>
 <div class="chat_button_wrapper">

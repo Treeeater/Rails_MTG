@@ -4,7 +4,7 @@ require 'rubygems'
 require 'active_support'
 require 'eventmachine'
 require 'em-websocket'
-require './chatLobby.rb'
+require './lobbyServer/chatLobby.rb'
 require 'json'
 
 BroadCast = 1
@@ -12,7 +12,7 @@ SingleCast = 2
 OtherCast = 3
 NoCast = 4
 
-MaxPlayers = 2
+MaxPlayers = 4
 
 def sendMessage(ws, msg)
 	ws.send msg
@@ -147,7 +147,7 @@ EventMachine.run {
 			when "message"
 				responseMsg = msg
 				castType = BroadCast
-			when "createGame"
+			when "createSealedGame"
 				if (checkIfUserIsInGame? msgUID)
 					#This user already created a game, we should return an error
 					castType = SingleCast
@@ -156,8 +156,21 @@ EventMachine.run {
 				else
 					castType = BroadCast
 					#init the game on back-end
-					$gl.games[msgUID] = Game.new(msgUID, msgUsername)
-					response = ResponseMessage.new("createGame",msgUsername,msgUID,ActiveSupport::JSON.encode($gl.games[msgUID]))
+					$gl.games[msgUID] = Game.new(msgUID, msgUsername,"sealed")
+					response = ResponseMessage.new("createSealedGame",msgUsername,msgUID,ActiveSupport::JSON.encode($gl.games[msgUID]))
+					responseMsg = response.serialize()
+				end
+			when "createDraftGame"
+				if (checkIfUserIsInGame? msgUID)
+					#This user already created a game, we should return an error
+					castType = SingleCast
+					response = ResponseMessage.new("error",msgUsername,msgUID,"You are already in a game, cannot create another!")
+					responseMsg = response.serialize()
+				else
+					castType = BroadCast
+					#init the game on back-end
+					$gl.games[msgUID] = Game.new(msgUID, msgUsername,"draft")
+					response = ResponseMessage.new("createDraftGame",msgUsername,msgUID,ActiveSupport::JSON.encode($gl.games[msgUID]))
 					responseMsg = response.serialize()
 				end
 			when "retrieveGameList"
@@ -174,13 +187,14 @@ EventMachine.run {
 					responseMsg = response.serialize()
 				else
 					if ($gl.games.has_key?(msgBody))
-						if ($gl.games[msgBody].players.length<MaxPlayers)
+						maxPlayers = ($gl.games[msgBody].type == "sealed") ? 2 : MaxPlayers
+						if ($gl.games[msgBody].players.length<maxPlayers)
 							#eligible to join
 							castType = BroadCast
 							$gl.games[msgBody].players.push([msgUID,msgUsername])
 							responseMsg = ResponseMessage.new("gameList","","",ActiveSupport::JSON.encode($gl.games)).serialize()
 						else
-							response = ResponseMessage.new("error",msgUsername,msgUID,"Maximum number of players reached! If you are seeing otherwise, try refresh the page?")
+							response = ResponseMessage.new("error",msgUsername,msgUID,"Maximum number of players reached! Refresh the page if you think there is a bug.")
 							responseMsg = response.serialize()
 						end
 					else
