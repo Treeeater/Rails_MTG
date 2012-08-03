@@ -7,7 +7,8 @@ class DraftController < ApplicationController
 	end
 
 	def new
-		pid = Kernel.spawn("ruby ./draftServer/draftServer.rb " + current_user.id.to_s)
+		arg = params.values.join(" ")
+		pid = Kernel.spawn("ruby ./draftServer/draftServer.rb " + current_user.id.to_s + " " + arg)
 		Process.detach(pid)
 	end
 	

@@ -141,8 +141,21 @@ function createGame()
 
 function initializeGame(draftOrSealed)
 {
-	xhr = new XMLHttpRequest();
-	xhr.open('GET', hostServerAddress+"/"+draftOrSealed+"/new", false);  		//hostServerAddress is derived from index.html.erb, must
+	$("#game_"+uid).attr('selected','selected');
+	rerenderPlayersList();
+	var i = 0;
+	var xhr = new XMLHttpRequest();
+	var addr = hostServerAddress+draftOrSealed+"/new";
+	if (draftOrSealed == "draft")
+	{
+		//we need to pass extra parameters: players number and players id.
+		addr += "?playersNo="+document.getElementById("game_"+uid).text[document.getElementById("game_"+uid).text.length-2];
+		for (i=0; i < document.getElementById("playerslist").children.length; i++) {
+			//of course, using player's name is not safe, might lead to sqlI/xss vul, but we just keep it this way for now.
+			addr += "&player"+i+"="+document.getElementById("playerslist").children[i].text;
+		}
+	}
+	xhr.open('GET', addr, false);  		//hostServerAddress is derived from index.html.erb, must
 	//use this under rails framework.
 	log("Sending initialize game command...\n");
 	xhr.send();
@@ -197,7 +210,7 @@ function rerenderGamesList(g)
 	}
 }
 
-function rerenderPlayersList(g)
+function rerenderPlayersList()
 {
 	cur_selected = $("#gameslist option:selected").attr('id');
 	if (cur_selected!=undefined)
