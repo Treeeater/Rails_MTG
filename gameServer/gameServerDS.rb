@@ -172,15 +172,15 @@ class User
 	def getBasicLands(l)
 		case l
 			when 0
-				return CardVisible.new(Card.new("1000","plains","16", "http://magiccards.info/scans/en/avr/230.jpg", "http://magiccards.info/scans/cn/avr/230.jpg", nil, nil, "0", "0", "0", "1", "AVR"),@uid)
+				return CardVisible.new(Card.new(1000,"plains",16, "http://magiccards.info/scans/en/avr/230.jpg", "http://magiccards.info/scans/cn/avr/230.jpg", nil, nil, 0, 0, 0, 1, "AVR"),@uid)
 			when 1
-				return CardVisible.new(Card.new("1001","island","16", "http://magiccards.info/scans/en/avr/235.jpg", "http://magiccards.info/scans/cn/avr/235.jpg", nil, nil, "0", "0", "0", "1", "AVR"),@uid)
+				return CardVisible.new(Card.new(1001,"island",16, "http://magiccards.info/scans/en/avr/235.jpg", "http://magiccards.info/scans/cn/avr/235.jpg", nil, nil, 0, 0, 0, 1, "AVR"),@uid)
 			when 2
-				return CardVisible.new(Card.new("1001","swamp","16", "http://magiccards.info/scans/en/avr/236.jpg", "http://magiccards.info/scans/cn/avr/236.jpg", nil, nil, "0", "0", "0", "1", "AVR"),@uid)
+				return CardVisible.new(Card.new(1002,"swamp",16, "http://magiccards.info/scans/en/avr/236.jpg", "http://magiccards.info/scans/cn/avr/236.jpg", nil, nil, 0, 0, 0, 1, "AVR"),@uid)
 			when 3
-				return CardVisible.new(Card.new("1001","mountain","16", "http://magiccards.info/scans/en/avr/239.jpg", "http://magiccards.info/scans/cn/avr/239.jpg", nil, nil, "0", "0", "0", "1", "AVR"),@uid)
+				return CardVisible.new(Card.new(1003,"mountain",16, "http://magiccards.info/scans/en/avr/239.jpg", "http://magiccards.info/scans/cn/avr/239.jpg", nil, nil, 0, 0, 0, 1, "AVR"),@uid)
 			when 4
-				return CardVisible.new(Card.new("1001","forest","16", "http://magiccards.info/scans/en/avr/244.jpg", "http://magiccards.info/scans/cn/avr/244.jpg", nil, nil, "0", "0", "0", "1", "AVR"),@uid)
+				return CardVisible.new(Card.new(1004,"forest",16, "http://magiccards.info/scans/en/avr/244.jpg", "http://magiccards.info/scans/cn/avr/244.jpg", nil, nil, 0, 0, 0, 1, "AVR"),@uid)
 			else
 		end
 	end
