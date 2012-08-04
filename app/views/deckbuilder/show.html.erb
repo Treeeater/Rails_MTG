@@ -4,7 +4,12 @@ var mainBoardCards = new Array();
 var sideBoardCards = new Array();
 <% 
 count = 1
-@mainBoardCards.each{|mbc| 
+basicLands = [0,0,0,0,0]
+@mainBoardCards.each{|mbc|
+	if (mbc.idInSet>=1000)	#it's a basic land, we don't want to display it
+		basicLands[mbc.idInSet-1000]+=1
+		next
+	end
 	mbc.uid = count
 	count+=1
 %>
@@ -18,6 +23,8 @@ count = 1
 %>
 	<%="sideBoardCards.push(eval("%> <%= raw ActiveSupport::JSON.encode(sbc) %> <%= "));" %>
 <%}%>
+<% str2write = " basicLands = new Array(); basicLands.push("+basicLands[0].to_s+"); basicLands.push("+basicLands[1].to_s+"); basicLands.push("+basicLands[2].to_s+"); basicLands.push("+basicLands[3].to_s+"); basicLands.push("+basicLands[4].to_s+");" %>
+<%= str2write %>
 </script>
 <script src="<%= $hostServerAddress %>javascript/kinetic-v3.10.5.min.js"></script>
 <script src="<%= $hostServerAddress %>javascript/deckbuilder/deckbuilder.js"></script>

@@ -5,6 +5,10 @@ var originalTipImage = null;
 var addLands = function(l){
 	var number = prompt("How many " + l + " do you want?");
 	window[l] = number;
+	addLandsImpl(l,number);
+};
+var addLandsImpl = function(l,number)
+{
 	if (stage.get("#"+l+"Number").length==0)
 	{
 		var landText = new Kinetic.Text({
@@ -388,7 +392,7 @@ function loadFixedFrames() {
 	});
 	buttonAddLandText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonAddLandText.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonAddLandText.on("click",function(){alert("Submit deck not implemented!")});
+	buttonAddLandText.on("click",submitDeck);
 	layer.add(buttonAddLandText);
 	
 	//card count
@@ -766,7 +770,9 @@ function sortMBByRarity()
 }
 
 function loadAllCards()
-{
+{	
+	//reset color counter
+	colorCardsNumber["G"]=colorCardsNumber["R"]=colorCardsNumber["B"]=colorCardsNumber["U"]=colorCardsNumber["W"]=0;
 	//load sb first.
 	var startX = 250;
 	var startY = 370;
@@ -917,6 +923,7 @@ function loadAllCards()
 	//load mb second.
 	startX = 250;
 	startY = 5;
+	//get a count on colors.
 	for (d in mbDisplayOrderArray)
 	{
 		i = mbDisplayOrderArray[d];
@@ -1018,9 +1025,20 @@ function loadAllCards()
 				cardsLoaded++;
 				if (cardsLoaded == totalCardNumber) reLayerCards();
 			}
+			colorCardsNumber["G"]+=((mbCards[I].color&1)==1?1:0);
+			colorCardsNumber["R"]+=((mbCards[I].color&2)==2?1:0);
+			colorCardsNumber["B"]+=((mbCards[I].color&4)==4?1:0);
+			colorCardsNumber["U"]+=((mbCards[I].color&8)==8?1:0);
+			colorCardsNumber["W"]+=((mbCards[I].color&16)==16?1:0);
 			imageObj.src = mbCards[I].engSRC;
 		})(startX,startY,i);
 	}
+	stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
+	stage.get("#UNumber")[0].setText(colorCardsNumber['U'].toString() + " " + 'U' + " cards");
+	stage.get("#BNumber")[0].setText(colorCardsNumber['B'].toString() + " " + 'B' + " cards");
+	stage.get("#RNumber")[0].setText(colorCardsNumber['R'].toString() + " " + 'R' + " cards");
+	stage.get("#GNumber")[0].setText(colorCardsNumber['G'].toString() + " " + 'G' + " cards");
+	layer.draw();
 };
 
 function cardToMB(cuid,oldimage)
@@ -1316,7 +1334,38 @@ function initCardDisplay()
 	mbCards = mainBoardCards;
 	stage.get("#cardCountSBText")[0].setText(sbCards.length.toString());
 	stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
+	addLandsImpl("plains",basicLands[0]);
+	addLandsImpl("island",basicLands[1]);
+	addLandsImpl("swamp",basicLands[2]);
+	addLandsImpl("mountain",basicLands[3]);
+	addLandsImpl("forest",basicLands[4]);
 	layer.draw();
 	sortByColor();
 };
+
+//submit deck
+function prepareCardsToSend(cards)
+{
+	var i;
+	var returnString = "";
+	for (i in cards)
+	{
+		returnString += (cards[i].expansion.toString() + "/" + cards[i].idInSet.toString()+"+");
+	}
+	return returnString;
+}
+
+function submitDeck(){
+	var xhr = new XMLHttpRequest();
+	xhr.open('POST', hostServerAddress+"/users/submitDeck", false);  		//hostServerAddress is derived from index.html.erb, must
+	//use this under rails framework.
+	xhr.setRequestHeader('Content-Type','application/json')
+	POSTload = {"cards":prepareCardsToSend(mbCards),"sbCards":prepareCardsToSend(sbCards),"L1":(stage.get("#plainsNumber").length==0)?0:stage.get("#plainsNumber")[0].attrs.number.toString(),"L2":(stage.get("#islandNumber").length==0)?0:stage.get("#islandNumber")[0].attrs.number.toString(),"L3":(stage.get("#swampNumber").length==0)?0:stage.get("#swampNumber")[0].attrs.number.toString(),"L4":(stage.get("#mountainNumber").length==0)?0:stage.get("#mountainNumber")[0].attrs.number.toString(),"L5":(stage.get("#forestNumber").length==0)?0:stage.get("#forestNumber")[0].attrs.number.toString()}
+	xhr.send(JSON.stringify(POSTload));
+	if (xhr.status == 200) {
+		alert("Deck submitted and accepted by the server!");
+	}
+	else alert("Deck submission failed, re-submit or check your connection!");
+}
+
 window.addEventListener("load",loadFixedFrames);
