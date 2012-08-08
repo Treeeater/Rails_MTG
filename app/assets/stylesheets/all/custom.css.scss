@@ -395,3 +395,20 @@ margin-left:-300px;
 width:1280px;
 height:900px;
 }
+
+/*Draft*/
+
+.draftContainer {
+border:2px solid;
+position:absolute;
+top: 50px;
+left: 10px;
+width:1280px;
+height:900px;
+}
+.draftContainerHolder {
+visibility : false;
+margin-left:-300px;
+width:1280px;
+height:900px;
+}

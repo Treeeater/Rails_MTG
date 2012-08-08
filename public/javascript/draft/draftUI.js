@@ -7,17 +7,7 @@ var addLands = function(l){
 	window[l] = number;
 	if (stage.get("#"+l+"Number").length==0)
 	{
-		var landText = new Kinetic.Text({
-		  x: 70,
-		  y: landsVisual[l],
-		  text: number + " " + l,
-		  fontSize: 12,
-		  fontFamily: "Calibri",
-		  textFill: "green",
-		  align: "center",
-		  verticalAlign: "middle",
-		  id: l+"Number"
-		});
+		var landText = new Kinetic.Text({x: 70,y: landsVisual[l],text: number + " " + l,fontSize: 12,fontFamily: "Calibri", textFill: "green", align: "center", verticalAlign: "middle",id: l+"Number"});
 		layer.add(landText);
 		stage.get("#"+l+"Number")[0].attrs.number = number;
 	}
@@ -40,79 +30,34 @@ function timeDown(){
 function loadFixedFrames() {
 	var imgReady = 0;
 	function testAndDraw(){
-		//if (imgReady == 6) {layer.draw();} else {imgReady++; alert(imgReady);}
 		layer.draw();
 	}
-	stage = new Kinetic.Stage({
-	  container: "container",
-	  width: 1280,
-	  height: 900
-	});
+	stage = new Kinetic.Stage({container: "container", width: 1280, height: 900});
 	layer = new Kinetic.Layer();
 	cardLayer = new Kinetic.Layer();
 	//draw section division lines
-	var blueLine = new Kinetic.Line({
-	  points: [240, 360, 1280, 360],
-	  stroke: "green",
-	  strokeWidth: 3,
-	  lineCap: "round",
-	  lineJoin: "round",
+	var blueLine = new Kinetic.Line({points: [240, 360, 1280, 360],stroke: "green",strokeWidth: 3,lineCap: "round",lineJoin: "round",
 	});
 	
-	var blueLine2 = new Kinetic.Line({
-	  points: [240, 0, 240, 900],
-	  stroke: "blue",
-	  strokeWidth: 3,
-	  lineCap: "round",
-	  lineJoin: "round"
+	var blueLine2 = new Kinetic.Line({points: [240, 0, 240, 900],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 	
-	var blueLine3 = new Kinetic.Line({
-	  points: [0, 320, 240, 320],
-	  stroke: "blue",
-	  strokeWidth: 3,
-	  lineCap: "round",
-	  lineJoin: "round"
+	var blueLine3 = new Kinetic.Line({points: [0, 320, 240, 320],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 	
-	var blueLine4 = new Kinetic.Line({
-	  points: [0, 360, 240, 360],
-	  stroke: "blue",
-	  strokeWidth: 3,
-	  lineCap: "round",
-	  lineJoin: "round"
+	var blueLine4 = new Kinetic.Line({points: [0, 360, 240, 360],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 	
-	var blueLine5 = new Kinetic.Line({
-	  points: [0, 450, 240, 450],
-	  stroke: "blue",
-	  strokeWidth: 3,
-	  lineCap: "round",
-	  lineJoin: "round"
+	var blueLine5 = new Kinetic.Line({points: [0, 450, 240, 450],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 
-	var blueLine6 = new Kinetic.Line({
-	  points: [0, 490, 240, 490],
-	  stroke: "blue",
-	  strokeWidth: 3,
-	  lineCap: "round",
-	  lineJoin: "round"
+	var blueLine6 = new Kinetic.Line({points: [0, 490, 240, 490],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 
-	var blueLine7 = new Kinetic.Line({
-	  points: [150, 490, 150, 700],
-	  stroke: "blue",
-	  strokeWidth: 3,
-	  lineCap: "round",
-	  lineJoin: "round"
+	var blueLine7 = new Kinetic.Line({points: [150, 490, 150, 700],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 
-	var blueLine8 = new Kinetic.Line({
-	  points: [0, 700, 240, 700],
-	  stroke: "blue",
-	  strokeWidth: 3,
-	  lineCap: "round",
-	  lineJoin: "round"
+	var blueLine8 = new Kinetic.Line({points: [0, 700, 240, 700],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 
 	layer.add(blueLine);
@@ -125,29 +70,12 @@ function loadFixedFrames() {
 	layer.add(blueLine8);
 	
 	//add timer
-	var timerTitleText = new Kinetic.Text({
-	  x: 40,
-	  y: 335,
-	  text: "Time Remaining : ",
-	  fontSize: 12,
-	  fontFamily: "Calibri",
-	  textFill: "black",
-	  align: "center",
-	  verticalAlign: "middle"
+	var timerTitleText = new Kinetic.Text({x: 40,y: 335,text: "Time Remaining : ",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
 	});
 	layer.add(timerTitleText);
 	//frequent redraw timer layer
 	timerLayer = new Kinetic.Layer();
-	var timerText = new Kinetic.Text({
-	  x: 170,
-	  y: 335,
-	  text: "15:00",
-	  fontSize: 12,
-	  fontFamily: "Calibri",
-	  textFill: "green",
-	  align: "center",
-	  verticalAlign: "middle",
-	  id: "timerText"
+	var timerText = new Kinetic.Text({x: 170,y: 335,text: "15:00",fontSize: 12,fontFamily: "Calibri",textFill: "green",align: "center",verticalAlign: "middle",id: "timerText"
 	});
 	timer = 900;
 	timerLayer.add(timerText);
@@ -155,25 +83,11 @@ function loadFixedFrames() {
 	//cardback
 	var imageObj = new Image();
 	imageObj.onload = function() {
-		var image = new Kinetic.Image({
-			x: 0,
-			y: 0,
-			image: imageObj,
-			width: 240,
-			height: 320,
-			id: "detailed"
-			});
+		var image = new Kinetic.Image({x: 0,y: 0,image: imageObj,width: 240,height: 320,id: "detailed"});
 		layer.add(image);
 		
 		//image tooltip helper (middle button)
-		var imageTooltip = new Kinetic.Image({
-			x: 0,
-			y: 0,
-			image: imageObj,
-			width: 240,
-			height: 320,
-			visible: false,
-			id: "tooltip"
+		var imageTooltip = new Kinetic.Image({x: 0,y: 0,image: imageObj,width: 240,height: 320,visible: false,id: "tooltip"
 		});
 		layer.add(imageTooltip);
 		imageTooltip.setZIndex(99999);
@@ -184,13 +98,7 @@ function loadFixedFrames() {
 	plains=island=swamp=mountain=forest=0;
 	var imageObj2 = new Image();
 	imageObj2.onload = function() {
-		var image = new Kinetic.Image({
-			x: 20,
-			y: 500,
-			image: imageObj2,
-			width: 30,
-			height: 33
-			});
+		var image = new Kinetic.Image({x: 20,y: 500,image: imageObj2,width: 30,height: 33});
 		image.on("click",addLands.bind(window,"plains"));
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -199,13 +107,7 @@ function loadFixedFrames() {
 	}
 	var imageObj3 = new Image();
 	imageObj3.onload = function() {
-		var image = new Kinetic.Image({
-			x: 20,
-			y: 540,
-			image: imageObj3,
-			width: 30,
-			height: 33
-			});
+		var image = new Kinetic.Image({x: 20,y: 540,image: imageObj3,width: 30,height: 33});
 		image.on("click",addLands.bind(window,"island"));
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -214,13 +116,7 @@ function loadFixedFrames() {
 	}
 	var imageObj4 = new Image();
 	imageObj4.onload = function() {
-		var image = new Kinetic.Image({
-			x: 20,
-			y: 580,
-			image: imageObj4,
-			width: 30,
-			height: 33
-			});
+		var image = new Kinetic.Image({x: 20,y: 580,image: imageObj4,width: 30,height: 33});
 		image.on("click",addLands.bind(window,"swamp"));
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -229,13 +125,7 @@ function loadFixedFrames() {
 	}
 	var imageObj5 = new Image();
 	imageObj5.onload = function() {
-		var image = new Kinetic.Image({
-			x: 20,
-			y: 620,
-			image: imageObj5,
-			width: 30,
-			height: 33
-			});
+		var image = new Kinetic.Image({x: 20,y: 620,image: imageObj5,width: 30,height: 33});
 		image.on("click",addLands.bind(window,"mountain"));
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -244,13 +134,7 @@ function loadFixedFrames() {
 	}
 	var imageObj6 = new Image();
 	imageObj6.onload = function() {
-		var image = new Kinetic.Image({
-			x: 20,
-			y: 660,
-			image: imageObj6,
-			width: 30,
-			height: 33
-			});
+		var image = new Kinetic.Image({x: 20,y: 660,image: imageObj6,width: 30,height: 33});
 		image.on("click",addLands.bind(window,"forest"));
 		image.on("mouseover",function(){document.body.style.cursor = "pointer";});
 		image.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -270,41 +154,16 @@ function loadFixedFrames() {
 	colorCardsNumber = {"W":0,"U":0,"B":0,"R":0,"G":0};
 	for (i in colorsVisual) {
 		if (colorsVisual.hasOwnProperty(i)) {
-			var cardsCountText = new Kinetic.Text({
-				  x: 165,
-				  y: colorsVisual[i],
-				  text: "0 " + i + " cards",
-				  fontSize: 12,
-				  fontFamily: "Calibri",
-				  textFill: "green",
-				  align: "center",
-				  verticalAlign: "middle",
-				  id: i+"Number"
-			});
+			var cardsCountText = new Kinetic.Text({x: 165,y: colorsVisual[i], text: "0 " + i + " cards",fontSize: 12,fontFamily: "Calibri",textFill: "green",align: "center",verticalAlign: "middle",id: i+"Number"});
 			layer.add(cardsCountText);
 		}
 	}
 	//sort buttons
 	//sort by color
-	var buttonSortColor = new Kinetic.Rect({
-	  x: 30,
-	  y: 380,
-	  width: 80,
-	  height: 20,
-	  fill: "#00D2FF",
-	  stroke: "black",
-	  strokeWidth: 2
+	var buttonSortColor = new Kinetic.Rect({x: 30,y: 380,width: 80,height: 20,fill: "#00D2FF",stroke: "black",strokeWidth: 2
 	});
 	layer.add(buttonSortColor);
-	var buttonSortColorText = new Kinetic.Text({
-	  x: 40,
-	  y: 385,
-	  text: "ColorSort",
-	  fontSize: 12,
-	  fontFamily: "Calibri",
-	  textFill: "black",
-	  align: "center",
-	  verticalAlign: "middle"
+	var buttonSortColorText = new Kinetic.Text({x: 40,y: 385,text: "ColorSort",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
 	});
 	buttonSortColorText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortColorText.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -312,25 +171,10 @@ function loadFixedFrames() {
 	layer.add(buttonSortColorText);
 	
 	//sort by cmc
-	var buttonSortCMC = new Kinetic.Rect({
-	  x: 130,
-	  y: 380,
-	  width: 80,
-	  height: 20,
-	  fill: "#00D2FF",
-	  stroke: "black",
-	  strokeWidth: 2
+	var buttonSortCMC = new Kinetic.Rect({x: 130,y: 380,width: 80,height: 20,fill: "#00D2FF",stroke: "black",strokeWidth: 2
 	});
 	layer.add(buttonSortCMC);
-	var buttonSortCMCText = new Kinetic.Text({
-	  x: 140,
-	  y: 385,
-	  text: "CMCSort",
-	  fontSize: 12,
-	  fontFamily: "Calibri",
-	  textFill: "black",
-	  align: "center",
-	  verticalAlign: "middle"
+	var buttonSortCMCText = new Kinetic.Text({x: 140,y: 385,text: "CMCSort",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
 	});
 	buttonSortCMCText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortCMCText.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -339,25 +183,10 @@ function loadFixedFrames() {
 	
 	//sort by rarity
 
-	var buttonSortRarity = new Kinetic.Rect({
-	  x: 30,
-	  y: 410,
-	  width: 80,
-	  height: 20,
-	  fill: "#00D2FF",
-	  stroke: "black",
-	  strokeWidth: 2
+	var buttonSortRarity = new Kinetic.Rect({x: 30,y: 410,width: 80,height: 20,fill: "#00D2FF",stroke: "black",strokeWidth: 2
 	});
 	layer.add(buttonSortRarity);
-	var buttonSortRarityText = new Kinetic.Text({
-	  x: 38,
-	  y: 415,
-	  text: "RaritySort",
-	  fontSize: 12,
-	  fontFamily: "Calibri",
-	  textFill: "black",
-	  align: "center",
-	  verticalAlign: "middle"
+	var buttonSortRarityText = new Kinetic.Text({x: 38,y: 415,text: "RaritySort",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
 	});
 	buttonSortRarityText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortRarityText.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -366,70 +195,38 @@ function loadFixedFrames() {
 
 	//add land button
 	
-	var buttonAddLand = new Kinetic.Rect({
-	  x: 130,
-	  y: 410,
-	  width: 80,
-	  height: 20,
-	  fill: "#FFFF00",
-	  stroke: "black",
-	  strokeWidth: 2
+	var buttonAddLand = new Kinetic.Rect({x: 130,y: 410,width: 80,height: 20,fill: "#FFFF00",stroke: "black",strokeWidth: 2
 	});
 	layer.add(buttonAddLand);
-	var buttonAddLandText = new Kinetic.Text({
-	  x: 135,
-	  y: 415,
-	  text: "Add Lands",
-	  fontSize: 12,
-	  fontFamily: "Calibri",
-	  textFill: "black",
-	  align: "center",
-	  verticalAlign: "middle"
+	var buttonAddLandText = new Kinetic.Text({x: 138,y: 415,text: "Time out!",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
 	});
 	buttonAddLandText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonAddLandText.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonAddLandText.on("click",function(){alert("Just click on the respective color symbols.")});
+	buttonAddLandText.on("click",function(){alert("Time out not implemented!")});
 	layer.add(buttonAddLandText);
 	
 	//card count
-	var cardCountHardCodedText = new Kinetic.Text({
-	  x: 20,
-	  y: 465,
-	  text: "Main board:        Side Board:",
-	  fontSize: 12,
-	  fontFamily: "Calibri",
-	  textFill: "black",
-	  align: "center",
-	  verticalAlign: "middle"
+	var cardCountHardCodedText = new Kinetic.Text({x: 20,y: 465,text: "Main board:        Side Board:",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
 	});
 	layer.add(cardCountHardCodedText);
 
-	var cardCountMBText = new Kinetic.Text({
-	  x: 100,
-	  y: 465,
-	  text: "",
-	  fontSize: 12,
-	  fontFamily: "Calibri",
-	  textFill: "black",
-	  align: "center",
-	  verticalAlign: "middle",
-	  id: "cardCountMBText"
+	var cardCountMBText = new Kinetic.Text({x: 100,y: 465,text: "",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id: "cardCountMBText"
 	});
 	layer.add(cardCountMBText);
 
-	var cardCountSBText = new Kinetic.Text({
-	  x: 210,
-	  y: 465,
-	  text: "",
-	  fontSize: 12,
-	  fontFamily: "Calibri",
-	  textFill: "black",
-	  align: "center",
-	  verticalAlign: "middle",
-	  id: "cardCountSBText"
+	var cardCountSBText = new Kinetic.Text({x: 210,y: 465,text: "",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id: "cardCountSBText"
 	});
 	layer.add(cardCountSBText);
 
+	//round table:
+	var roundTable = new Kinetic.Circle({x:120, y: 800, radius:50, fill: "white", stroke: "black", strokeWidth:1});
+	layer.add(roundTable);
+	var roundTablePlayers = new Array();
+	for (i = 0; i < 8; i++)
+	{
+		roundTablePlayers[i] = new Kinetic.Circle({x:120 + 75 * Math.sin(i*Math.PI/4), y: 800 - 75 * Math.cos(i*Math.PI/4), radius:10, fill: "gray", stroke: "black", strokeWidth:1, id:"roundTablePlayers"+i.toString()});
+		layer.add(roundTablePlayers[i]);
+	}	
 	//finalize
 	stage.add(timerLayer);
 	stage.add(cardLayer);
