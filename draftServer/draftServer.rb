@@ -8,11 +8,47 @@ require './sealedServer/selectCards.rb'
 
 #ARGV[0] is the host user's id
 #ARGV[1] is the total number of users
-#ARGV[2..n] is the user name of all the users, including the host.
+#ARGV[2..-1] is the user name of all the users, including the host.
 
 class DraftGame
 	attr_accessor :users, :wsID_userHash, :wsID_wsHash, :totalUserNo
-	def initialize(totalUserNo, totalUsers)
+
+	def userDelete(uID,wsID)
+		@users.delete(leavingUID)
+		@wsID_userHash.delete(ws.object_id)
+		@wsID_wsHash.delete(ws.object_id)
+	end
+	
+	def userDisconnect(uID,ws)
+		@users[uID].connectionStatus = false
+		@wsID_userHash.delete(ws.object_id)
+		@wsID_wsHash.delete(ws.object_id)
+		@users[uID].wsObjectID = 0
+	end
+
+	def userReconnect(uID,ws)
+		@users[uID].connectionStatus = true
+		@users[uID].wsObjectID = ws.object_id
+		@wsID_userHash[ws.object_id] = @users[uID]
+		@wsID_wsHash[ws.object_id] = ws
+	end
+	
+	def connectedUserNumber()
+		i = 0
+		@users.each_value{|u|
+			if (u.connectionStatus)
+				i+=1
+			end
+		}
+		return i
+	end
+
+	def dispatchPack()
+		puts "dispatching packs..."
+		return pickCards("AVR")
+	end
+
+	def initialize(totalUserNo)
 		@users = Hash.new
 		@wsID_userHash = Hash.new
 		@wsID_wsHash = Hash.new
@@ -21,14 +57,15 @@ class DraftGame
 end
 
 class User
-	attr_accessor :uid, :username, :wsObjectID, :ws, :connectionStatus, :cardPool
+	attr_accessor :uid, :username, :wsObjectID, :ws, :connectionStatus, :cardPool, :sitNo
 
-	def initialize(uid,username,wsObjectID)
+	def initialize(uid,username,wsObjectID,sitNo)
 		@uid = uid
 		@username = username
 		@wsObjectID = wsObjectID
 		@connectionStatus = true
 		@cardPool = Array.new
+		@sitNo = sitNo
 	end
 end
 
@@ -54,7 +91,9 @@ end
 
 EventMachine.run {
 
+	$playerNames = ARGV[2..-1]
 	$game = DraftGame.new(ARGV[1].to_i)
+	order = rand_n($game.totalUserNo,$game.totalUserNo)			#generate sit order
 	puts "WebSocket server opened at localhost on port " + (12320+ARGV[0].to_i).to_s + "!"
 	
 	EventMachine::WebSocket.start(:host => "localhost", :port => (12320+ARGV[0].to_i) ) do |ws|
@@ -65,18 +104,21 @@ EventMachine.run {
 
 		ws.onclose { 
 			puts "Connection closed from #{ws.object_id}"
-			leavingUID = $game.wsID_userHash[ws.object_id].uid
-			leavingUsername = $game.wsID_userHash[ws.object_id].username
-			$game.userDisconnect(leavingUID,ws)
-			#puts $game.connectedUserNumber()
-			if ($game.connectedUserNumber()==0)
-				#in production, we should wait for a fixed time, but in dev, we terminate it right away
-				Kernel.exit!				
-			else
-				response = ResponseMessage.new("disconnect",leavingUsername,leavingUID,"")
-				#wsToSend = (wsID_wsHash.values[0] == ws) ? wsID_wsHash.values[1] : wsID_wsHash.values[0]
-				#p $game.wsID_wsHash.keys
-				response.send($game.wsID_wsHash.values[0])
+			if ($game.wsID_userHash.has_key? ws.object_id)
+				leavingUID = $game.wsID_userHash[ws.object_id].uid
+				leavingUsername = $game.wsID_userHash[ws.object_id].username
+				leavingSitNo = $game.wsID_userHash[ws.object_id].sitNo
+				$game.userDisconnect(leavingUID,ws)
+				#puts $game.connectedUserNumber()
+				if ($game.connectedUserNumber()==0)
+					#in production, we should wait for a fixed time, but in dev, we terminate it right away
+					Kernel.exit!				
+				else
+					response = ResponseMessage.new("disconnect",leavingUsername,leavingUID,leavingSitNo)
+					#wsToSend = (wsID_wsHash.values[0] == ws) ? wsID_wsHash.values[1] : wsID_wsHash.values[0]
+					#p $game.wsID_wsHash.keys
+					response.send($game.wsID_wsHash.values[0])
+				end
 			end
 		}
 	
@@ -90,27 +132,37 @@ EventMachine.run {
 			responseMsg = ""
 			case parsedMSG["type"]
 				when "init"
-					if ($game.users.has_key?(msgUID))
-						#this user is reconnecting.
-						$game.userReconnect(msgUID,ws)
-					else
-						user = User.new(msgUID,msgUsername,ws.object_id)
-						$game.users[msgUID] = user
-						$game.wsID_userHash[ws.object_id] = user
-						$game.wsID_wsHash[ws.object_id] = ws
-					end
-					response = ResponseMessage.new("init",msgUsername,msgUID,(($game.connectedUserNumber()==2) ? "ready" : "" ))
-					$game.wsID_wsHash.each_value{|w|
-						response.send(w)
-					}
-					if ($game.distributedPacks)
-						#this player disconnected after the packs are already distributed, let's re-setup him.
-						toSend = Array.new
-						$game.users[msgUID].cardPool.each{|c|
-							toSend.push(c.to_hash)
+					if ($playerNames.include? msgUsername)
+						if ($game.users.has_key?(msgUID))
+							#this user is reconnecting.
+							$game.userReconnect(msgUID,ws)				#re-config game state on server side
+						else
+							sitNo = order[$game.connectedUserNumber()]
+							user = User.new(msgUID,msgUsername,ws.object_id,sitNo)
+							$game.users[msgUID] = user
+							$game.wsID_userHash[ws.object_id] = user
+							$game.wsID_wsHash[ws.object_id] = ws
+						end
+						$game.users.each_value{|u|
+							msgUsername = u.username
+							msgUID = u.uid
+							sitNo = u.sitNo
+							response = ResponseMessage.new("init",msgUsername,msgUID, sitNo.to_s+"/"+$game.totalUserNo.to_s)
+							$game.wsID_wsHash.each_value{|w|
+								response.send(w)
+							}
 						}
-						response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
-						response.send(ws)
+=begin
+						if ($game.distributedPacks)
+							#this player disconnected after the packs are already distributed, let's re-setup him.
+							toSend = Array.new
+							$game.users[msgUID].cardPool.each{|c|
+								toSend.push(c.to_hash)
+							}
+							response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
+							response.send(ws)
+						end
+=end
 					end
 				when "initPacks"
 					if (!$game.distributedPacks)

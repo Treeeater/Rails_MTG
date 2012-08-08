@@ -219,7 +219,7 @@ function loadFixedFrames() {
 	layer.add(cardCountSBText);
 
 	//round table:
-	var roundTable = new Kinetic.Circle({x:120, y: 800, radius:50, fill: "white", stroke: "black", strokeWidth:1});
+	var roundTable = new Kinetic.Circle({x:120, y: 800, radius:50, fill: "white", stroke: "black", strokeWidth:1, id:"roundTable"});
 	layer.add(roundTable);
 	var roundTablePlayers = new Array();
 	for (i = 0; i < 8; i++)
@@ -227,6 +227,11 @@ function loadFixedFrames() {
 		roundTablePlayers[i] = new Kinetic.Circle({x:120 + 75 * Math.sin(i*Math.PI/4), y: 800 - 75 * Math.cos(i*Math.PI/4), radius:10, fill: "gray", stroke: "black", strokeWidth:1, id:"roundTablePlayers"+i.toString()});
 		layer.add(roundTablePlayers[i]);
 	}	
+	//playerNameBox
+	var playerNameBox = new Kinetic.Rect({x: 0,y: 0,width: 40,height: 20, visible:false, fill: "white", stroke: "black", strokeWidth:1, id:"playerNameBox"});
+	var playerNameBoxText = new Kinetic.Text({x:0, y:0, text:"", fontSize:12, fontFamily: "Calibri", textFill:"black", align: "center",verticalAlign: "middle", visible: false, id:"playerNameBoxText"});
+	layer.add(playerNameBox);
+	layer.add(playerNameBoxText);
 	//finalize
 	stage.add(timerLayer);
 	stage.add(cardLayer);
@@ -1112,4 +1117,24 @@ function initCardDisplay()
 	sortByColor();
 	log('Info : All cards rendered. Please build your deck before the time runs out.\n\n');
 };
+
+function showPlayerName(usrname, x, y)
+{
+	stage.get("#playerNameBox")[0].attrs.x = x;
+	stage.get("#playerNameBox")[0].attrs.y = y;
+	stage.get("#playerNameBoxText")[0].attrs.x = x+5;
+	stage.get("#playerNameBoxText")[0].attrs.y = y;
+	stage.get("#playerNameBoxText")[0].setText(usrname);
+	stage.get("#playerNameBox")[0].attrs.visible = true;
+	stage.get("#playerNameBoxText")[0].attrs.visible = true;
+	layer.draw();
+};
+
+function hidePlayerName(usrname, x, y)
+{
+	stage.get("#playerNameBox")[0].attrs.visible = false;
+	stage.get("#playerNameBoxText")[0].attrs.visible = false;
+	layer.draw();
+};
+
 window.addEventListener("load",loadFixedFrames);
