@@ -11,7 +11,7 @@ require './sealedServer/selectCards.rb'
 #ARGV[2..-1] is the user name of all the users, including the host.
 
 class DraftGame
-	attr_accessor :users, :wsID_userHash, :wsID_wsHash, :totalUserNo
+	attr_accessor :users, :wsID_userHash, :wsID_wsHash, :totalUserNo, :currentDraftRound, :currentPickNo
 
 	def userDelete(uID,wsID)
 		@users.delete(leavingUID)
@@ -24,6 +24,7 @@ class DraftGame
 		@wsID_userHash.delete(ws.object_id)
 		@wsID_wsHash.delete(ws.object_id)
 		@users[uID].wsObjectID = 0
+		@users[uID].readyForNextPick = false
 	end
 
 	def userReconnect(uID,ws)
@@ -31,6 +32,8 @@ class DraftGame
 		@users[uID].wsObjectID = ws.object_id
 		@wsID_userHash[ws.object_id] = @users[uID]
 		@wsID_wsHash[ws.object_id] = ws
+		@users[uID].ws = ws
+		@users[uID].readyForNextPick = true
 	end
 	
 	def connectedUserNumber()
@@ -43,9 +46,27 @@ class DraftGame
 		return i
 	end
 
+	def readyUserNumber()
+		i = 0
+		@users.each_value{|u|
+			if (u.readyForNextPick)
+				i+=1
+			end
+		}
+		return i
+	end
+
 	def dispatchPack()
 		puts "dispatching packs..."
 		return pickCards("AVR")
+	end
+
+	def checkAndSendCards()
+		if ($game.readyUserNumber()!=$game.totalUserNo) then return end
+		#check and send cards for all players, this triggers every time when a player submits a card, or a player first inits.
+		@users.each_value{|u|
+			u.checkAndSendCards()
+		}
 	end
 
 	def initialize(totalUserNo)
@@ -53,19 +74,30 @@ class DraftGame
 		@wsID_userHash = Hash.new
 		@wsID_wsHash = Hash.new
 		@totalUserNo = totalUserNo
+		@currentDraftRound = 1
+		@currentPickNo = 0
 	end
 end
 
 class User
-	attr_accessor :uid, :username, :wsObjectID, :ws, :connectionStatus, :cardPool, :sitNo
+	attr_accessor :uid, :username, :wsObjectID, :ws, :connectionStatus, :cardPool, :sitNo, :currentPack, :readyForNextPick
 
-	def initialize(uid,username,wsObjectID,sitNo)
+	def initialize(uid,username,ws,wsObjectID,sitNo)
 		@uid = uid
 		@username = username
 		@wsObjectID = wsObjectID
 		@connectionStatus = true
 		@cardPool = Array.new
 		@sitNo = sitNo
+		@ws = ws
+		@currentPack = $game.dispatchPack()
+		@readyForNextPick = true
+	end
+	
+	def checkAndSendCards()
+		if ($game.readyUserNumber()!=$game.totalUserNo) then return end
+		response = ResponseMessage.new("nextPack",@username,@uid,ActiveSupport::JSON.encode(currentPack))
+		response.send(@ws)
 	end
 end
 
@@ -133,25 +165,25 @@ EventMachine.run {
 			case parsedMSG["type"]
 				when "init"
 					if ($playerNames.include? msgUsername)
+						reconnect = false
 						if ($game.users.has_key?(msgUID))
 							#this user is reconnecting.
+							reconnect = true
 							$game.userReconnect(msgUID,ws)				#re-config game state on server side
 						else
 							sitNo = order[$game.connectedUserNumber()]
-							user = User.new(msgUID,msgUsername,ws.object_id,sitNo)
+							user = User.new(msgUID,msgUsername,ws,ws.object_id,sitNo)
 							$game.users[msgUID] = user
 							$game.wsID_userHash[ws.object_id] = user
 							$game.wsID_wsHash[ws.object_id] = ws
 						end
 						$game.users.each_value{|u|
-							msgUsername = u.username
-							msgUID = u.uid
-							sitNo = u.sitNo
-							response = ResponseMessage.new("init",msgUsername,msgUID, sitNo.to_s+"/"+$game.totalUserNo.to_s)
+							response = ResponseMessage.new("init",u.username,u.uid, u.sitNo.to_s+"/"+$game.totalUserNo.to_s)
 							$game.wsID_wsHash.each_value{|w|
 								response.send(w)
 							}
 						}
+						if (!reconnect) then $game.checkAndSendCards() else $game.users[msgUID].checkAndSendCards() end
 =begin
 						if ($game.distributedPacks)
 							#this player disconnected after the packs are already distributed, let's re-setup him.

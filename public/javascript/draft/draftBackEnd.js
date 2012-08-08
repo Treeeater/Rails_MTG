@@ -160,7 +160,7 @@ function start(){
 				log('Error : ' + msg.body + '\n\n');
 			case "info":
 				log('Info : ' + msg.body + '\n\n');
-			case "cards":
+			case "nextPack":
 				var c = JSON.parse(msg.body);
 				var i = 0;
 				//global var 'cards' holding all cards

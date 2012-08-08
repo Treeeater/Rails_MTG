@@ -580,8 +580,8 @@ function loadAllCards()
 			var imageObj = new Image();
 			imageObj.onload = function() {
 				var image = new Kinetic.Image({
-					x: X + Math.floor(displayOrder/11) * 128,
-					y: Y + (displayOrder%11) * 18,
+					x: X + Math.floor(displayOrder/2) * 128,
+					y: Y + (displayOrder%2) * 170,
 					image: imageObj,
 					width: 120,
 					height: 160,
@@ -725,8 +725,8 @@ function loadAllCards()
 			var imageObj = new Image();
 			imageObj.onload = function() {
 				var image = new Kinetic.Image({
-					x: X + Math.floor(displayOrder/11) * 128,
-					y: Y + (displayOrder%11) * 18,
+					x: X + Math.floor(displayOrder/2) * 128,
+					y: Y + (displayOrder%2) * 170,
 					image: imageObj,
 					width: 120,
 					height: 160,
@@ -840,8 +840,8 @@ function cardToMB(cuid,oldimage)
 	Y = 5;
 	imageObj.onload = function() {
 		var image = new Kinetic.Image({
-			x: X + Math.floor(mbCards.length/11) * 128,
-			y: Y + (mbCards.length%11) * 18,
+			x: X + Math.floor(mbCards.length/2) * 128,
+			y: Y + (mbCards.length%2) * 170,
 			image: imageObj,
 			width: 120,
 			height: 160,
@@ -962,8 +962,8 @@ function cardToSB(cuid,oldimage)
 	Y = 370;
 	imageObj.onload = function() {
 		var image = new Kinetic.Image({
-			x: X + Math.floor(sbCards.length/11) * 128,
-			y: Y + (sbCards.length%11) * 18,
+			x: X + Math.floor(sbCards.length/2) * 128,
+			y: Y + (sbCards.length%2) * 170,
 			image: imageObj,
 			width: 120,
 			height: 160,
@@ -1072,12 +1072,12 @@ function reLayerCards()
 	for (d in sbDisplayOrderArray)
 	{
 		i = sbDisplayOrderArray[d];
-		stage.get("#card"+sbCards[i].uid.toString())[0].setZIndex( sbCards[i].displayOrder % 11 );
+		stage.get("#card"+sbCards[i].uid.toString())[0].setZIndex( sbCards[i].displayOrder % 2 );
 	}
 	for (d in mbDisplayOrderArray)
 	{
 		i = mbDisplayOrderArray[d];
-		stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( mbCards[i].displayOrder % 11 + 1000);
+		stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( mbCards[i].displayOrder % 2 + 1000);
 	}
 	cardLayer.draw();
 }
@@ -1114,7 +1114,7 @@ function initCardDisplay()
 	sbCards = cards;
 	stage.get("#cardCountSBText")[0].setText(sbCards.length.toString());
 	layer.draw();
-	sortByColor();
+	sortByRarity();
 	log('Info : All cards rendered. Please build your deck before the time runs out.\n\n');
 };
 
