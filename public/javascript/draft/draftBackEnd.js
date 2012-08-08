@@ -83,6 +83,12 @@ function start(){
 		ws.send(JSON.stringify(msg));
 	}
 	
+	submitCard = function(card)
+	{
+		var msg = new Message("submitCard",myUsername,myUID,card.card);
+		ws.send(JSON.stringify(msg));
+	}
+
 	submitDeck = function()
 	{
 		if (mbCards==undefined)
@@ -163,16 +169,30 @@ function start(){
 			case "nextPack":
 				var c = JSON.parse(msg.body);
 				var i = 0;
-				//global var 'cards' holding all cards
+				sbCards = new Array();
+				totalSelectionCardNumber = 0;
 				for (i = 0; i<c.length; i++)
 				{
 					var card = new Card(i,c[i]);
-					cards.push(card);
+					sbCards.push(card);
+					totalSelectionCardNumber++;
 				}
-				totalCardNumber = cards.length;
-				gotpacks = true;
 				log('Info : packs received, rendering card images...\n\n');
-				initCardDisplay();		//hand control over to sealedUI.js
+				refreshSelectionDisplay();		//hand control over to sealedUI.js
+				break;
+			case "selectedCards":
+				var c = JSON.parse(msg.body);
+				var i = 0;
+				mbCards = new Array();
+				totalSelectedCardNumber = 0;
+				for (i = 0; i<c.length; i++)
+				{
+					var card = new Card(i,c[i]);
+					mbCards.push(card);
+					totalSelectedCardNumber++;
+				}
+				log('Info : selected cards received, rendering card images...\n\n');
+				refreshSelectedDisplay();		//hand control over to sealedUI.js
 				break;
 			case "verified":
 				if (msg.uid == myUID)

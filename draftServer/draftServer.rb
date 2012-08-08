@@ -61,11 +61,12 @@ class DraftGame
 		return pickCards("AVR")
 	end
 
-	def checkAndSendCards()
+	def checkAndSendSelections()
 		if ($game.readyUserNumber()!=$game.totalUserNo) then return end
 		#check and send cards for all players, this triggers every time when a player submits a card, or a player first inits.
 		@users.each_value{|u|
-			u.checkAndSendCards()
+			u.sendSelections()
+			u.readyForNextPick = false
 		}
 	end
 
@@ -94,9 +95,13 @@ class User
 		@readyForNextPick = true
 	end
 	
-	def checkAndSendCards()
-		if ($game.readyUserNumber()!=$game.totalUserNo) then return end
+	def sendSelections()
 		response = ResponseMessage.new("nextPack",@username,@uid,ActiveSupport::JSON.encode(currentPack))
+		response.send(@ws)
+	end
+
+	def sendSelected()
+		response = ResponseMessage.new("selectedCards",@username,@uid,ActiveSupport::JSON.encode(@cardPool))
 		response.send(@ws)
 	end
 end
@@ -183,7 +188,10 @@ EventMachine.run {
 								response.send(w)
 							}
 						}
-						if (!reconnect) then $game.checkAndSendCards() else $game.users[msgUID].checkAndSendCards() end
+						if (!reconnect) then $game.checkAndSendSelections() else 
+							$game.users[msgUID].sendSelected()
+							$game.users[msgUID].sendSelections()
+						end
 =begin
 						if ($game.distributedPacks)
 							#this player disconnected after the packs are already distributed, let's re-setup him.
@@ -196,32 +204,9 @@ EventMachine.run {
 						end
 =end
 					end
-				when "initPacks"
-					if (!$game.distributedPacks)
-						if ($game.connectedUserNumber()!=2)
-							response = ResponseMessage.new("error",msgUsername,msgUID,"Please wait until both players are connected and try again.")
-							response.send(ws)
-						else
-							$game.users[msgUID].packReadyStatus = true
-							if ($game.users.values[0].packReadyStatus && $game.users.values[1].packReadyStatus)
-								$game.distributedPacks = true
-								$game.dispatchPacks(6)
-								puts "Packs distributed..."
-								$game.wsID_wsHash.each_key{|wsid|
-									p "sending these cards to player " + $game.wsID_userHash[wsid].username
-									toSend = Array.new
-									$game.wsID_userHash[wsid].cardPool.each{|c|
-										toSend.push(c.to_hash)
-									}
-									response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
-									response.send($game.wsID_wsHash[wsid])
-								}
-							else
-								response = ResponseMessage.new("info",msgUsername,msgUID,"Your 'pack ready' status has been set to ready, waiting for your opponent now...")
-								response.send(ws)
-							end
-						end
-					end
+				when "submitCard"
+					puts msgBody
+					$game.users[msgUID].cardPool.push(msgBody)
 				when "verifyDeck"
 					if !$game.wsID_userHash[ws.object_id].verified
 						$game.wsID_userHash[ws.object_id].verified = true

@@ -939,7 +939,40 @@ function loadAllCards()
 				});
 				image.cuid = mbCards[I].uid;
 				image.cname = mbCards[I].card.cardName;
-				image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
+				image.on("mouseover",function(){
+					stage.get("#detailed")[0].setImage(imageObj);layer.draw();
+					if (middleMouseDown)
+					{
+						var imageTooltip = stage.get("#tooltip")[0];
+						var p = image.getPosition();
+						if (p.x<1000){
+							imageTooltip.setX(p.x+image.attrs.width+10);
+						}
+						else {imageTooltip.setX(p.x-250)};
+						if (p.y>570){
+							imageTooltip.setY(p.y-320+image.attrs.height);
+						}
+						else {imageTooltip.setY(p.y);}
+						imageTooltip.setImage(imageObj);
+						imageTooltip.show();
+
+						layer.draw();
+						cardLayer.draw();
+					}
+				});
+
+				image.on("mouseout",function(evt){
+					if (evt.which == 2){
+						evt.stopPropagation();
+						evt.preventDefault(evt);
+						evt.cancelBubble = true;
+						stage.get("#tooltip")[0].hide();
+						if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+						cardLayer.draw();
+						layer.draw();
+					}
+				});
+
 				image.on("mousedown",function(evt){
 					//console.log('downed');
 					if (evt.which==1) {
@@ -952,6 +985,9 @@ function loadAllCards()
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
+						image.setDraggable(false);
+						middleMouseDown = true;				//this is used in mouseover event.
+						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
 						var p = image.getPosition();
 						if (p.x<1000){
@@ -979,9 +1015,11 @@ function loadAllCards()
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
 						stage.get("#tooltip")[0].hide();
+						originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+						middleMouseDown = false;
 					}
-					layer.draw();
 					cardLayer.draw();
+					layer.draw();
 					return false;
 				});
 				image.on('click', function(evt) {
@@ -1054,7 +1092,40 @@ function cardToMB(cuid,oldimage)
 		});
 		image.cuid = cuid;
 		image.cname = thisCard.card.cardName;
-		image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
+		image.on("mouseover",function(){
+			stage.get("#detailed")[0].setImage(imageObj);layer.draw();
+			if (middleMouseDown)
+			{
+				var imageTooltip = stage.get("#tooltip")[0];
+				var p = image.getPosition();
+				if (p.x<1000){
+					imageTooltip.setX(p.x+image.attrs.width+10);
+				}
+				else {imageTooltip.setX(p.x-250)};
+				if (p.y>570){
+					imageTooltip.setY(p.y-320+image.attrs.height);
+				}
+				else {imageTooltip.setY(p.y);}
+				imageTooltip.setImage(imageObj);
+				imageTooltip.show();
+
+				layer.draw();
+				cardLayer.draw();
+			}
+		});
+
+		image.on("mouseout",function(evt){
+			if (evt.which == 2){
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+				stage.get("#tooltip")[0].hide();
+				if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+				cardLayer.draw();
+				layer.draw();
+			}
+		});
+
 		image.on("mousedown",function(evt){
 			//console.log('downed');
 			if (evt.which==1) {
@@ -1067,6 +1138,9 @@ function cardToMB(cuid,oldimage)
 				evt.stopPropagation();
 				evt.preventDefault(evt);
 				evt.cancelBubble = true;
+				image.setDraggable(false);
+				middleMouseDown = true;				//this is used in mouseover event.
+				originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 				var imageTooltip = stage.get("#tooltip")[0];
 				var p = image.getPosition();
 				if (p.x<1000){
@@ -1094,9 +1168,11 @@ function cardToMB(cuid,oldimage)
 				evt.preventDefault(evt);
 				evt.cancelBubble = true;
 				stage.get("#tooltip")[0].hide();
+				originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+				middleMouseDown = false;
 			}
-			layer.draw();
 			cardLayer.draw();
+			layer.draw();
 			return false;
 		});
 		image.on('click', function(evt) {
@@ -1176,7 +1252,40 @@ function cardToSB(cuid,oldimage)
 		});
 		image.cuid = cuid;
 		image.cname = thisCard.card.cardName;
-		image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
+		image.on("mouseover",function(){
+			stage.get("#detailed")[0].setImage(imageObj);layer.draw();
+			if (middleMouseDown)
+			{
+				var imageTooltip = stage.get("#tooltip")[0];
+				var p = image.getPosition();
+				if (p.x<1000){
+					imageTooltip.setX(p.x+image.attrs.width+10);
+				}
+				else {imageTooltip.setX(p.x-250)};
+				if (p.y>570){
+					imageTooltip.setY(p.y-320+image.attrs.height);
+				}
+				else {imageTooltip.setY(p.y);}
+				imageTooltip.setImage(imageObj);
+				imageTooltip.show();
+
+				layer.draw();
+				cardLayer.draw();
+			}
+		});
+
+		image.on("mouseout",function(evt){
+			if (evt.which == 2){
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+				stage.get("#tooltip")[0].hide();
+				if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+				cardLayer.draw();
+				layer.draw();
+			}
+		});
+
 		image.on("mousedown",function(evt){
 			//console.log('downed');
 			if (evt.which==1) {
@@ -1189,6 +1298,9 @@ function cardToSB(cuid,oldimage)
 				evt.stopPropagation();
 				evt.preventDefault(evt);
 				evt.cancelBubble = true;
+				image.setDraggable(false);
+				middleMouseDown = true;				//this is used in mouseover event.
+				originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 				var imageTooltip = stage.get("#tooltip")[0];
 				var p = image.getPosition();
 				if (p.x<1000){
@@ -1216,9 +1328,11 @@ function cardToSB(cuid,oldimage)
 				evt.preventDefault(evt);
 				evt.cancelBubble = true;
 				stage.get("#tooltip")[0].hide();
+				originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+				middleMouseDown = false;
 			}
-			layer.draw();
 			cardLayer.draw();
+			layer.draw();
 			return false;
 		});
 		image.on('click', function(evt) {
