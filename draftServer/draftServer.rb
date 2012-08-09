@@ -5,6 +5,7 @@ require 'eventmachine'
 require 'em-websocket'
 require 'json'
 require './sealedServer/selectCards.rb'
+require 'sqlite3'
 
 #ARGV[0] is the host user's id
 #ARGV[1] is the total number of users
@@ -64,15 +65,24 @@ class DraftGame
 	end
 
 	def checkAndSavePicks()
-		if ($game.readyUserNumber()!=$game.totalUserNo || $game.connectedUserNumber()!=$game.totalUserNo) then return end
+		if ($game.readyUserNumber()!=$game.totalUserNo || $game.connectedUserNumber()!=$game.totalUserNo) then return false end
 		if (@sitArray == nil) then tryFormSitArray() end
 		if (@currentDraftRound==3 && @sitArray[0].currentPack.length == 0)
 			#we are done, all cards have been issued
 			#save picks to db here
-			#send redirect to card builder.
-			#puts @sitArray[1].cardPool
-			exit(0)
+			db = SQLite3::Database.open "./db/development.sqlite3"
+			@users.each_value{|u|
+				toSaveString = '{"cards":"","sbCards":"'
+				u.cardPool.each{|uc|
+					toSaveString += (uc['expansion'].to_s + '/' + uc['idInSet'].to_s + '+')
+				}
+				toSaveString += '","L1":0,"L2":"0","L3":0,"L4":0,"L5":0,"controller":"users","action":"submitDeck","user":{}}'
+				stmt = db.prepare "UPDATE users SET Deck_info='" + toSaveString + "' WHERE Id=" + u.uid
+				rs = stmt.execute
+			}
+			return true
 		end
+		return false
 	end
 
 	def checkAndOpenNewPacks()
@@ -184,9 +194,10 @@ class ResponseMessage
 	end
 	
 	def send(ws)
-		puts "sending message to "+$game.wsID_userHash[ws.object_id].username+", "+ self.serialize
 		ws.send(self.serialize)
+		puts "sent message to "+$game.wsID_userHash[ws.object_id].username+", "+ self.serialize
 	end
+
 end
 
 EventMachine.run {
@@ -267,13 +278,12 @@ EventMachine.run {
 							$game.users[msgUID].cardPool.each{|c|
 								toSend.push(c.to_hash)
 							}
-							response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
+							response = ResponseMesswsage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
 							response.send(ws)
 						end
 =end
 					end
 				when "submitCard"
-					puts msgBody
 					$game.users[msgUID].cardPool.push(msgBody)
 					response = ResponseMessage.new("ackSubmitCard",msgUsername,msgUID,"")
 					response.send(ws)
@@ -286,7 +296,13 @@ EventMachine.run {
 						end
 					}
 					#test if the draft is over and we should save these picks to the db.
-					$game.checkAndSavePicks()
+					if ($game.checkAndSavePicks())
+						#send redirect to card builder.
+						$game.users.each_value{|u|
+							response = ResponseMessage.new("redirect_to_deckbuilder",u.username,u.uid,"")
+							response.send(u.ws)
+						}
+					end
 					#test if the pack is empty and we should open new packs.
 					$game.checkAndOpenNewPacks()
 					#test if all players have submitted their choice, then rotate the packs.
