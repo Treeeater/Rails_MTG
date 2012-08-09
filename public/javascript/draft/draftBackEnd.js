@@ -179,6 +179,7 @@ function start(){
 				}
 				log('Info : packs received, rendering card images...\n\n');
 				refreshSelectionDisplay();		//hand control over to sealedUI.js
+				hideSubmissionACKBox();
 				break;
 			case "selectedCards":
 				var c = JSON.parse(msg.body);

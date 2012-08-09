@@ -11,7 +11,7 @@ require './sealedServer/selectCards.rb'
 #ARGV[2..-1] is the user name of all the users, including the host.
 
 class DraftGame
-	attr_accessor :users, :wsID_userHash, :wsID_wsHash, :totalUserNo, :currentDraftRound, :currentPickNo
+	attr_accessor :users, :wsID_userHash, :wsID_wsHash, :totalUserNo, :currentDraftRound, :sitArray
 
 	def userDelete(uID,wsID)
 		@users.delete(leavingUID)
@@ -24,7 +24,6 @@ class DraftGame
 		@wsID_userHash.delete(ws.object_id)
 		@wsID_wsHash.delete(ws.object_id)
 		@users[uID].wsObjectID = 0
-		@users[uID].readyForNextPick = false
 	end
 
 	def userReconnect(uID,ws)
@@ -33,7 +32,10 @@ class DraftGame
 		@wsID_userHash[ws.object_id] = @users[uID]
 		@wsID_wsHash[ws.object_id] = ws
 		@users[uID].ws = ws
-		@users[uID].readyForNextPick = true
+		if (@users[uID].readyForNextPick)
+			response = ResponseMessage.new("ackSubmitCard",@users[uID].username,uID,"")
+			response.send(ws)
+		end
 	end
 	
 	def connectedUserNumber()
@@ -61,13 +63,73 @@ class DraftGame
 		return pickCards("AVR")
 	end
 
+	def checkAndSavePicks()
+		if ($game.readyUserNumber()!=$game.totalUserNo || $game.connectedUserNumber()!=$game.totalUserNo) then return end
+		if (@sitArray == nil) then tryFormSitArray() end
+		if (@currentDraftRound==3 && @sitArray[0].currentPack.length == 0)
+			#we are done, all cards have been issued
+			#save picks to db here
+			#send redirect to card builder.
+			#puts @sitArray[1].cardPool
+			exit(0)
+		end
+	end
+
+	def checkAndOpenNewPacks()
+		if ($game.readyUserNumber()!=$game.totalUserNo || $game.connectedUserNumber()!=$game.totalUserNo) then return end
+		if (@sitArray == nil) then tryFormSitArray() end
+		if (@sitArray[0].currentPack.length == 0)
+			#we need to open new packs
+			@users.each_value{|u|
+				u.currentPack = dispatchPack()
+			}
+			@currentDraftRound+=1
+		end
+	end
+
 	def checkAndSendSelections()
-		if ($game.readyUserNumber()!=$game.totalUserNo) then return end
+		if ($game.readyUserNumber()!=$game.totalUserNo || $game.connectedUserNumber()!=$game.totalUserNo) then return end
 		#check and send cards for all players, this triggers every time when a player submits a card, or a player first inits.
 		@users.each_value{|u|
 			u.sendSelections()
 			u.readyForNextPick = false
 		}
+	end
+
+	def checkAndRotatePacks()
+		if ($game.readyUserNumber()!=$game.totalUserNo || $game.connectedUserNumber()!=$game.totalUserNo) then return end
+		if (@sitArray == nil) then tryFormSitArray() end
+		if (@currentDraftRound % 2 == 0)
+			#rotate right
+			temp = @sitArray[0].currentPack
+			@sitArray.each_index{|i|
+				if (i < @sitArray.length-1) then @sitArray[i].currentPack = @sitArray[i+1].currentPack end
+			}
+			@sitArray[@sitArray.length-1].currentPack = temp
+		else
+			#rotate left
+			temp = @sitArray[@sitArray.length-1].currentPack
+			@sitArray.each_index{|i|
+				if (i < @sitArray.length-1) then @sitArray[@sitArray.length-i-1].currentPack = @sitArray[@sitArray.length-i-2].currentPack end
+			}
+			@sitArray[0].currentPack = temp
+		end
+	end
+
+	def tryFormSitArray
+		if (@sitArray != nil) then return end
+		if ($game.connectedUserNumber()!=$game.totalUserNo) then return end
+		@sitArray = Array.new
+		i = 0
+		while (i < $game.totalUserNo)
+			@users.each_value{|u|
+				if (u.sitNo == i)
+					@sitArray.push(u)
+					break
+				end
+			}
+			i+=1
+		end
 	end
 
 	def initialize(totalUserNo)
@@ -76,7 +138,7 @@ class DraftGame
 		@wsID_wsHash = Hash.new
 		@totalUserNo = totalUserNo
 		@currentDraftRound = 1
-		@currentPickNo = 0
+		@sitArray = nil 		#used to store users in an array in the order of sit number.
 	end
 end
 
@@ -93,6 +155,7 @@ class User
 		@ws = ws
 		@currentPack = $game.dispatchPack()
 		@readyForNextPick = true
+		$game.tryFormSitArray()
 	end
 	
 	def sendSelections()
@@ -188,9 +251,14 @@ EventMachine.run {
 								response.send(w)
 							}
 						}
-						if (!reconnect) then $game.checkAndSendSelections() else 
+						if (!reconnect) 
+							$game.checkAndSendSelections() 
+						else
 							$game.users[msgUID].sendSelected()
-							$game.users[msgUID].sendSelections()
+							if (!$game.users[msgUID].readyForNextPick)
+								#user haven't chosen his card yet, we need to show him the current pack.
+								$game.users[msgUID].sendSelections()
+							end
 						end
 =begin
 						if ($game.distributedPacks)
@@ -209,6 +277,22 @@ EventMachine.run {
 					$game.users[msgUID].cardPool.push(msgBody)
 					response = ResponseMessage.new("ackSubmitCard",msgUsername,msgUID,"")
 					response.send(ws)
+					$game.users[msgUID].readyForNextPick = true
+					#we need to deduct this card from this pool
+					$game.users[msgUID].currentPack.each{|c|
+						if (c.idInSet == msgBody["idInSet"])
+							$game.users[msgUID].currentPack.delete(c)
+							break
+						end
+					}
+					#test if the draft is over and we should save these picks to the db.
+					$game.checkAndSavePicks()
+					#test if the pack is empty and we should open new packs.
+					$game.checkAndOpenNewPacks()
+					#test if all players have submitted their choice, then rotate the packs.
+					$game.checkAndRotatePacks()
+					#now send the new packs to the players
+					$game.checkAndSendSelections()
 				when "verifyDeck"
 					if !$game.wsID_userHash[ws.object_id].verified
 						$game.wsID_userHash[ws.object_id].verified = true
