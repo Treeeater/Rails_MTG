@@ -207,6 +207,8 @@ EventMachine.run {
 				when "submitCard"
 					puts msgBody
 					$game.users[msgUID].cardPool.push(msgBody)
+					response = ResponseMessage.new("ackSubmitCard",msgUsername,msgUID,"")
+					response.send(ws)
 				when "verifyDeck"
 					if !$game.wsID_userHash[ws.object_id].verified
 						$game.wsID_userHash[ws.object_id].verified = true

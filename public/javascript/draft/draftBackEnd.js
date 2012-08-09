@@ -173,7 +173,7 @@ function start(){
 				totalSelectionCardNumber = 0;
 				for (i = 0; i<c.length; i++)
 				{
-					var card = new Card(i,c[i]);
+					var card = new Card(i+15*pickNumber+100,c[i]);			//very important not to be confused with the selectedCards pool
 					sbCards.push(card);
 					totalSelectionCardNumber++;
 				}
@@ -193,6 +193,9 @@ function start(){
 				}
 				log('Info : selected cards received, rendering card images...\n\n');
 				refreshSelectedDisplay();		//hand control over to sealedUI.js
+				break;
+			case "ackSubmitCard":
+				showSubmissionACKBox();
 				break;
 			case "verified":
 				if (msg.uid == myUID)

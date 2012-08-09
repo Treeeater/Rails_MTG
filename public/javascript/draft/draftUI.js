@@ -4,6 +4,7 @@ var middleMouseDown = false;
 var originalTipImage = null;
 totalSelectionCardNumber = 0;
 totalSelectedCardNumber = 0;
+pickNumber = 0;
 var addLands = function(l){
 	var number = prompt("How many " + l + " do you want?");
 	window[l] = number;
@@ -237,6 +238,10 @@ function loadFixedFrames() {
 	var playerNameBoxText = new Kinetic.Text({x:0, y:0, text:"", fontSize:12, fontFamily: "Calibri", textFill:"black", align: "center",verticalAlign: "middle", visible: false, id:"playerNameBoxText"});
 	layer.add(playerNameBox);
 	layer.add(playerNameBoxText);
+	var submitConfirmationBox = new Kinetic.Rect({x: 585,y: 400,width: 200,height: 50, visible:false, fill: "white", stroke: "black", strokeWidth:1, id:"submitConfirmationBox"});
+	var submitConfirmationBoxText = new Kinetic.Text({x:600, y:420, text:"Submission received", fontSize:16, fontFamily: "Calibri", textFill:"black", align: "center",verticalAlign: "middle", visible: false, id:"submitConfirmationBoxText"});
+	layer.add(submitConfirmationBox);
+	layer.add(submitConfirmationBoxText);
 	//finalize
 	stage.add(timerLayer);
 	stage.add(cardLayer);
@@ -841,6 +846,8 @@ function loadAllMBCards()
 
 function selectCard(cuid)
 {
+	pickNumber++;
+	totalSelectedCardNumber++;
 	//back end representation move
 	for (i in sbCards)
 	{
@@ -854,6 +861,8 @@ function selectCard(cuid)
 	}
 	cardsForSelection = new Array();			//empty the array.
 	mbCards.push(thisCard);
+	stage.get("#cardCountSBText")[0].setText((15-sbCards.length).toString());
+/*
 	sbCards.splice(i,1);
 	//visually add this image to MB
 	var imageObj = new Image();
@@ -991,7 +1000,9 @@ function selectCard(cuid)
 		SBCardLayer.draw();
 		MBCardLayer.draw();
 	}
-	imageObj.src = thisCard.card.engSRC;
+	imageObj.src = thisCard.card.engSRC;*/
+	sbCards = new Array();
+	sortByRarity();
 }
 
 function reLayerMBCards()
@@ -999,7 +1010,7 @@ function reLayerMBCards()
 	for (d in mbDisplayOrderArray)
 	{
 		i = mbDisplayOrderArray[d];
-		stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( mbCards[i].displayOrder % 2 + 1000);
+		stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( mbCards[i].displayOrder % 11);
 	}
 	MBCardLayer.draw();
 }
@@ -1009,7 +1020,7 @@ function reLayerSBCards()
 	for (d in sbDisplayOrderArray)
 	{
 		i = sbDisplayOrderArray[d];
-		stage.get("#card"+sbCards[i].uid.toString())[0].setZIndex( sbCards[i].displayOrder % 2 );
+		stage.get("#card"+sbCards[i].uid.toString())[0].setZIndex( sbCards[i].displayOrder % 11);
 	}
 	SBCardLayer.draw();
 }
@@ -1085,6 +1096,20 @@ function hidePlayerName(usrname, x, y)
 {
 	stage.get("#playerNameBox")[0].attrs.visible = false;
 	stage.get("#playerNameBoxText")[0].attrs.visible = false;
+	layer.draw();
+};
+
+function showSubmissionACKBox()
+{
+	stage.get("#submitConfirmationBoxText")[0].attrs.visible = true;
+	stage.get("#submitConfirmationBox")[0].attrs.visible = true;
+	layer.draw();
+};
+
+function hideSubmissionACKBox()
+{
+	stage.get("#submitConfirmationBoxText")[0].attrs.visible = false;
+	stage.get("#submitConfirmationBox")[0].attrs.visible = false;
 	layer.draw();
 };
 
