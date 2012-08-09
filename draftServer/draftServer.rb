@@ -271,17 +271,6 @@ EventMachine.run {
 								$game.users[msgUID].sendSelections()
 							end
 						end
-=begin
-						if ($game.distributedPacks)
-							#this player disconnected after the packs are already distributed, let's re-setup him.
-							toSend = Array.new
-							$game.users[msgUID].cardPool.each{|c|
-								toSend.push(c.to_hash)
-							}
-							response = ResponseMesswsage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
-							response.send(ws)
-						end
-=end
 					end
 				when "submitCard"
 					$game.users[msgUID].cardPool.push(msgBody)

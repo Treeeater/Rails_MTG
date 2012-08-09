@@ -1357,13 +1357,16 @@ function prepareCardsToSend(cards)
 
 function submitDeck(){
 	var xhr = new XMLHttpRequest();
-	xhr.open('POST', hostServerAddress+"/users/submitDeck", false);  		//hostServerAddress is derived from index.html.erb, must
+	xhr.open('POST', hostServerAddress+"users/submitDeck", false);  		//hostServerAddress is derived from index.html.erb, must
 	//use this under rails framework.
 	xhr.setRequestHeader('Content-Type','application/json')
 	POSTload = {"cards":prepareCardsToSend(mbCards),"sbCards":prepareCardsToSend(sbCards),"L1":(stage.get("#plainsNumber").length==0)?0:stage.get("#plainsNumber")[0].attrs.number.toString(),"L2":(stage.get("#islandNumber").length==0)?0:stage.get("#islandNumber")[0].attrs.number.toString(),"L3":(stage.get("#swampNumber").length==0)?0:stage.get("#swampNumber")[0].attrs.number.toString(),"L4":(stage.get("#mountainNumber").length==0)?0:stage.get("#mountainNumber")[0].attrs.number.toString(),"L5":(stage.get("#forestNumber").length==0)?0:stage.get("#forestNumber")[0].attrs.number.toString()}
 	xhr.send(JSON.stringify(POSTload));
 	if (xhr.status == 200) {
-		alert("Deck submitted and accepted by the server!");
+		if (confirm("Deck submitted and accepted by the server! Press OK to download the deck list, cancel to stay on this page."))
+		{
+			window.location = hostServerAddress+"downloadDeckList";
+		}
 	}
 	else alert("Deck submission failed, re-submit or check your connection!");
 }
