@@ -1,5 +1,7 @@
 This is a project intended to create a free MTG sealed/draft web application, totally based on HTML5 canvas, websocket and JavaScript.
 
-To inject cards into the db, run $rake import_AVR_cards
+
+To inject cards into the db, first, copy the generated .rake file into ./lib/tasks/, and then run $rake import_AVR_cards
+
 
 This app auto supports Chrome, in order to get better support from FireFox, turn off auto-scrolling at options->advanced->general. This will disable the default behavior of middle click.

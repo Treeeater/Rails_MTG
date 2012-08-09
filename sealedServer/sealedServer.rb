@@ -46,7 +46,7 @@ class Game
 		i = 0
 		while (i<packNumber)
 			i+=1
-			cards = pickCards("AVR")
+			cards = pickCards("M13")
 			totalCards += cards
 		end
 		@users.values[0].cardPool = totalCards
@@ -55,7 +55,7 @@ class Game
 		i = 0
 		while (i<packNumber)
 			i+=1
-			cards = pickCards("AVR")
+			cards = pickCards("M13")
 			totalCards += cards
 		end
 		@users.values[1].cardPool = totalCards
