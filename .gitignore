@@ -9,6 +9,7 @@ capybara-*.html
 /log/*
 /tmp/*
 /public/system/*
+/userDeckLists/*
 /coverage/
 /spec/tmp/*
 **.orig
