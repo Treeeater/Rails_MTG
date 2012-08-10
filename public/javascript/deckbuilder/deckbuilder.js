@@ -4,6 +4,7 @@ var middleMouseDown = false;
 var originalTipImage = null;
 var addLands = function(l){
 	var number = prompt("How many " + l + " do you want?");
+	if (number == null) number = 0;
 	window[l] = number;
 	addLandsImpl(l,number);
 };

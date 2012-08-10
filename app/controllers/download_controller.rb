@@ -99,6 +99,7 @@ EOF
   <section name="Planes/Schemes" />
 </deck>
 EOF
+		if (!File.directory? "./userDeckLists/") then Dir::mkdir("./userDeckLists/") end
 		fileName = "./userDeckLists/"+uid.to_s+".o8d"
 		File.open(fileName,"w"){|f|
 			f.write(stringToWrite)
