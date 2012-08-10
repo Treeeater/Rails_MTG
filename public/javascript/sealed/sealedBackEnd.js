@@ -232,6 +232,19 @@ function start(){
 			case "submitted":
 				if (msg.uid == myUID)
 				{
+					redirect_URL = "http://"+document.domain+":"+window.location.port+"/downloadDeckList";
+					window.location = redirect_URL;				//get request.
+				}
+				else{
+					OppoSubmitted = true;
+					log('Opponent submitted their deck..\n\n');
+				}
+				break;
+			//for now, the game play is disabled. To enable, comment the code above from case "submitted": and uncomment the code below.
+/*
+			case "submitted":
+				if (msg.uid == myUID)
+				{
 					ISubmitted = true;
 					log('Server ACK OK. If you are the last player to submit the deck, the game should start right away.\n\n');
 				}
@@ -255,16 +268,9 @@ function start(){
 				break;
 			case "startGame":
 				redirect_URL = "http://"+document.domain+":"+window.location.port+"/"+msg.body;
-				/*$('#hiddenInputMB')[0].value=prepareCardsToSend(mbCards);
-				$('#hiddenInputSB')[0].value=prepareCardsToSend(sbCards);
-				if (stage.get("#plainsNumber").length>0) $('#hiddenInputL1')[0].value=stage.get("#plainsNumber")[0].attrs.number.toString();
-				if (stage.get("#islandNumber").length>0) $('#hiddenInputL2')[0].value=stage.get("#islandNumber")[0].attrs.number.toString();
-				if (stage.get("#swampNumber").length>0) $('#hiddenInputL3')[0].value=stage.get("#swampNumber")[0].attrs.number.toString();
-				if (stage.get("#mountainNumber").length>0) $('#hiddenInputL4')[0].value=stage.get("#mountainNumber")[0].attrs.number.toString();
-				if (stage.get("#forestNumber").length>0) $('#hiddenInputL5')[0].value=stage.get("#forestNumber")[0].attrs.number.toString();
-				$('#hiddenForm')[0].action=redirect_URL;
-				$('#hiddenForm')[0].submit();*/
 				window.location = redirect_URL;				//get request.
+				break;
+*/
 			default:
 		}
 	}

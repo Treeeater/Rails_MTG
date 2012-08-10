@@ -46,8 +46,8 @@ def pickCards(exp, mythicThreshold = 2, foilThreshold = 1)
 		end
 		
 	#rarity of cards we needed	
-		commonNumber = 1 + ((foil == 1) ? 1 : 0) + ((foil == 0) ? 1 : 0)		#9
-		uncommonNumber = 1 + ((foil == 2) ? 1 : 0)					#3
+		commonNumber = 9 + ((foil == 1) ? 1 : 0) + ((foil == 0) ? 1 : 0)		
+		uncommonNumber = 3 + ((foil == 2) ? 1 : 0)					
 		rareNumber = 1 - (mythic ? 1 : 0) + ((foil == 3) ? 1 : 0)
 		mythicNumber = (mythic ? 1 : 0) + ((foil == 4) ? 1 : 0)
 
