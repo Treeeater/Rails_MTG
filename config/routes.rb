@@ -8,13 +8,12 @@ Mtg::Application.routes.draw do
   resources :users
   resources :sessions, only: [:new, :create, :destroy]
   resources :sealed, only: [:show, :new]
+  resources :draft, only: [:show, :new]
+  resources :game, only: [:show, :new]
 
   root :to => 'static_pages#home' 
-  match 'draft/new', to:'draft#new'
-  match 'draft/:id', to:'draft#show'
   match 'deckbuilder', to: 'deckbuilder#show'
-  match '/game/new', to:'game#new'
-  match '/game/:id', to:'game#show', :via => [:post, :get]
+  match 'downloadDeckList', to: 'download#show'
   match '/signup',  to: 'users#new'
   match '/signin',  to: 'sessions#new'
   match '/signout', to: 'sessions#destroy', via: :delete		#Use the DELETE http verb

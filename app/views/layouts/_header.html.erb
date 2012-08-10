@@ -7,7 +7,20 @@
           <li><%= link_to "Home", root_path %></li>
           <li><%= link_to "Help", help_path %></li>
           <% if signed_in? %>
-	    <li><%= link_to "Lobby", lobby_path %></li>
+
+	    <li id="fat-menu" class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="play">
+                Play <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu">
+                <li><%= link_to "Lobby", lobby_path %></li>
+                <!--<li><%= link_to "Draft", draft_path(current_user) %></li>
+                <li><%= link_to "Sealed", sealed_path(current_user) %></li>-->
+                <li><%= link_to "Deck Builder", deckbuilder_path %></li>
+                <li><%= link_to "Download Deck List", downloadDeckList_path %></li>
+              </ul>
+            </li>
+
             <li><%= link_to "Users", users_path %></li>
             <li id="fat-menu" class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="account" uid="<%= current_user.id %>" uname="<%= current_user.name %>">
