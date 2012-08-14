@@ -6,3 +6,14 @@ To inject cards into the db, first, copy the generated .rake file into ./lib/tas
 Potential Bug: although basic lands' ID are fixed in download_controller.rb, they are not fixed elsewhere, so we might run into troubles.
 
 This app auto supports Chrome, in order to get better support from FireFox, turn off auto-scrolling at options->advanced->general. This will disable the default behavior of middle click.
+
+Ports on UVa hosting:
+
+12340: rails
+12341: lobby
+12342: draft
+12343: sealed
+12344: game
+
+First time git checkout:
+Run bundle install to install all the required gems.

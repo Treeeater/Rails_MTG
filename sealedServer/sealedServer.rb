@@ -104,9 +104,12 @@ EventMachine.run {
 	$game.wsID_wsHash = Hash.new
 	$game.distributedPacks = false
 
-	puts "WebSocket server opened at localhost on port " + (12341+ARGV[0].to_i).to_s + "!"
+	#puts "WebSocket server opened at localhost on port " + (12341+ARGV[0].to_i).to_s + "!"
 	
-	EventMachine::WebSocket.start(:host => "localhost", :port => (12341+ARGV[0].to_i) ) do |ws|
+	#EventMachine::WebSocket.start(:host => "localhost", :port => (12341+ARGV[0].to_i) ) do |ws|
+	puts "WebSocket server opened at localhost on port 12343!"
+	
+	EventMachine::WebSocket.start(:host => "localhost", :port => 12343 ) do |ws|
 	
 		ws.onopen {
 			puts "WebSocket connection open from #{ws.object_id}"

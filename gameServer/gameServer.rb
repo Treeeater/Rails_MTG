@@ -216,8 +216,9 @@ EventMachine.run {
 	$game.initiated = false
 	$game.gameState = GameState.new
 	$cardArray = Array.new
-	puts "Game server opened at localhost on port " + (12331+ARGV[0].to_i).to_s + "!"
-	EventMachine::WebSocket.start(:host => "localhost", :port => (12331+ARGV[0].to_i) ) do |ws|
+	puts "Game server opened at localhost on port 12344!"
+	
+	EventMachine::WebSocket.start(:host => "localhost", :port => 12344 ) do |ws|
 	
 		ws.onopen {
 			puts "WebSocket connection open from #{ws.object_id}"

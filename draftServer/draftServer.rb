@@ -205,10 +205,12 @@ EventMachine.run {
 	$playerNames = ARGV[2..-1]
 	$game = DraftGame.new(ARGV[1].to_i)
 	order = rand_n($game.totalUserNo,$game.totalUserNo)			#generate sit order
-	puts "WebSocket server opened at localhost on port " + (12320+ARGV[0].to_i).to_s + "!"
+	#puts "WebSocket server opened at localhost on port " + (12320+ARGV[0].to_i).to_s + "!"
 	
-	EventMachine::WebSocket.start(:host => "localhost", :port => (12320+ARGV[0].to_i) ) do |ws|
+	#EventMachine::WebSocket.start(:host => "localhost", :port => (12320+ARGV[0].to_i) ) do |ws|
+	puts "WebSocket server opened at localhost on port 12342!"
 	
+	EventMachine::WebSocket.start(:host => "localhost", :port => 12342 ) do |ws|
 		ws.onopen {
 			puts "WebSocket connection open from #{ws.object_id}"
 		}
