@@ -70,7 +70,7 @@ EventMachine.run {
 	$cl.websockets = Hash.new			#uid => ws
 	$gl = GamesList.new
 	$gl.games = Hash.new
-    EventMachine::WebSocket.start(:host => "localhost", :port => 12341) do |ws|
+    EventMachine::WebSocket.start(:host => "chromium.cs.virginia.edu", :port => 12341) do |ws|
 	
 	ws.onopen {
         puts "WebSocket connection open from #{ws.object_id}"

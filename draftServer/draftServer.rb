@@ -210,7 +210,7 @@ EventMachine.run {
 	#EventMachine::WebSocket.start(:host => "localhost", :port => (12320+ARGV[0].to_i) ) do |ws|
 	puts "WebSocket server opened at localhost on port 12342!"
 	
-	EventMachine::WebSocket.start(:host => "localhost", :port => 12342 ) do |ws|
+	EventMachine::WebSocket.start(:host => "chromium.cs.virginia.edu", :port => 12342 ) do |ws|
 		ws.onopen {
 			puts "WebSocket connection open from #{ws.object_id}"
 		}

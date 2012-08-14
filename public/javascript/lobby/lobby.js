@@ -7,8 +7,8 @@
 	username = $('#account').attr('uname');
 	$('#chatInput').attr('disabled','disabled');
 	window.addEventListener('load', clearChatBox, false);			//FF does not clear chatbox after refresh, this is a work around.
-	host = "http://localhost:3000/"
-	lobbyServerHost = "ws://localhost:12341/"
+	host = hostServerAddress;
+	lobbyServerHost = "ws://"+hostServerDomain+":"+gamePort+"/";
 })();
 
 function keys(obj)
