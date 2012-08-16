@@ -7,8 +7,21 @@
   <h2>
     Developed by <a href="http://www.yuchenzhou.com/">Yuchen Zhou</a>
   </h2>
-  
-  <p>This application is completely written in HTML5 on client side and Ruby on Rails on server side</p>
+  <hr/>
+  <h3>Introduction:</h3>
+  <br/>
+  <p>This application is completely written in HTML5/JavaScript on client side and Ruby on Rails on server side. Special thanks to Eric Drowell and his awesome Canvas library '<a href="http://www.kineticjs.com/">KineticJS</a>'!</p>
+  <p>In this application, you will be able to launch and participate in a draft or sealed event, build your deck and download the decklist. I currently do not provide GUI for gameplay, as <a href="http://kellyelton.github.com/OCTGN/">OCTGN3</a> is already doing a great job and I would just be reinventing the wheel.</p>
+  <hr/>
+  <h3>Instructions:</h3>
+  <br/>
+  <p>After a draft event, this application automatically redirects you to deckbuilding. After you complete your deckbuilding, you will receive your decklist in o8d format (OCTGN3-compatible). As a prerequisite, you need to <span style="color:red"><b>(1)</b></span> download <a href="https://github.com/downloads/kellyelton/OCTGN/OCTGN-Setup-3.0.1.14.exe">OCTGN3</a> main program and OCTGN3 Magic expansion sets. <span style="color:red"><b>(2)</b></span> Launch OCTGN3 main program and register an account.  After logging into OCTGN3, <span style="color:red"><b>(3)</b></span> install the <a href="http://www.mediafire.com/?rx8yzy13yl7qabv">Magic game definition</a>, <span style="color:red"><b>(4)</b></span> <a href="http://www.mediafire.com/?jyhl0wnjmwnod4b">token definition</a> and <span style="color:red"><b>(5)</b></span> relevant set definition.  Here is a list of useful links to these set resources. Enjoy!</p>
+  <hr/>
+  <h3>Set Download Links:</h3>
+  <br/>
+  <li>
+	<ul><a href="http://www.mediafire.com/?pu8dsjiex85p29x">M13</a></ul>
+  </li>
   <% if (!current_user) %>
   <%= link_to "Sign up now!", signup_path, class: "btn btn-large btn-primary" %>
   <% end %>

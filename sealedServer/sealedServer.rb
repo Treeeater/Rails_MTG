@@ -123,6 +123,7 @@ EventMachine.run {
 			#puts $game.connectedUserNumber()
 			if ($game.connectedUserNumber()==0)
 				#in production, we should wait for a fixed time, but in dev, we terminate it right away
+				puts "terminating myself..."
 				Kernel.exit!				
 			else
 				response = ResponseMessage.new("disconnect",leavingUsername,leavingUID,"")
@@ -134,134 +135,143 @@ EventMachine.run {
 	
 		ws.onmessage { |msg|
 			puts "received message from "+ws.object_id.inspect+" : "+msg
-			parsedMSG = JSON.parse(msg)
-			msgUID = parsedMSG["uid"]
-			msgUsername = parsedMSG["username"]
-			msgBody = parsedMSG["body"]
-			response = nil
-			responseMsg = ""
-			case parsedMSG["type"]
-				when "init"
-					if ($game.users.has_key?(msgUID))
-						#this user is reconnecting.
-						$game.userReconnect(msgUID,ws)
-					else
-						user = User.new(msgUID,msgUsername,ws.object_id)
-						$game.users[msgUID] = user
-						$game.wsID_userHash[ws.object_id] = user
-						$game.wsID_wsHash[ws.object_id] = ws
-					end
-					response = ResponseMessage.new("init",msgUsername,msgUID,(($game.connectedUserNumber()==2) ? "ready" : "" ))
-					$game.wsID_wsHash.each_value{|w|
-						response.send(w)
-					}
-					if ($game.distributedPacks)
-						#this player disconnected after the packs are already distributed, let's re-setup him.
-						toSend = Array.new
-						$game.users[msgUID].cardPool.each{|c|
-							toSend.push(c.to_hash)
-						}
-						response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
-						response.send(ws)
-					end
-				when "initPacks"
-					if (!$game.distributedPacks)
-						if ($game.connectedUserNumber()!=2)
-							response = ResponseMessage.new("error",msgUsername,msgUID,"Please wait until both players are connected and try again.")
-							response.send(ws)
+			parsedMSG = nil
+			skip = false
+			begin
+				parsedMSG = JSON.parse(msg)
+			rescue 
+				puts "invalid message"
+				skip = true
+			end
+			if (!skip)
+				msgUID = parsedMSG["uid"]
+				msgUsername = parsedMSG["username"]
+				msgBody = parsedMSG["body"]
+				response = nil
+				responseMsg = ""
+				case parsedMSG["type"]
+					when "init"
+						if ($game.users.has_key?(msgUID))
+							#this user is reconnecting.
+							$game.userReconnect(msgUID,ws)
 						else
-							$game.users[msgUID].packReadyStatus = true
-							if ($game.users.values[0].packReadyStatus && $game.users.values[1].packReadyStatus)
-								$game.distributedPacks = true
-								$game.dispatchPacks(6)
-								puts "Packs distributed..."
-								$game.wsID_wsHash.each_key{|wsid|
-									p "sending these cards to player " + $game.wsID_userHash[wsid].username
-									toSend = Array.new
-									$game.wsID_userHash[wsid].cardPool.each{|c|
-										toSend.push(c.to_hash)
-									}
-									response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
-									response.send($game.wsID_wsHash[wsid])
-								}
-							else
-								response = ResponseMessage.new("info",msgUsername,msgUID,"Your 'pack ready' status has been set to ready, waiting for your opponent now...")
-								response.send(ws)
-							end
+							user = User.new(msgUID,msgUsername,ws.object_id)
+							$game.users[msgUID] = user
+							$game.wsID_userHash[ws.object_id] = user
+							$game.wsID_wsHash[ws.object_id] = ws
 						end
-					end
-				when "verifyDeck"
-					if !$game.wsID_userHash[ws.object_id].verified
-						$game.wsID_userHash[ws.object_id].verified = true
-						basicLands = getBasicLands()
-						curCardPool = $game.wsID_userHash[ws.object_id].cardPool
-						mbCards = JSON.parse(msgBody)
-						mbCardPool = Array.new
-						#puts "Submitted " + mbCards[0]
-						mbCards.each{|mbc|
-							mbcExp = mbc[0..mbc.index('/')-1]
-							mbcId = mbc[mbc.index('/')+1..-1]
-							thisCard = nil
-							case mbcExp
-							when 'plains'
-								for i in 1..mbcId.to_i
-									mbCardPool.push(basicLands[0])
-								end
-							when 'island'
-								for i in 1..mbcId.to_i
-									mbCardPool.push(basicLands[1])
-								end
-							when 'swamp'
-								for i in 1..mbcId.to_i
-									mbCardPool.push(basicLands[2])
-								end
-							when 'mountain'
-								for i in 1..mbcId.to_i
-									mbCardPool.push(basicLands[3])
-								end
-							when 'forest'
-								for i in 1..mbcId.to_i
-									mbCardPool.push(basicLands[4])
-								end
-							else
-								#A regular card
-								curCardPool.each{|c|
-									if (c.expansion.to_s == mbcExp.to_s)&&(c.idInSet.to_s == mbcId.to_s)
-										thisCard = c
-										curCardPool.delete(c)
-										break
-									end
-								}
-								if (thisCard == nil)
-									#cheated by submitting an illegal card
-									return
-								end
-								mbCardPool.push(thisCard)
-							end
+						response = ResponseMessage.new("init",msgUsername,msgUID,(($game.connectedUserNumber()==2) ? "ready" : "" ))
+						$game.wsID_wsHash.each_value{|w|
+							response.send(w)
 						}
-						if (mbCardPool.length() >= 40)
-							#valid
-							response = ResponseMessage.new("verified",msgUsername,msgUID,"")
-							$game.wsID_wsHash.each_value{|w|
-								response.send(w)
+						if ($game.distributedPacks)
+							#this player disconnected after the packs are already distributed, let's re-setup him.
+							toSend = Array.new
+							$game.users[msgUID].cardPool.each{|c|
+								toSend.push(c.to_hash)
 							}
+							response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
+							response.send(ws)
 						end
-					end
-				when "submitDeck"
-					response = ResponseMessage.new("submitted",msgUsername,msgUID,"")
-					$game.wsID_wsHash.each_value{|w|
-						response.send(w)
-					}
-				when "startGame"
-					redirect_URL = "game/#{ARGV[0]}"
-					response = ResponseMessage.new("startGame",msgUsername,msgUID,redirect_URL)
-					$game.wsID_wsHash.each_value{|w|
-						response.send(w)
-					}
-				else
+					when "initPacks"
+						if (!$game.distributedPacks)
+							if ($game.connectedUserNumber()!=2)
+								response = ResponseMessage.new("error",msgUsername,msgUID,"Please wait until both players are connected and try again.")
+								response.send(ws)
+							else
+								$game.users[msgUID].packReadyStatus = true
+								if ($game.users.values[0].packReadyStatus && $game.users.values[1].packReadyStatus)
+									$game.distributedPacks = true
+									$game.dispatchPacks(6)
+									puts "Packs distributed..."
+									$game.wsID_wsHash.each_key{|wsid|
+										p "sending these cards to player " + $game.wsID_userHash[wsid].username
+										toSend = Array.new
+										$game.wsID_userHash[wsid].cardPool.each{|c|
+											toSend.push(c.to_hash)
+										}
+										response = ResponseMessage.new("cards",msgUsername,msgUID,ActiveSupport::JSON.encode(toSend))
+										response.send($game.wsID_wsHash[wsid])
+									}
+								else
+									response = ResponseMessage.new("info",msgUsername,msgUID,"Your 'pack ready' status has been set to ready, waiting for your opponent now...")
+									response.send(ws)
+								end
+							end
+						end
+					when "verifyDeck"
+						if !$game.wsID_userHash[ws.object_id].verified
+							$game.wsID_userHash[ws.object_id].verified = true
+							basicLands = getBasicLands()
+							curCardPool = $game.wsID_userHash[ws.object_id].cardPool
+							mbCards = JSON.parse(msgBody)
+							mbCardPool = Array.new
+							#puts "Submitted " + mbCards[0]
+							mbCards.each{|mbc|
+								mbcExp = mbc[0..mbc.index('/')-1]
+								mbcId = mbc[mbc.index('/')+1..-1]
+								thisCard = nil
+								case mbcExp
+								when 'plains'
+									for i in 1..mbcId.to_i
+										mbCardPool.push(basicLands[0])
+									end
+								when 'island'
+									for i in 1..mbcId.to_i
+										mbCardPool.push(basicLands[1])
+									end
+								when 'swamp'
+									for i in 1..mbcId.to_i
+										mbCardPool.push(basicLands[2])
+									end
+								when 'mountain'
+									for i in 1..mbcId.to_i
+										mbCardPool.push(basicLands[3])
+									end
+								when 'forest'
+									for i in 1..mbcId.to_i
+										mbCardPool.push(basicLands[4])
+									end
+								else
+									#A regular card
+									curCardPool.each{|c|
+										if (c.expansion.to_s == mbcExp.to_s)&&(c.idInSet.to_s == mbcId.to_s)
+											thisCard = c
+											curCardPool.delete(c)
+											break
+										end
+									}
+									if (thisCard == nil)
+										#cheated by submitting an illegal card
+										return
+									end
+									mbCardPool.push(thisCard)
+								end
+							}
+							if (mbCardPool.length() >= 40)
+								#valid
+								response = ResponseMessage.new("verified",msgUsername,msgUID,"")
+								$game.wsID_wsHash.each_value{|w|
+									response.send(w)
+								}
+							end
+						end
+					when "submitDeck"
+						response = ResponseMessage.new("submitted",msgUsername,msgUID,"")
+						$game.wsID_wsHash.each_value{|w|
+							response.send(w)
+						}
+					when "startGame"
+						redirect_URL = "game/#{ARGV[0]}"
+						response = ResponseMessage.new("startGame",msgUsername,msgUID,redirect_URL)
+						$game.wsID_wsHash.each_value{|w|
+							response.send(w)
+						}
+					else
+				end
 			end
 		}
-        end
+    end
 }
 
 #sleep(3)

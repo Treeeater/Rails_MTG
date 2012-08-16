@@ -225,6 +225,7 @@ EventMachine.run {
 				#puts $game.connectedUserNumber()
 				if ($game.connectedUserNumber()==0)
 					#in production, we should wait for a fixed time, but in dev, we terminate it right away
+					puts "terminating myself..."
 					Kernel.exit!				
 				else
 					response = ResponseMessage.new("disconnect",leavingUsername,leavingUID,leavingSitNo)
@@ -237,138 +238,147 @@ EventMachine.run {
 	
 		ws.onmessage { |msg|
 			puts "received message from "+ws.object_id.inspect+" : "+msg
-			parsedMSG = JSON.parse(msg)
-			msgUID = parsedMSG["uid"]
-			msgUsername = parsedMSG["username"]
-			msgBody = parsedMSG["body"]
-			response = nil
-			responseMsg = ""
-			case parsedMSG["type"]
-				when "init"
-					if ($playerNames.include? msgUsername)
-						reconnect = false
-						if ($game.users.has_key?(msgUID))
-							#this user is reconnecting.
-							reconnect = true
-							$game.userReconnect(msgUID,ws)				#re-config game state on server side
-						else
-							sitNo = order[$game.connectedUserNumber()]
-							user = User.new(msgUID,msgUsername,ws,ws.object_id,sitNo)
-							$game.users[msgUID] = user
-							$game.wsID_userHash[ws.object_id] = user
-							$game.wsID_wsHash[ws.object_id] = ws
-						end
-						$game.users.each_value{|u|
-							response = ResponseMessage.new("init",u.username,u.uid, u.sitNo.to_s+"/"+$game.totalUserNo.to_s)
-							$game.wsID_wsHash.each_value{|w|
-								response.send(w)
-							}
-						}
-						if (!reconnect) 
-							$game.checkAndSendSelections() 
-						else
-							$game.users[msgUID].sendSelected()
-							if (!$game.users[msgUID].readyForNextPick)
-								#user haven't chosen his card yet, we need to show him the current pack.
-								$game.users[msgUID].sendSelections()
-							end
-						end
-					end
-				when "submitCard"
-					$game.users[msgUID].cardPool.push(msgBody)
-					response = ResponseMessage.new("ackSubmitCard",msgUsername,msgUID,"")
-					response.send(ws)
-					$game.users[msgUID].readyForNextPick = true
-					#we need to deduct this card from this pool
-					$game.users[msgUID].currentPack.each{|c|
-						if (c.idInSet == msgBody["idInSet"])
-							$game.users[msgUID].currentPack.delete(c)
-							break
-						end
-					}
-					#test if the draft is over and we should save these picks to the db.
-					if ($game.checkAndSavePicks())
-						#send redirect to card builder.
-						$game.users.each_value{|u|
-							response = ResponseMessage.new("redirect_to_deckbuilder",u.username,u.uid,"")
-							response.send(u.ws)
-						}
-					end
-					#test if the pack is empty and we should open new packs.
-					$game.checkAndOpenNewPacks()
-					#test if all players have submitted their choice, then rotate the packs.
-					$game.checkAndRotatePacks()
-					#now send the new packs to the players
-					$game.checkAndSendSelections()
-				when "verifyDeck"
-					if !$game.wsID_userHash[ws.object_id].verified
-						$game.wsID_userHash[ws.object_id].verified = true
-						basicLands = getBasicLands()
-						curCardPool = $game.wsID_userHash[ws.object_id].cardPool
-						mbCards = JSON.parse(msgBody)
-						mbCardPool = Array.new
-						#puts "Submitted " + mbCards[0]
-						mbCards.each{|mbc|
-							mbcExp = mbc[0..mbc.index('/')-1]
-							mbcId = mbc[mbc.index('/')+1..-1]
-							thisCard = nil
-							case mbcExp
-							when 'plains'
-								for i in 1..mbcId.to_i
-									mbCardPool.push(basicLands[0])
-								end
-							when 'island'
-								for i in 1..mbcId.to_i
-									mbCardPool.push(basicLands[1])
-								end
-							when 'swamp'
-								for i in 1..mbcId.to_i
-									mbCardPool.push(basicLands[2])
-								end
-							when 'mountain'
-								for i in 1..mbcId.to_i
-									mbCardPool.push(basicLands[3])
-								end
-							when 'forest'
-								for i in 1..mbcId.to_i
-									mbCardPool.push(basicLands[4])
-								end
+			parsedMSG = nil
+			skip = false
+			begin
+				parsedMSG = JSON.parse(msg)
+			rescue 
+				puts "invalid message"
+				skip = true
+			end
+			if (!skip)
+				msgUID = parsedMSG["uid"]
+				msgUsername = parsedMSG["username"]
+				msgBody = parsedMSG["body"]
+				response = nil
+				responseMsg = ""
+				case parsedMSG["type"]
+					when "init"
+						if ($playerNames.include? msgUsername)
+							reconnect = false
+							if ($game.users.has_key?(msgUID))
+								#this user is reconnecting.
+								reconnect = true
+								$game.userReconnect(msgUID,ws)				#re-config game state on server side
 							else
-								#A regular card
-								curCardPool.each{|c|
-									if (c.expansion.to_s == mbcExp.to_s)&&(c.idInSet.to_s == mbcId.to_s)
-										thisCard = c
-										curCardPool.delete(c)
-										break
-									end
+								sitNo = order[$game.connectedUserNumber()]
+								user = User.new(msgUID,msgUsername,ws,ws.object_id,sitNo)
+								$game.users[msgUID] = user
+								$game.wsID_userHash[ws.object_id] = user
+								$game.wsID_wsHash[ws.object_id] = ws
+							end
+							$game.users.each_value{|u|
+								response = ResponseMessage.new("init",u.username,u.uid, u.sitNo.to_s+"/"+$game.totalUserNo.to_s)
+								$game.wsID_wsHash.each_value{|w|
+									response.send(w)
 								}
-								if (thisCard == nil)
-									#cheated by submitting an illegal card
-									return
+							}
+							if (!reconnect) 
+								$game.checkAndSendSelections() 
+							else
+								$game.users[msgUID].sendSelected()
+								if (!$game.users[msgUID].readyForNextPick)
+									#user haven't chosen his card yet, we need to show him the current pack.
+									$game.users[msgUID].sendSelections()
 								end
-								mbCardPool.push(thisCard)
+							end
+						end
+					when "submitCard"
+						$game.users[msgUID].cardPool.push(msgBody)
+						response = ResponseMessage.new("ackSubmitCard",msgUsername,msgUID,"")
+						response.send(ws)
+						$game.users[msgUID].readyForNextPick = true
+						#we need to deduct this card from this pool
+						$game.users[msgUID].currentPack.each{|c|
+							if (c.idInSet == msgBody["idInSet"])
+								$game.users[msgUID].currentPack.delete(c)
+								break
 							end
 						}
-						if (mbCardPool.length() >= 40)
-							#valid
-							response = ResponseMessage.new("verified",msgUsername,msgUID,"")
-							$game.wsID_wsHash.each_value{|w|
-								response.send(w)
+						#test if the draft is over and we should save these picks to the db.
+						if ($game.checkAndSavePicks())
+							#send redirect to card builder.
+							$game.users.each_value{|u|
+								response = ResponseMessage.new("redirect_to_deckbuilder",u.username,u.uid,"")
+								response.send(u.ws)
 							}
 						end
-					end
-				when "submitDeck"
-					response = ResponseMessage.new("submitted",msgUsername,msgUID,"")
-					$game.wsID_wsHash.each_value{|w|
-						response.send(w)
-					}
-				when "startGame"
-					redirect_URL = "game/#{ARGV[0]}"
-					response = ResponseMessage.new("startGame",msgUsername,msgUID,redirect_URL)
-					$game.wsID_wsHash.each_value{|w|
-						response.send(w)
-					}
-				else
+						#test if the pack is empty and we should open new packs.
+						$game.checkAndOpenNewPacks()
+						#test if all players have submitted their choice, then rotate the packs.
+						$game.checkAndRotatePacks()
+						#now send the new packs to the players
+						$game.checkAndSendSelections()
+					when "verifyDeck"
+						if !$game.wsID_userHash[ws.object_id].verified
+							$game.wsID_userHash[ws.object_id].verified = true
+							basicLands = getBasicLands()
+							curCardPool = $game.wsID_userHash[ws.object_id].cardPool
+							mbCards = JSON.parse(msgBody)
+							mbCardPool = Array.new
+							#puts "Submitted " + mbCards[0]
+							mbCards.each{|mbc|
+								mbcExp = mbc[0..mbc.index('/')-1]
+								mbcId = mbc[mbc.index('/')+1..-1]
+								thisCard = nil
+								case mbcExp
+								when 'plains'
+									for i in 1..mbcId.to_i
+										mbCardPool.push(basicLands[0])
+									end
+								when 'island'
+									for i in 1..mbcId.to_i
+										mbCardPool.push(basicLands[1])
+									end
+								when 'swamp'
+									for i in 1..mbcId.to_i
+										mbCardPool.push(basicLands[2])
+									end
+								when 'mountain'
+									for i in 1..mbcId.to_i
+										mbCardPool.push(basicLands[3])
+									end
+								when 'forest'
+									for i in 1..mbcId.to_i
+										mbCardPool.push(basicLands[4])
+									end
+								else
+									#A regular card
+									curCardPool.each{|c|
+										if (c.expansion.to_s == mbcExp.to_s)&&(c.idInSet.to_s == mbcId.to_s)
+											thisCard = c
+											curCardPool.delete(c)
+											break
+										end
+									}
+									if (thisCard == nil)
+										#cheated by submitting an illegal card
+										return
+									end
+									mbCardPool.push(thisCard)
+								end
+							}
+							if (mbCardPool.length() >= 40)
+								#valid
+								response = ResponseMessage.new("verified",msgUsername,msgUID,"")
+								$game.wsID_wsHash.each_value{|w|
+									response.send(w)
+								}
+							end
+						end
+					when "submitDeck"
+						response = ResponseMessage.new("submitted",msgUsername,msgUID,"")
+						$game.wsID_wsHash.each_value{|w|
+							response.send(w)
+						}
+					when "startGame"
+						redirect_URL = "game/#{ARGV[0]}"
+						response = ResponseMessage.new("startGame",msgUsername,msgUID,redirect_URL)
+						$game.wsID_wsHash.each_value{|w|
+							response.send(w)
+						}
+					else
+				end
 			end
 		}
         end
