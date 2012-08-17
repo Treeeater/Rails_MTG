@@ -687,7 +687,7 @@ function loadAllSBCards()
 				selectionCardsLoaded++;
 				if (selectionCardsLoaded == totalSelectionCardNumber) reLayerSBCards();
 			}
-			imageObj.src = sbCards[I].card.engSRC;
+			imageObj.src = sbCards[I].card.chiSRC;
 		})(startX,startY,i);
 	}
 }
@@ -831,7 +831,7 @@ function loadAllMBCards()
 			colorCardsNumber["B"]+=((mbCards[I].card.color&4)==4?1:0);
 			colorCardsNumber["U"]+=((mbCards[I].card.color&8)==8?1:0);
 			colorCardsNumber["W"]+=((mbCards[I].card.color&16)==16?1:0);
-			imageObj.src = mbCards[I].card.engSRC;
+			imageObj.src = mbCards[I].card.chiSRC;
 		})(startX,startY,i);
 	}
 	stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");

@@ -67,7 +67,7 @@ class DraftGame
 	def checkAndSavePicks()
 		if ($game.readyUserNumber()!=$game.totalUserNo || $game.connectedUserNumber()!=$game.totalUserNo) then return false end
 		if (@sitArray == nil) then tryFormSitArray() end
-		if (@currentDraftRound==3 && @sitArray[0].currentPack.length == 0)
+		if (@currentDraftRound==4 && @sitArray[0].currentPack.length == 0)			#this line is the only line we need to change to get more rounds or less rounds.
 			#we are done, all cards have been issued
 			#save picks to db here
 			db = SQLite3::Database.open "./db/development.sqlite3"

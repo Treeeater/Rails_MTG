@@ -917,7 +917,7 @@ function loadAllCards()
 				cardsLoaded++;
 				if (cardsLoaded == totalCardNumber) reLayerCards();
 			}
-			imageObj.src = sbCards[I].engSRC;
+			imageObj.src = sbCards[I].chiSRC;
 		})(startX,startY,i);
 	}
 	
@@ -1031,7 +1031,7 @@ function loadAllCards()
 			colorCardsNumber["B"]+=((mbCards[I].color&4)==4?1:0);
 			colorCardsNumber["U"]+=((mbCards[I].color&8)==8?1:0);
 			colorCardsNumber["W"]+=((mbCards[I].color&16)==16?1:0);
-			imageObj.src = mbCards[I].engSRC;
+			imageObj.src = mbCards[I].chiSRC;
 		})(startX,startY,i);
 	}
 	stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
@@ -1161,7 +1161,7 @@ function cardToMB(cuid,oldimage)
 		layer.draw();
 		cardLayer.draw();
 	}
-	imageObj.src = thisCard.engSRC;
+	imageObj.src = thisCard.chiSRC;
 }
 
 function cardToSB(cuid,oldimage)
@@ -1283,7 +1283,7 @@ function cardToSB(cuid,oldimage)
 		layer.draw();
 		cardLayer.draw();
 	}
-	imageObj.src = thisCard.engSRC;
+	imageObj.src = thisCard.chiSRC;
 }
 
 function reLayerCards()
