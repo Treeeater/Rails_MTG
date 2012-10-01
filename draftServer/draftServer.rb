@@ -61,7 +61,7 @@ class DraftGame
 
 	def dispatchPack()
 		puts "dispatching packs..."
-		return pickCards("M13")
+		return pickCards("RTR")
 	end
 
 	def checkAndSavePicks()
