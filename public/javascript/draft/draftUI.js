@@ -233,11 +233,11 @@ function loadFixedFrames() {
 	stage.add(MBCardLayer);
 	stage.add(SBCardLayer);
 	stage.add(layer);
-	document.getElementById('container').firstChild.children[2].oncontextmenu = function() {
+	document.getElementById('container').firstChild.lastChild.oncontextmenu = function() {
 		return false;
 	}
 	//this prevents doubleclick selecting all outside text.
-	document.getElementById('container').firstChild.children[2].onselectstart = function () { return false; }
+	document.getElementById('container').firstChild.lastChild.onselectstart = function () { return false; }
 };
 
 function sortSBByCMC()
@@ -855,7 +855,8 @@ function selectCard(cuid)
 	submitCard(thisCard);
 	for (i in cardsForSelection)
 	{
-		SBCardLayer.remove(cardsForSelection[i]);		//visually all cards in selection area.
+		//SBCardLayer.remove(cardsForSelection[i]);		//visually all cards in selection area.
+		cardsForSelection[i].remove();
 	}
 	cardsForSelection = new Array();			//empty the array.
 	mbCards.push(thisCard);

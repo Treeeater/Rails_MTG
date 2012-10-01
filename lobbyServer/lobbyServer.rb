@@ -80,26 +80,29 @@ EventMachine.run {
     }
 
     ws.onclose { 
-		puts "Connection closed from #{ws.object_id}"
-		msgUID = $cl.users[ws.object_id.inspect].uid
-		msgUsername = $cl.users[ws.object_id.inspect].name
-		response = ResponseMessage.new("logout",$cl.users[ws.object_id.inspect].name, msgUID)
-		$cl.users.delete(ws.object_id.inspect)
-		$cl.websockets.delete(msgUID)
-		#find the games he is in and withdraw him.
-		leftGame = userLeaveGame(msgUID)
-		if (leftGame)
+		if ($cl.users[ws.object_id.inspect]!=nil)
+		#to tackle some weird network situation.
+			puts "Connection closed from #{ws.object_id}"
+			msgUID = $cl.users[ws.object_id.inspect].uid
+			msgUsername = $cl.users[ws.object_id.inspect].name
+			response = ResponseMessage.new("logout",$cl.users[ws.object_id.inspect].name, msgUID)
+			$cl.users.delete(ws.object_id.inspect)
+			$cl.websockets.delete(msgUID)
+			#find the games he is in and withdraw him.
+			leftGame = userLeaveGame(msgUID)
+			if (leftGame)
+				$cl.websockets.each_value {|w|
+					#user exit msg should be sent to everyone.
+					responseMsg = ResponseMessage.new("gameList","","",ActiveSupport::JSON.encode($gl.games)).serialize()
+					sendMessage(w, responseMsg)
+				}
+			end
+			#broadcast the message to everybody
 			$cl.websockets.each_value {|w|
 				#user exit msg should be sent to everyone.
-				responseMsg = ResponseMessage.new("gameList","","",ActiveSupport::JSON.encode($gl.games)).serialize()
-				sendMessage(w, responseMsg)
+				sendMessage(w, response.serialize())
 			}
 		end
-		#broadcast the message to everybody
-		$cl.websockets.each_value {|w|
-			#user exit msg should be sent to everyone.
-			sendMessage(w, response.serialize())
-		}
 	}
 	
     ws.onmessage { |msg|

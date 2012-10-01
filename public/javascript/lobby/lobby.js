@@ -50,12 +50,12 @@ function Game(hostName, hostUID, players, type)
 
 function connectChatServer()
 {
-	log('Connecting to chat server...\n');
 	if (connecting||chatServerConnected)
 	{
 		alert("already connecting or connected! don't click this twice!")
 		return;
 	}
+	log('Connecting to chat server...\n');
 	connecting = true;
 	chatws = new WebSocket(lobbyServerHost);
 	chatws.onopen = function(){  

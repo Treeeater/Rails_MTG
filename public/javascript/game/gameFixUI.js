@@ -35,7 +35,7 @@ var chooseColorVisual = function(l){
 	}
 	tickImage.src = hostServerAddress+"assets/game/general/greenTick.png";
 };
-var removeColorVisual = function (l){FixedLayer.remove(stage.get("#tickImage"+l)[0]);FixedLayer.draw();};
+var removeColorVisual = function (l){(stage.get("#tickImage"+l)[0]).remove();FixedLayer.draw();};
 
 var choosePhaseVisual = function(l){
 	if (cur_phase!=undefined) cur_phase.attrs.fill = "#99FF99";
@@ -465,11 +465,11 @@ function loadFixedFrames() {
 	//this hidden box is for click detection, workaround for kineticjs not supporting 'on' method on layer
 	FixedLayer.draw();
 	//this prevents right click default handler
-	document.getElementById('container').firstChild.children[2].oncontextmenu = function() {
+	document.getElementById('container').firstChild.lastChild.oncontextmenu = function() {
 		return false;
 	}
 	//this prevents doubleclick selecting all outside text.
-	document.getElementById('container').firstChild.children[2].onselectstart = function () { return false; }
+	document.getElementById('container').firstChild.lastChild.onselectstart = function () { return false; }
 	
 	//call backend init
 	initBackEndJS();

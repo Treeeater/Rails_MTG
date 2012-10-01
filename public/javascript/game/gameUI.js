@@ -9,7 +9,8 @@ var clickedContextHiddenBox = function(evt)
 			stage.get("#contextMenuGroup")[0].children[i].off("mouseover");
 			stage.get("#contextMenuGroup")[0].children[i].off("click");
 		}
-		ContextLayer.remove(stage.get("#contextMenuGroup")[0]);
+		//ContextLayer.remove(stage.get("#contextMenuGroup")[0]);
+		(stage.get("#contextMenuGroup")[0]).remove();
 		ContextLayer.draw();
 	}	
 }
@@ -43,7 +44,8 @@ var BattlefieldCardDisplayer = function()
 	this.display = function(card,mine){
 		if (stage.get("#handCard"+card.cardID).length>0)
 		{
-			VisibleCardLayer.remove(stage.get("#handCard"+card.cardID)[0]);
+			//VisibleCardLayer.remove(stage.get("#handCard"+card.cardID)[0]);
+			(stage.get("#handCard"+card.cardID)[0]).remove();
 		}
 		var battlefieldCard = new Image();
 		battlefieldCard.onload = function() {
@@ -79,7 +81,8 @@ var StackCardDisplayer = function()
 	{
 		if (stage.get("#handCard"+card.cardID).length>0)
 		{
-			VisibleCardLayer.remove(stage.get("#handCard"+card.cardID)[0]);
+			//VisibleCardLayer.remove(stage.get("#handCard"+card.cardID)[0]);
+			(stage.get("#handCard"+card.cardID)[0]).remove();
 		}
 		var stackCard = new Image();
 		stackCard.onload = function() {
