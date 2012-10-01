@@ -149,13 +149,11 @@ EOF
 	def translate_to_OCTGN_exp(exp)
 		case exp
 		when "M13"
-			return 1
+			return 8
 		when "AVR"
-			return 2
-		when "DKA"
-			return 3
-		when "ISD"
-			return 4
+			return 7
+		when "RTR"
+			return 6
 		end
 	end
 
