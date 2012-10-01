@@ -17,3 +17,15 @@ Ports on UVa hosting:
 
 First time git checkout:
 Run bundle install to install all the required gems.
+
+To run the server:
+
+1) cd to root directory
+
+2) run rails s -p 12340
+
+3) run ruby ./lobbyServer/lobbyServer.rb
+
+4) If not hosted on the UVa server, you have to change the hostServerAddress and related variables in app/controllers/application_controller.rb
+
+5) You may experience other issues if you are not hosting it on the UVa server. Please refer to source code if problem occurs.
