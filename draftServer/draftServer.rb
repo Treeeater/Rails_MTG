@@ -232,7 +232,11 @@ EventMachine.run {
 					response = ResponseMessage.new("disconnect",leavingUsername,leavingUID,leavingSitNo)
 					#wsToSend = (wsID_wsHash.values[0] == ws) ? wsID_wsHash.values[1] : wsID_wsHash.values[0]
 					#p $game.wsID_wsHash.keys
-					response.send($game.wsID_wsHash.values[0])
+					$game.wsID_wsHash.each_value{|w|
+						if (ws.object_id != w.object_id)
+							response.send(w)
+						end
+					}
 				end
 			end
 		}
@@ -270,10 +274,20 @@ EventMachine.run {
 								$game.tryFormSitArray()
 							end
 							$game.users.each_value{|u|
+								if (!u.connectionStatus) then next end
 								response = ResponseMessage.new("init",u.username,u.uid, u.sitNo.to_s+"/"+$game.totalUserNo.to_s)
 								$game.wsID_wsHash.each_value{|w|
 									response.send(w)
 								}
+							}
+							#check to make sure this guy got all the red connections, instead of the gray ones.
+							$game.users.each_value{|u|
+								if (!u.connectionStatus)
+									response = ResponseMessage.new("init",u.username,u.uid, u.sitNo.to_s+"/"+$game.totalUserNo.to_s)
+									response.send(ws)
+									response = ResponseMessage.new("disconnect",u.username,u.uid, u.sitNo.to_s)
+									response.send(ws)
+								end
 							}
 							if (!reconnect) 
 								$game.checkAndSendSelections() 
