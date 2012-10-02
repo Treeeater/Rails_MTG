@@ -47,7 +47,7 @@ def userLeaveGame(msgUID)
 			break
 		end
 	}
-	return returnValue;
+	return returnValue
 end
 
 def checkIfUserIsInGame?(msgUID)

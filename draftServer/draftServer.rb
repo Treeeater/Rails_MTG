@@ -128,6 +128,7 @@ class DraftGame
 
 	def tryFormSitArray
 		if (@sitArray != nil) then return end
+		#File.open("draftServerlog.txt","a"){|f| f.write($game.readyUserNumber().to_s+" "+ $game.connectedUserNumber().to_s+"\n")}
 		if ($game.connectedUserNumber()!=$game.totalUserNo) then return end
 		@sitArray = Array.new
 		i = 0
@@ -165,7 +166,6 @@ class User
 		@ws = ws
 		@currentPack = $game.dispatchPack()
 		@readyForNextPick = true
-		$game.tryFormSitArray()
 	end
 	
 	def sendSelections()
@@ -204,6 +204,7 @@ EventMachine.run {
 
 	$playerNames = ARGV[2..-1]
 	$game = DraftGame.new(ARGV[1].to_i)
+	#File.open("log_draft_server_2.txt","w"){|f| f.write($game.totalUserNo)}
 	order = rand_n($game.totalUserNo,$game.totalUserNo)			#generate sit order
 	#puts "WebSocket server opened at localhost on port " + (12320+ARGV[0].to_i).to_s + "!"
 	
@@ -266,6 +267,7 @@ EventMachine.run {
 								$game.users[msgUID] = user
 								$game.wsID_userHash[ws.object_id] = user
 								$game.wsID_wsHash[ws.object_id] = ws
+								$game.tryFormSitArray()
 							end
 							$game.users.each_value{|u|
 								response = ResponseMessage.new("init",u.username,u.uid, u.sitNo.to_s+"/"+$game.totalUserNo.to_s)
