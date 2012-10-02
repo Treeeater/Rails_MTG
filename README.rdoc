@@ -44,3 +44,7 @@ To make the download Decklist thing to work after each set update:
 You need to update OCTGN db to install that set; Then you copy the %octgn%/Database/master.db3 to %root%/db/
 
 Then, you need to update the translate_to_OCTGN_exp function in downloadController.rb to have your new set map to the correct set number in the master.db3
+
+---
+
+FIXME: player name cannot have spaces in them. This would make draft/new send wrong numbers/values of argument to draftServer.rb. Thanks to congcong who helped me find this bug. Will address later.
