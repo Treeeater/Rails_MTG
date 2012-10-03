@@ -67,7 +67,7 @@ class DraftGame
 	def checkAndSavePicks()
 		if ($game.readyUserNumber()!=$game.totalUserNo || $game.connectedUserNumber()!=$game.totalUserNo) then return false end
 		if (@sitArray == nil) then tryFormSitArray() end
-		if (@currentDraftRound==4 && @sitArray[0].currentPack.length == 0)			#this line is the only line we need to change to get more rounds or less rounds.
+		if (@currentDraftRound==3 && @sitArray[0].currentPack.length == 0)			#this line is the only line we need to change to get more rounds or less rounds.
 			#we are done, all cards have been issued
 			#save picks to db here
 			db = SQLite3::Database.open "./db/development.sqlite3"
@@ -280,15 +280,6 @@ EventMachine.run {
 									response.send(w)
 								}
 							}
-							#check to make sure this guy got all the red connections, instead of the gray ones.
-							$game.users.each_value{|u|
-								if (!u.connectionStatus)
-									response = ResponseMessage.new("init",u.username,u.uid, u.sitNo.to_s+"/"+$game.totalUserNo.to_s)
-									response.send(ws)
-									response = ResponseMessage.new("disconnect",u.username,u.uid, u.sitNo.to_s)
-									response.send(ws)
-								end
-							}
 							if (!reconnect) 
 								$game.checkAndSendSelections() 
 							else
@@ -298,11 +289,49 @@ EventMachine.run {
 									$game.users[msgUID].sendSelections()
 								end
 							end
+							#check to make sure the guys who has submitted is green, instead of yellow
+							$game.users.each_value{|u|
+								if (u.readyForNextPick)
+									response = ResponseMessage.new("ackSubmitCard",u.username,u.uid, u.sitNo.to_s)
+									$game.wsID_wsHash.each_value{|w|
+										response.send(w)
+									}
+								end
+							}
+							#check to make sure this guy got all the red connections, instead of the gray ones.
+							$game.users.each_value{|u|
+								if (!u.connectionStatus)
+									#response = ResponseMessage.new("init",u.username,u.uid, u.sitNo.to_s+"/"+$game.totalUserNo.to_s)
+									#response.send(ws)
+									response = ResponseMessage.new("disconnect",u.username,u.uid, u.sitNo.to_s)
+									response.send(ws)
+								end
+							}
+							if (reconnect)
+								#check if playerA and playerB selected a card, then playerB disconnects, during which playerC make a selection. When playerB reconnects, this program halts.
+								
+								if ($game.checkAndSavePicks())
+									#send redirect to card builder.
+									$game.users.each_value{|u|
+										response = ResponseMessage.new("redirect_to_deckbuilder",u.username,u.uid,"")
+										response.send(u.ws)
+									}
+								end
+								#test if the pack is empty and we should open new packs.
+								$game.checkAndOpenNewPacks()
+								#test if all players have submitted their choice, then rotate the packs.
+								$game.checkAndRotatePacks()
+								#now send the new packs to the players
+								$game.checkAndSendSelections()
+							end
 						end
 					when "submitCard"
 						$game.users[msgUID].cardPool.push(msgBody)
-						response = ResponseMessage.new("ackSubmitCard",msgUsername,msgUID,"")
-						response.send(ws)
+						response = ResponseMessage.new("ackSubmitCard",msgUsername,msgUID,$game.wsID_userHash[ws.object_id].sitNo)
+						#response.send(ws)
+						$game.wsID_wsHash.each_value{|w|
+							response.send(w)
+						}
 						$game.users[msgUID].readyForNextPick = true
 						#we need to deduct this card from this pool
 						$game.users[msgUID].currentPack.each{|c|

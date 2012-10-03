@@ -996,4 +996,20 @@ function hideSubmissionACKBox()
 	layer.draw();
 };
 
+function changeAllGreenToYellow()
+{
+	var i = 0;
+	for (;i<8;i++)
+	{
+		if (stage.get("#roundTablePlayers"+i.toString())[0].getFill()=='green')	stage.get("#roundTablePlayers"+i.toString())[0].setFill('yellow');
+	}
+	layer.draw();
+};
+
+function changeYellowToGreen(i)
+{
+	stage.get("#roundTablePlayers"+i)[0].setFill('green');
+	layer.draw();
+};
+
 window.addEventListener("load",loadFixedFrames);

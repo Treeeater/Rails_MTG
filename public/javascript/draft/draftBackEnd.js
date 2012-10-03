@@ -147,7 +147,7 @@ function start(){
 			case "init":
 				thisPlayerSeat = msg.body.split("/")[0];
 				totalPlayerNo = msg.body.split("/")[1];
-				stage.get("#roundTablePlayers"+thisPlayerSeat)[0].setFill('green');
+				stage.get("#roundTablePlayers"+thisPlayerSeat)[0].setFill('yellow');
 				stage.get("#roundTablePlayers"+thisPlayerSeat)[0].on("mouseover",showPlayerName.bind(window, msg.username, (120 + 95 * Math.sin(parseInt(thisPlayerSeat)*Math.PI/4)), (800 - 95 * Math.cos(parseInt(thisPlayerSeat)*Math.PI/4)) ));
 				stage.get("#roundTablePlayers"+thisPlayerSeat)[0].on("mouseout",hidePlayerName);
 				layer.draw();
@@ -180,6 +180,7 @@ function start(){
 				log('Info : packs received, rendering card images...\n\n');
 				refreshSelectionDisplay();		//hand control over to sealedUI.js
 				hideSubmissionACKBox();
+				changeAllGreenToYellow();
 				break;
 			case "selectedCards":
 				var c = JSON.parse(msg.body);
@@ -196,7 +197,11 @@ function start(){
 				refreshSelectedDisplay();		//hand control over to sealedUI.js
 				break;
 			case "ackSubmitCard":
-				showSubmissionACKBox();
+				if (msg.uid == myUID)
+				{
+					showSubmissionACKBox();
+				}
+				changeYellowToGreen(msg.body);
 				break;
 			case "redirect_to_deckbuilder":
 				redirect_URL = "http://"+document.domain+":"+window.location.port+"/deckbuilder";
