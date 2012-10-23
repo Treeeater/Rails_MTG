@@ -24,7 +24,7 @@ def getBasicLands()
 	return basicLands
 end
 
-def pickCards(exp, mythicThreshold = 2, foilThreshold = 1)
+def pickCards(exp, mythicThreshold = 2, foilThreshold = 2)
 
 	begin
 		db = SQLite3::Database.open "./db/development.sqlite3"

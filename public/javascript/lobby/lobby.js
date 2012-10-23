@@ -131,7 +131,13 @@ function clearChatBox()
 function createGame()
 {
 	var draftOrSealed = confirm("Press OK for a draft game, press cancel for a sealed game.");
-	if (draftOrSealed) message = new Message("createDraftGame", username, "", uid);
+	if (draftOrSealed) 
+	{
+		packsNo = prompt("Tell me how many packs you want to open in this draft.");
+		packsNo = parseInt(packsNo);
+		if (isNaN(packsNo)||(packsNo>5)||(packsNo<2)) {alert('Enter a number (2, 3, 4 or 5) please!'); return;}
+		message = new Message("createDraftGame", username, "", uid);
+	}
 	else message = new Message("createSealedGame", username, "", uid);
 	chatws.send(JSON.stringify(message));
 	$("#createStartGame").val("Start game!");
@@ -149,7 +155,7 @@ function initializeGame(draftOrSealed)
 	if (draftOrSealed == "draft")
 	{
 		//we need to pass extra parameters: players number and players id.
-		addr += "?playersNo="+document.getElementById("game_"+uid).text[document.getElementById("game_"+uid).text.length-2];
+		addr += "?packsNo="+packsNo.toString()+"&playersNo="+document.getElementById("game_"+uid).text[document.getElementById("game_"+uid).text.length-2];
 		for (i=0; i < document.getElementById("playerslist").children.length; i++) {
 			//of course, using player's name is not safe, might lead to sqlI/xss vul, but we just keep it this way for now.
 			addr += "&player"+i+"="+document.getElementById("playerslist").children[i].text;

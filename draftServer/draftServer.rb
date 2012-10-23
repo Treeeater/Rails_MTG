@@ -67,7 +67,7 @@ class DraftGame
 	def checkAndSavePicks()
 		if ($game.readyUserNumber()!=$game.totalUserNo || $game.connectedUserNumber()!=$game.totalUserNo) then return false end
 		if (@sitArray == nil) then tryFormSitArray() end
-		if (@currentDraftRound==3 && @sitArray[0].currentPack.length == 0)			#this line is the only line we need to change to get more rounds or less rounds.
+		if (@currentDraftRound==$totalNoPacks && @sitArray[0].currentPack.length == 0)			#this line is the only line we need to change to get more rounds or less rounds.
 			#we are done, all cards have been issued
 			#save picks to db here
 			db = SQLite3::Database.open "./db/development.sqlite3"
@@ -202,8 +202,9 @@ end
 
 EventMachine.run {
 
-	$playerNames = ARGV[2..-1]
-	$game = DraftGame.new(ARGV[1].to_i)
+	$playerNames = ARGV[3..-1]
+	$game = DraftGame.new(ARGV[2].to_i)
+	$totalNoPacks = ARGV[1].to_i
 	#File.open("log_draft_server_2.txt","w"){|f| f.write($game.totalUserNo)}
 	order = rand_n($game.totalUserNo,$game.totalUserNo)			#generate sit order
 	#puts "WebSocket server opened at localhost on port " + (12320+ARGV[0].to_i).to_s + "!"
