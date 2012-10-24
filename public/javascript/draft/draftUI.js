@@ -717,34 +717,62 @@ function loadAllMBCards()
 	//load card pool second.
 	startX = 250;
 	startY = 5;
-	var i,d;
+	var i=d=0;
+	var dm=dr=-1;
 	selectedCardsLoaded = 0;
 	for (d in mbDisplayOrderArray)
 	{
 		i = mbDisplayOrderArray[d];
-		(function (X,Y,I){
-			var displayOrder = mbCards[I].displayOrder;
+		var reserved;
+		if (mbCards[i].reserved) {reserved = true; dr++} else {reserved = false; dm++;}
+		(function (X,Y,I,R,DR,DM){
+			//var displayOrder = mbCards[I].displayOrder;
 			var imageObj = new Image();
 			imageObj.onload = function() {
-				var image = new Kinetic.Image({
-					x: X + Math.floor(displayOrder/11) * 128,
-					y: Y + (displayOrder%11) * 18,
-					image: imageObj,
-					width: 120,
-					height: 160,
-					draggable: true,
-					dragBoundFunc: function(pos) {
-						var newY = pos.y < 5 ? 5 : pos.y;
-						newY = newY > 200 ? 200 : newY;
-						var newX = pos.x < 250 ? 250 : pos.x;
-						newX = newX > 800 ? 800 : newX;
-						return {
-						  x: newX,
-						  y: newY
-						};
-					},
-					id: "card"+mbCards[I].uid.toString()
-				});
+				var image;
+				if (R)
+				{
+					image = new Kinetic.Image({
+						x: X + 680 + Math.floor(DR/11) * 128,
+						y: Y + (DR%11) * 18,
+						image: imageObj,
+						width: 120,
+						height: 160,
+						draggable: true,
+						dragBoundFunc: function(pos) {
+							var newY = pos.y < 5 ? 5 : pos.y;
+							newY = newY > 200 ? 200 : newY;
+							var newX = pos.x < 920 ? 920 : pos.x;
+							newX = newX > 1160 ? 1160 : newX;
+							return {
+							  x: newX,
+							  y: newY
+							};
+						},
+						id: "card"+mbCards[I].uid.toString()
+					});
+				}
+				else {
+					image = new Kinetic.Image({
+						x: X + Math.floor(DM/11) * 128,
+						y: Y + (DM%11) * 18,
+						image: imageObj,
+						width: 120,
+						height: 160,
+						draggable: true,
+						dragBoundFunc: function(pos) {
+							var newY = pos.y < 5 ? 5 : pos.y;
+							newY = newY > 200 ? 200 : newY;
+							var newX = pos.x < 250 ? 250 : pos.x;
+							newX = newX > 800 ? 800 : newX;
+							return {
+							  x: newX,
+							  y: newY
+							};
+						},
+						id: "card"+mbCards[I].uid.toString()
+					});
+				}
 				image.cuid = mbCards[I].uid;
 				image.cname = mbCards[I].card.cardName;
 				image.on("mouseover",function(){
@@ -849,7 +877,7 @@ function loadAllMBCards()
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
-						moveCardToReserved(image.cuid);
+						if (R) removeCardFromReserved(image.cuid); else moveCardToReserved(image.cuid);
 					}
 					return false;
 				});
@@ -857,13 +885,16 @@ function loadAllMBCards()
 				selectedCardsLoaded++;
 				if (selectedCardsLoaded == totalSelectedCardNumber) reLayerMBCards();
 			}
-			colorCardsNumber["G"]+=((mbCards[I].card.color&1)==1?1:0);
-			colorCardsNumber["R"]+=((mbCards[I].card.color&2)==2?1:0);
-			colorCardsNumber["B"]+=((mbCards[I].card.color&4)==4?1:0);
-			colorCardsNumber["U"]+=((mbCards[I].card.color&8)==8?1:0);
-			colorCardsNumber["W"]+=((mbCards[I].card.color&16)==16?1:0);
+			if (R!=true)
+			{
+				colorCardsNumber["G"]+=((mbCards[I].card.color&1)==1?1:0);
+				colorCardsNumber["R"]+=((mbCards[I].card.color&2)==2?1:0);
+				colorCardsNumber["B"]+=((mbCards[I].card.color&4)==4?1:0);
+				colorCardsNumber["U"]+=((mbCards[I].card.color&8)==8?1:0);
+				colorCardsNumber["W"]+=((mbCards[I].card.color&16)==16?1:0);
+			}
 			imageObj.src = mbCards[I].card.chiSRC;
-		})(startX,startY,i);
+		})(startX,startY,i,reserved,dr,dm);
 	}
 	stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
 	stage.get("#UNumber")[0].setText(colorCardsNumber['U'].toString() + " " + 'U' + " cards");
@@ -872,6 +903,18 @@ function loadAllMBCards()
 	stage.get("#GNumber")[0].setText(colorCardsNumber['G'].toString() + " " + 'G' + " cards");
 	layer.draw();
 };
+
+function countMBCards()
+{
+	//this returns the cards that are not reserved.
+	var count = 0;
+	for (i in mbCards)
+	{
+		if (mbCards[i].reserved) continue;
+		count++;
+	}
+	return count.toString();
+}
 
 function selectCard(cuid)
 {
@@ -891,7 +934,7 @@ function selectCard(cuid)
 	}
 	cardsForSelection = new Array();			//empty the array.
 	mbCards.push(thisCard);
-	stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
+	stage.get("#cardCountMBText")[0].setText(countMBCards());
 	stage.get("#cardCountSBText")[0].setText((15-sbCards.length).toString());
 	sbCards = new Array();
 	sortByRarity();
@@ -899,26 +942,58 @@ function selectCard(cuid)
 
 function moveCardToReserved(cuid)
 {
-	
+	for (i in mbCards)
+	{
+		if (mbCards[i].uid == cuid) break;
+	}
+	var thisCard = mbCards[i];
+	thisCard.reserved = true;
+	stage.get("#cardCountMBText")[0].setText(countMBCards());
+	sortMBByRarity();
+	MBCardLayer.removeChildren();
+	loadAllMBCards();
+}
+
+function removeCardFromReserved(cuid)
+{
+	for (i in mbCards)
+	{
+		if (mbCards[i].uid == cuid) break;
+	}
+	var thisCard = mbCards[i];
+	thisCard.reserved = false;
+	stage.get("#cardCountMBText")[0].setText(countMBCards());
+	sortMBByRarity();
+	MBCardLayer.removeChildren();
+	loadAllMBCards();
 }
 
 function reLayerMBCards()
-{
+{/*
+	var dm=dr=-1;
 	for (d in mbDisplayOrderArray)
 	{
 		i = mbDisplayOrderArray[d];
-		stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( mbCards[i].displayOrder % 11);
-	}
+		if (mbCards[i].reserved) 
+		{	
+			dr++;
+			stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( dr % 11);
+		}
+		else {
+			dm++;
+			stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( dm % 11);
+		}
+	}*/
 	MBCardLayer.draw();
 }
 
 function reLayerSBCards()
-{
+{/*
 	for (d in sbDisplayOrderArray)
 	{
 		i = sbDisplayOrderArray[d];
 		stage.get("#card"+sbCards[i].uid.toString())[0].setZIndex( sbCards[i].displayOrder % 11);
-	}
+	}*/
 	SBCardLayer.draw();
 }
 
@@ -969,7 +1044,7 @@ function refreshSelectionDisplay()
 function refreshSelectedDisplay()
 {
 	//init
-	stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
+	stage.get("#cardCountMBText")[0].setText(countMBCards());
 	layer.draw();
 	sortMBByRarity();
 	MBCardLayer.removeChildren();

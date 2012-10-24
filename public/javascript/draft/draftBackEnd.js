@@ -8,8 +8,6 @@ cards = new Array();
 sbCards = new Array();
 mbCards = new Array();
 displayOrderArray = new Array();
-//sbDisplayOrderArray = new Array();
-//mbDisplayOrderArray = new Array();
 gotpacks = false;
 isGameHost = false;
 
