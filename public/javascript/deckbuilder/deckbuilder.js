@@ -793,11 +793,15 @@ function loadAllCards()
 					width: 120,
 					height: 160,
 					draggable: true,
-					dragBounds: {
-						top: 370,
-						left: 250,
-						right: 1160,
-						bottom: 730
+					dragBoundFunc: function(pos) {
+						var newY = pos.y < 370 ? 370 : pos.y;
+						newY = newY > 730 ? 730 : newY;
+						var newX = pos.x < 250 ? 250 : pos.x;
+						newX = newX > 1160 ? 1160 : newX;
+						return {
+						  x: newX,
+						  y: newY
+						};
 					},
 					id: "card"+sbCards[I].uid.toString()
 				});
@@ -939,11 +943,15 @@ function loadAllCards()
 					width: 120,
 					height: 160,
 					draggable: true,
-					dragBounds: {
-						top: 5,
-						left: 250,
-						right: 1160,
-						bottom: 200
+					dragBoundFunc: function(pos) {
+						var newY = pos.y < 5 ? 5 : pos.y;
+						newY = newY > 200 ? 200 : newY;
+						var newX = pos.x < 250 ? 250 : pos.x;
+						newX = newX > 1160 ? 1160 : newX;
+						return {
+						  x: newX,
+						  y: newY
+						};
 					},
 					id: "card"+mbCards[I].uid.toString()
 				});
@@ -1065,11 +1073,15 @@ function cardToMB(cuid,oldimage)
 			width: 120,
 			height: 160,
 			draggable: true,
-			dragBounds: {
-				top: 5,
-				left: 250,
-				right: 1160,
-				bottom: 200
+			dragBoundFunc: function(pos) {
+				var newY = pos.y < 5 ? 5 : pos.y;
+				newY = newY > 200 ? 200 : newY;
+				var newX = pos.x < 250 ? 250 : pos.x;
+				newX = newX > 1160 ? 1160 : newX;
+				return {
+				  x: newX,
+				  y: newY
+				};
 			},
 			id: "card"+cuid.toString()
 		});
@@ -1187,11 +1199,15 @@ function cardToSB(cuid,oldimage)
 			width: 120,
 			height: 160,
 			draggable: true,
-			dragBounds: {
-				top: 370,
-				left: 250,
-				right: 1160,
-				bottom: 730
+			dragBoundFunc: function(pos) {
+				var newY = pos.y < 370 ? 370 : pos.y;
+				newY = newY > 730 ? 730 : newY;
+				var newX = pos.x < 250 ? 250 : pos.x;
+				newX = newX > 1160 ? 1160 : newX;
+				return {
+				  x: newX,
+				  y: newY
+				};
 			},
 			id: "card"+cuid.toString()
 		});

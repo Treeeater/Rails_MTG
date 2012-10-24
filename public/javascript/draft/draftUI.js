@@ -4,6 +4,7 @@ var middleMouseDown = false;
 var originalTipImage = null;
 totalSelectionCardNumber = 0;
 totalSelectedCardNumber = 0;
+totalReservedCardNumber = 0;
 pickNumber = 0;
 var addLands = function(l){
 	var number = prompt("How many " + l + " do you want?");
@@ -42,7 +43,10 @@ function loadFixedFrames() {
 	SBCardLayer = new Kinetic.Layer();
 	MBCardLayer = new Kinetic.Layer();
 	//draw section division lines
-	var blueLine = new Kinetic.Line({points: [240, 360, 1280, 360],stroke: "green",strokeWidth: 3,lineCap: "round",lineJoin: "round",
+	var greenLine = new Kinetic.Line({points: [240, 360, 1280, 360],stroke: "green",strokeWidth: 3,lineCap: "round",lineJoin: "round",
+	});
+	
+	var greenLine2 = new Kinetic.Line({points: [920, 0, 920, 360],stroke: "green",strokeWidth: 3,lineCap: "round",lineJoin: "round",
 	});
 	
 	var blueLine2 = new Kinetic.Line({points: [240, 0, 240, 900],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
@@ -66,7 +70,9 @@ function loadFixedFrames() {
 	var blueLine8 = new Kinetic.Line({points: [0, 700, 240, 700],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 
-	layer.add(blueLine);
+	
+	layer.add(greenLine);
+	layer.add(greenLine2);
 	layer.add(blueLine2);
 	layer.add(blueLine3);
 	layer.add(blueLine4);
@@ -576,7 +582,18 @@ function loadAllSBCards()
 			var displayOrder = sbCards[I].displayOrder;
 			var imageObj = new Image();
 			imageObj.onload = function() {
-				var image = new Kinetic.Image({x: X + Math.floor(displayOrder/2) * 128,y: Y + (displayOrder%2) * 170,image: imageObj,width: 120,height: 160,draggable: true,dragBounds: {top: 370,left: 250,right: 1160,bottom: 730},id: "card"+sbCards[I].uid.toString()});
+				var image = new Kinetic.Image({x: X + Math.floor(displayOrder/2) * 128,y: Y + (displayOrder%2) * 170,image: imageObj,width: 120,height: 160,draggable: true,
+				dragBoundFunc: function(pos) {
+					var newY = pos.y < 370 ? 370 : pos.y;
+					newY = newY > 730 ? 730 : newY;
+					var newX = pos.x < 250 ? 250 : pos.x;
+					newX = newX > 1160 ? 1160 : newX;
+					return {
+					  x: newX,
+					  y: newY
+					};
+				},
+				id: "card"+sbCards[I].uid.toString()});
 				cardsForSelection.push(image);
 				image.cuid = sbCards[I].uid;
 				image.cname = sbCards[I].card.cardName;
@@ -716,11 +733,15 @@ function loadAllMBCards()
 					width: 120,
 					height: 160,
 					draggable: true,
-					dragBounds: {
-						top: 5,
-						left: 250,
-						right: 1160,
-						bottom: 200
+					dragBoundFunc: function(pos) {
+						var newY = pos.y < 5 ? 5 : pos.y;
+						newY = newY > 200 ? 200 : newY;
+						var newX = pos.x < 250 ? 250 : pos.x;
+						newX = newX > 800 ? 800 : newX;
+						return {
+						  x: newX,
+						  y: newY
+						};
 					},
 					id: "card"+mbCards[I].uid.toString()
 				});
@@ -822,6 +843,16 @@ function loadAllMBCards()
 					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
 					//console.log(evt.which);
 				});
+				image.on('dblclick', function(evt) {
+					//console.log('dblclicked');
+					if (evt.which==1){
+						evt.stopPropagation();
+						evt.preventDefault(evt);
+						evt.cancelBubble = true;
+						moveCardToReserved(image.cuid);
+					}
+					return false;
+				});
 				MBCardLayer.add(image);
 				selectedCardsLoaded++;
 				if (selectedCardsLoaded == totalSelectedCardNumber) reLayerMBCards();
@@ -862,30 +893,13 @@ function selectCard(cuid)
 	mbCards.push(thisCard);
 	stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
 	stage.get("#cardCountSBText")[0].setText((15-sbCards.length).toString());
-	/*cardColor = (thisCard.card.color & 16) ? 'W' : '';
-
-	if (cardColor!='') colorCardsNumber[cardColor]++;
-	cardColor = (thisCard.card.color & 8) ? 'U' : '';
-	if (cardColor!='') colorCardsNumber[cardColor]++;
-	cardColor = (thisCard.card.color & 4) ? 'B' : '';
-	if (cardColor!='') colorCardsNumber[cardColor]++;
-
-	cardColor = (thisCard.card.color & 2) ? 'R' : '';
-	if (cardColor!='') colorCardsNumber[cardColor]++;
-	cardColor = (thisCard.card.color & 1) ? 'G' : '';
-	if (cardColor!='') colorCardsNumber[cardColor]++;
-	stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
-
-	stage.get("#UNumber")[0].setText(colorCardsNumber['U'].toString() + " " + 'U' + " cards");
-	stage.get("#BNumber")[0].setText(colorCardsNumber['B'].toString() + " " + 'B' + " cards");
-	stage.get("#RNumber")[0].setText(colorCardsNumber['R'].toString() + " " + 'R' + " cards");
-	stage.get("#GNumber")[0].setText(colorCardsNumber['G'].toString() + " " + 'G' + " cards");
-
-	layer.draw();
-	SBCardLayer.draw();
-	MBCardLayer.draw();*/
 	sbCards = new Array();
 	sortByRarity();
+}
+
+function moveCardToReserved(cuid)
+{
+	
 }
 
 function reLayerMBCards()
