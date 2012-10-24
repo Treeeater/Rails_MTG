@@ -72,12 +72,12 @@ class DraftGame
 			#save picks to db here
 			db = SQLite3::Database.open "./db/development.sqlite3"
 			@users.each_value{|u|
-				toSaveString = '{"cards":"","sbCards":"'
+				mbSaveString = '{"cards":"","sbCards":"'
 				u.cardPool.each{|uc|
-					toSaveString += (uc['expansion'].to_s + '/' + uc['idInSet'].to_s + '+')
+					mbSaveString += (uc['expansion'].to_s + '/' + uc['idInSet'].to_s + '+')
 				}
-				toSaveString += '","L1":0,"L2":"0","L3":0,"L4":0,"L5":0,"controller":"users","action":"submitDeck","user":{}}'
-				stmt = db.prepare "UPDATE users SET Deck_info='" + toSaveString + "' WHERE Id=" + u.uid
+				mbSaveString += '","L1":0,"L2":"0","L3":0,"L4":0,"L5":0,"controller":"users","action":"submitDeck","user":{}}'
+				stmt = db.prepare "UPDATE users SET Deck_info='" + mbSaveString + "' WHERE Id=" + u.uid
 				rs = stmt.execute
 			}
 			return true
@@ -314,7 +314,7 @@ EventMachine.run {
 								if ($game.checkAndSavePicks())
 									#send redirect to card builder.
 									$game.users.each_value{|u|
-										response = ResponseMessage.new("redirect_to_deckbuilder",u.username,u.uid,"")
+										response = ResponseMessage.new("submitSideBoard",u.username,u.uid,"")
 										response.send(u.ws)
 									}
 								end
@@ -345,7 +345,7 @@ EventMachine.run {
 						if ($game.checkAndSavePicks())
 							#send redirect to card builder.
 							$game.users.each_value{|u|
-								response = ResponseMessage.new("redirect_to_deckbuilder",u.username,u.uid,"")
+								response = ResponseMessage.new("submitSideBoard",u.username,u.uid,"")
 								response.send(u.ws)
 							}
 						end
@@ -423,6 +423,36 @@ EventMachine.run {
 						$game.wsID_wsHash.each_value{|w|
 							response.send(w)
 						}
+					when "submitSideBoard"
+						db = SQLite3::Database.open "./db/development.sqlite3"
+						toSaveString = '{"cards":"'
+						mbSaveString = ''
+						sbSaveString = ''
+						$game.users[msgUID].cardPool.each{|uc|
+							mbSaveString += (uc['expansion'].to_s + '/' + uc['idInSet'].to_s + '+')
+						}
+						msgBody.each{|sbcard|
+							sbcard = sbcard + '+'
+							i = mbSaveString.index(sbcard)
+							if (i!=nil)
+								if (i!=0)
+									mbSaveString = mbSaveString[0..i-1]+mbSaveString[i+sbcard.length..-1]
+								else
+									mbSaveString = mbSaveString[sbcard.length..-1]
+								end
+								sbSaveString += sbcard
+							end
+						}
+						toSaveString += mbSaveString
+						toSaveString += '","sbCards":"'
+						toSaveString += sbSaveString
+						toSaveString += '","L1":0,"L2":"0","L3":0,"L4":0,"L5":0,"controller":"users","action":"submitDeck","user":{}}'
+						
+						stmt = db.prepare "UPDATE users SET Deck_info='" + toSaveString + "' WHERE Id=" + msgUID
+						rs = stmt.execute
+						
+						response = ResponseMessage.new("redirect_to_deckbuilder",msgUsername,msgUID,"")
+						response.send($game.users[msgUID].ws)
 					else
 				end
 			end

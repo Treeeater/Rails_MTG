@@ -201,6 +201,15 @@ function start(){
 				}
 				changeYellowToGreen(msg.body);
 				break;
+			case "submitSideBoard":
+				var sideBoards = new Array();
+				var i = 0;
+				for (i in mbCards)
+				{
+					if (mbCards[i].reserved) sideBoards.push(mbCards[i].card.expansion + "/" + mbCards[i].card.idInSet);
+				}
+				var msg = new Message("submitSideBoard",myUsername,myUID,sideBoards);
+				ws.send(JSON.stringify(msg));
 			case "redirect_to_deckbuilder":
 				redirect_URL = "http://"+document.domain+":"+window.location.port+"/deckbuilder";
 				window.location = redirect_URL;				//get request.
