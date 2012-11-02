@@ -12,7 +12,7 @@ SingleCast = 2
 OtherCast = 3
 NoCast = 4
 
-MaxPlayers = 4
+MaxPlayers = 8
 
 def sendMessage(ws, msg)
 	ws.send msg

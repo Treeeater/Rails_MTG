@@ -24,7 +24,7 @@ def getBasicLands()
 	return basicLands
 end
 
-def pickCards(exp, mythicThreshold = 2, foilThreshold = 2)
+def pickCards(exp, mythicThreshold = 3, foilThreshold = 3)
 
 	begin
 		db = SQLite3::Database.open "./db/development.sqlite3"
@@ -47,7 +47,7 @@ def pickCards(exp, mythicThreshold = 2, foilThreshold = 2)
 		
 	#rarity of cards we needed	
 		commonNumber = 9 + ((foil == 1) ? 1 : 0) + ((foil == 0) ? 1 : 0)		
-		uncommonNumber = 3 + ((foil == 2) ? 1 : 0)					
+		uncommonNumber = 4 + ((foil == 2) ? 1 : 0)					
 		rareNumber = 1 - (mythic ? 1 : 0) + ((foil == 3) ? 1 : 0)
 		mythicNumber = (mythic ? 1 : 0) + ((foil == 4) ? 1 : 0)
 

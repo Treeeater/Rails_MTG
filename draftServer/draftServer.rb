@@ -348,13 +348,14 @@ EventMachine.run {
 								response = ResponseMessage.new("submitSideBoard",u.username,u.uid,"")
 								response.send(u.ws)
 							}
+						else
+							#test if the pack is empty and we should open new packs.
+							$game.checkAndOpenNewPacks()
+							#test if all players have submitted their choice, then rotate the packs.
+							$game.checkAndRotatePacks()
+							#now send the new packs to the players
+							$game.checkAndSendSelections()
 						end
-						#test if the pack is empty and we should open new packs.
-						$game.checkAndOpenNewPacks()
-						#test if all players have submitted their choice, then rotate the packs.
-						$game.checkAndRotatePacks()
-						#now send the new packs to the players
-						$game.checkAndSendSelections()
 					when "verifyDeck"
 						if !$game.wsID_userHash[ws.object_id].verified
 							$game.wsID_userHash[ws.object_id].verified = true
