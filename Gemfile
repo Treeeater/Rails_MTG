@@ -7,7 +7,7 @@ gem 'rails', '3.2.1'
 
 gem 'thin'
 gem 'sqlite3'
-gem 'bootstrap-sass'
+gem 'bootstrap-sass', '2.0.4.0'
 gem 'annotate', '~> 2.4.1.beta1'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'eventmachine', ">= 1.0.0.beta.4", "<= 1.0.0.beta.4.1"

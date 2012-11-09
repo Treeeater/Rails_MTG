@@ -6,6 +6,7 @@ require 'eventmachine'
 require 'em-websocket'
 require './lobbyServer/chatLobby.rb'
 require 'json'
+require './serverConf.rb'
 
 BroadCast = 1
 SingleCast = 2
@@ -70,7 +71,7 @@ EventMachine.run {
 	$cl.websockets = Hash.new			#uid => ws
 	$gl = GamesList.new
 	$gl.games = Hash.new
-    EventMachine::WebSocket.start(:host => "chromium.cs.virginia.edu", :port => 12341) do |ws|
+    EventMachine::WebSocket.start(:host => $hostServerDomain, :port => 12341) do |ws|
 	
 	ws.onopen {
         puts "WebSocket connection open from #{ws.object_id}"

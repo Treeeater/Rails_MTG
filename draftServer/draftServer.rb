@@ -6,6 +6,7 @@ require 'em-websocket'
 require 'json'
 require './sealedServer/selectCards.rb'
 require 'sqlite3'
+require './serverConf.rb'
 
 #ARGV[0] is the host user's id
 #ARGV[1] is the total number of users
@@ -212,7 +213,7 @@ EventMachine.run {
 	#EventMachine::WebSocket.start(:host => "localhost", :port => (12320+ARGV[0].to_i) ) do |ws|
 	puts "WebSocket server opened at localhost on port 12342!"
 	
-	EventMachine::WebSocket.start(:host => "chromium.cs.virginia.edu", :port => 12342 ) do |ws|
+	EventMachine::WebSocket.start(:host => $hostServerDomain, :port => 12342 ) do |ws|
 		ws.onopen {
 			puts "WebSocket connection open from #{ws.object_id}"
 		}
