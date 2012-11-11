@@ -37,7 +37,7 @@ function loadFixedFrames() {
 	function testAndDraw(){
 		layer.draw();
 	}
-	stage = new Kinetic.Stage({container: "container", width: 1280, height: 900});
+	stage = new Kinetic.Stage({container: "container", width: 1280, height: 920});
 	layer = new Kinetic.Layer();
 	cardLayer = new Kinetic.Layer();
 	SBCardLayer = new Kinetic.Layer();
@@ -49,7 +49,7 @@ function loadFixedFrames() {
 	var greenLine2 = new Kinetic.Line({points: [920, 0, 920, 360],stroke: "green",strokeWidth: 3,lineCap: "round",lineJoin: "round",
 	});
 	
-	var blueLine2 = new Kinetic.Line({points: [240, 0, 240, 900],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
+	var blueLine2 = new Kinetic.Line({points: [240, 0, 240, 920],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 	
 	var blueLine3 = new Kinetic.Line({points: [0, 320, 240, 320],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
@@ -89,7 +89,7 @@ function loadFixedFrames() {
 	timerLayer = new Kinetic.Layer();
 	var timerText = new Kinetic.Text({x: 170,y: 335,text: "15:00",fontSize: 12,fontFamily: "Calibri",textFill: "green",align: "center",verticalAlign: "middle",id: "timerText"
 	});
-	timer = 900;
+	timer = 60;
 	timerLayer.add(timerText);
 	setInterval("timeDown();",1000);
 	//cardback
