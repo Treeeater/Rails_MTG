@@ -612,7 +612,7 @@ function loadAllSBCards()
 					{
 						var imageTooltip = stage.get("#tooltip")[0];
 						var p = image.getPosition();
-						if (p.x<1000){
+						if (p.x<900){
 							imageTooltip.setX(p.x+image.attrs.width+10);
 						}
 						else {imageTooltip.setX(p.x-250)};
@@ -656,7 +656,7 @@ function loadAllSBCards()
 						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
 						var p = image.getPosition();
-						if (p.x<1000){
+						if (p.x<900){
 							imageTooltip.setX(p.x+image.attrs.width+10);
 						}
 						else {imageTooltip.setX(p.x-250)};
@@ -791,7 +791,7 @@ function loadAllMBCards()
 					{
 						var imageTooltip = stage.get("#tooltip")[0];
 						var p = image.getPosition();
-						if (p.x<1000){
+						if (p.x<900){
 							imageTooltip.setX(p.x+image.attrs.width+10);
 						}
 						else {imageTooltip.setX(p.x-250)};
@@ -835,7 +835,7 @@ function loadAllMBCards()
 						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
 						var p = image.getPosition();
-						if (p.x<1000){
+						if (p.x<900){
 							imageTooltip.setX(p.x+image.attrs.width+10);
 						}
 						else {imageTooltip.setX(p.x-250)};
