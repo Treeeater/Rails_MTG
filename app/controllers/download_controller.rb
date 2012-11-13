@@ -154,6 +154,12 @@ EOF
 			return 7
 		when "RTR"
 			return 6
+		when "RAV"
+			return 9
+		when "GPT"
+			return 10
+		when "DIS"
+			return 11
 		end
 	end
 

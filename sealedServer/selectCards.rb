@@ -24,11 +24,24 @@ def getBasicLands()
 	return basicLands
 end
 
+def checkExpIfMythicExists(exp)
+	case exp
+	when "RAV"
+		return false
+	when "GPT"
+		return false
+	when "DIS"
+		return false
+	end
+	return true
+end
+
 def pickCards(exp, mythicThreshold = 3, foilThreshold = 3)
 
 	begin
+		mythicOrNot = checkExpIfMythicExists(exp)
 		db = SQLite3::Database.open "./db/development.sqlite3"
-		mythic = (rand(10) < mythicThreshold) ? true : false
+		mythic = (rand(10) < mythicThreshold) ? mythicOrNot : false
 		foil =  (rand(10) < foilThreshold) ? true : false
 		if (foil) then foil = rand(4)+1 else foil = 0 end
 		stmt = db.prepare "SELECT * FROM mtg_cards WHERE Expansion='"+exp+"'"
