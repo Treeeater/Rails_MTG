@@ -1,10 +1,42 @@
 <div class="lobby_chatbox_wrapper">
-<h2> Your name: <span id="username" uid="<%= current_user.id %>"><%= current_user.name %></span> </h2>
+<h2 style="margin-top:20px"> Your name: <span id="username" uid="<%= current_user.id %>"><%= current_user.name %></span> </h2>
 <script src="/javascript/lobby/lobby.js"></script>
 <textarea id = "chatbox" placeholder="Find lobby messages here!" rows="10" disabled="disabled"></textarea>
 <input id="chatInput" type="text" disabled="disabled" onkeydown="testAndSend(event);" value="Hi"></input>
 <div class="chat_button_wrapper">
-<%= button_to_function "send", "sendChatMsg($('#chatInput').val())", :class => "btn btn-medium btn-primary" %>
-<%= button_to_function "clear", "clearChatBox()", :class => "btn btn-medium btn-primary" %>
+<%= button_to_function "send", "sendChatMsg($('#chatInput').val())", :class => "btn btn-medium" %>
+<%= button_to_function "clear", "clearChatBox()", :class => "btn btn-medium" %>
 </div>
+<hr style="margin-top:20px" />
+
+<div id="CreateGameWrapper" style="width:99%; margin:auto; visibility:hidden">
+<form id = "gameTypeSelector" style="margin-left:40%">
+<input type="radio" name="gameType" value="Draft" id = "draftSelected" checked/>Draft
+<input type="radio" name="gameType" value="Sealed" style="margin-left:20px" id = "sealedSelected"/>Sealed
+</form>
+<hr />
+
+<div style="width:40%; margin:auto;">
+<form>
+
+<% for i in 1..6 %>
+
+<input type="checkbox" name="PackNumber" value="Pack<%=i%>" id="Pack<%=i%>Checked" <% if i<=3 %>checked<%end%>/>&nbsp;Pack<%=i%>
+<select id = "Pack<%=i%>Selection" style="width:50%; margin-left:20px; margin-top:10px">
+  <option>RTR</option>
+  <option>AVR</option>
+  <option>M13</option>
+</select>
+<br>
+
+<% end %>
+
+</form>
+</div>
+<div class="chat_button_wrapper">
+<%= button_to_function "Create", "createGame();", :class => "btn btn-small" %>
+<%= button_to_function "Cancel", "cancelCreateGame();", :class => "btn btn-small" %>
+</div>
+</div>
+
 </div>

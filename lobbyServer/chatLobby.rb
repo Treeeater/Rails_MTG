@@ -24,12 +24,13 @@ end
 
 class Game
 	attr_accessor :players, :hostUID, :hostName, :type
-	def initialize(uid, username, type)
+	def initialize(uid, username, type, pd)
 		@hostName = username
 		@hostUID = uid
 		@players = Array.new
 		@players.push([uid,username])
 		@type = type
+		@packsDetails = pd
 	end
 end
 

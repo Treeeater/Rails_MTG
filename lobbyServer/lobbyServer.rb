@@ -168,8 +168,8 @@ EventMachine.run {
 					else
 						castType = BroadCast
 						#init the game on back-end
-						$gl.games[msgUID] = Game.new(msgUID, msgUsername,"sealed")
-						response = ResponseMessage.new("createSealedGame",msgUsername,msgUID,ActiveSupport::JSON.encode($gl.games[msgUID]))
+						$gl.games[msgUID] = Game.new(msgUID, msgUsername,"sealed",msgBody)	#msgBody is the pack details.
+						response = ResponseMessage.new("createSealedGame",msgUsername,msgUID,msgBody)
 						responseMsg = response.serialize()
 					end
 				when "createDraftGame"
@@ -181,8 +181,8 @@ EventMachine.run {
 					else
 						castType = BroadCast
 						#init the game on back-end
-						$gl.games[msgUID] = Game.new(msgUID, msgUsername,"draft")
-						response = ResponseMessage.new("createDraftGame",msgUsername,msgUID,ActiveSupport::JSON.encode($gl.games[msgUID]))
+						$gl.games[msgUID] = Game.new(msgUID, msgUsername,"draft",msgBody)	#msgBody is the pack details.
+						response = ResponseMessage.new("createDraftGame",msgUsername,msgUID,msgBody)
 						responseMsg = response.serialize()
 					end
 				when "retrieveGameList"

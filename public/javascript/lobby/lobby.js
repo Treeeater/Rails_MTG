@@ -6,9 +6,9 @@
 	uid = $('#account').attr('uid');
 	username = $('#account').attr('uname');
 	$('#chatInput').attr('disabled','disabled');
-	window.addEventListener('load', clearChatBox, false);			//FF does not clear chatbox after refresh, this is a work around.
 	host = hostServerAddress;
 	lobbyServerHost = "ws://"+hostServerDomain+":"+gamePort+"/";
+	window.addEventListener('load', initConnectServer, false);			//FF does not clear chatbox after refresh, this is a work around.
 })();
 
 function keys(obj)
@@ -40,12 +40,13 @@ function Message(type, username, body, uid)
 	this.uid = uid;
 }
 
-function Game(hostName, hostUID, players, type)
+function Game(hostName, hostUID, players, type, packsDetails)
 {
 	this.hostName = hostName;
 	this.hostUID = hostUID;
 	this.players = players;
 	this.type = type;
+	this.packsDetails = packsDetails;
 }
 
 function connectChatServer()
@@ -89,7 +90,7 @@ function closeConnection()
 	initialization = true;
 	$('#status_img').attr('src','/assets/lobby/broken.png');
 	$("#createStartGame").val("Create a game!");
-	$("#createStartGame").attr('onclick', 'createGame()');
+	$("#createStartGame").attr('onclick', 'toCreateGame()');
 	clearLists();
 }
 
@@ -128,34 +129,64 @@ function clearChatBox()
 	$('#chatbox').val("");	
 }
 
+function initConnectServer()
+{
+	clearChatBox();
+	connectChatServer();
+}
+
+function toCreateGame()
+{
+	document.getElementById('CreateGameWrapper').style.visibility = "visible";
+}
+
+function cancelCreateGame()
+{
+	document.getElementById('CreateGameWrapper').style.visibility = "hidden";
+}
+
 function createGame()
 {
-	var draftOrSealed = confirm("Press OK for a draft game, press cancel for a sealed game.");
-	if (draftOrSealed) 
+	if (!document.getElementById('draftSelected').checked && !document.getElementById('sealedSelected').checked) {alert("You haven't picked a game type!");return;}
+	var draft = document.getElementById('draftSelected').checked;
+	if (draft)
 	{
-		packsNo = prompt("Tell me how many packs you want to open in this draft.");
-		packsNo = parseInt(packsNo);
-		if (isNaN(packsNo)||(packsNo>5)||(packsNo<2)) {alert('Enter a number (2, 3, 4 or 5) please!'); return;}
-		message = new Message("createDraftGame", username, "", uid);
+		packsDetails = new Array();
+		var i = 1;
+		for (; i < 7; i++)
+		{
+			if (document.getElementById('Pack'+i.toString()+'Checked').checked) 
+			{
+				packsDetails.push(document.getElementById('Pack'+i.toString()+'Selection').value);
+			}
+		}
+		if (packsDetails.length <= 2) {alert("you want to draft with less than three packs?! Don't be kidding..."); return;}
+		message = new Message("createDraftGame", username, packsDetails.toString(), uid);
 	}
-	else message = new Message("createSealedGame", username, "", uid);
+	else message = new Message("createSealedGame", username, packsDetails.toString(), uid);
 	chatws.send(JSON.stringify(message));
 	$("#createStartGame").val("Start game!");
-	if (draftOrSealed) $("#createStartGame").attr('onclick', 'initializeGame("draft")');
+	if (draft) $("#createStartGame").attr('onclick', 'initializeGame("draft")');
 	else $("#createStartGame").attr('onclick', 'initializeGame("sealed")');
+	//done creating, we should hide the menu
+	document.getElementById('CreateGameWrapper').style.visibility = "hidden";
 }
 
 function initializeGame(draftOrSealed)
 {
 	$("#game_"+uid).attr('selected','selected');
-	rerenderPlayersList();
+	rerenderGameDetails();
 	var i = 0;
 	var xhr = new XMLHttpRequest();
 	var addr = hostServerAddress+draftOrSealed+"/new";
 	if (draftOrSealed == "draft")
 	{
 		//we need to pass extra parameters: players number and players id.
-		addr += "?packsNo="+packsNo.toString()+"&playersNo="+document.getElementById("game_"+uid).text[document.getElementById("game_"+uid).text.length-2];
+		addr += "?packsNo="+packsDetails.length.toString()+"&playersNo="+document.getElementById("game_"+uid).text[document.getElementById("game_"+uid).text.length-2];
+		for (i=0; i < packsDetails.length; i++)
+		{
+			addr += "&pack"+i.toString()+"="+packsDetails[i];
+		}
 		for (i=0; i < document.getElementById("playerslist").children.length; i++) {
 			//of course, using player's name is not safe, might lead to sqlI/xss vul, but we just keep it this way for now.
 			addr += "&player"+i+"="+document.getElementById("playerslist").children[i].text;
@@ -197,7 +228,7 @@ function leaveGame()
 	message = new Message("leaveGame", username, "", uid);
 	chatws.send(JSON.stringify(message));
 	$("#createStartGame").val("Create a game");
-	$("#createStartGame").attr('onclick', 'createGame()');
+	$("#createStartGame").attr('onclick', 'toCreateGame()');
 }
 
 function retrieveGameList()
@@ -212,11 +243,11 @@ function rerenderGamesList(g)
 	k = keys(g);
 	for (i = 0; i < k.length; i++)
 	{
-		$('#gameslist').append("<option id='game_"+g[k[i]].hostUID+"' onclick = 'rerenderPlayersList();'>"+g[k[i]].type+":"+g[k[i]].hostName+"  ("+g[k[i]].players.length+(g[k[i]].type=="sealed"?"/2":"")+")</option>")
+		$('#gameslist').append("<option id='game_"+g[k[i]].hostUID+"' onclick = 'rerenderGameDetails();'>"+g[k[i]].type+":"+g[k[i]].hostName+"  ("+g[k[i]].players.length+(g[k[i]].type=="sealed"?"/2":"")+")</option>")
 	}
 }
 
-function rerenderPlayersList()
+function rerenderGameDetails()
 {
 	cur_selected = $("#gameslist option:selected").attr('id');
 	if (cur_selected!=undefined)
@@ -227,6 +258,11 @@ function rerenderPlayersList()
 		for (i = 0; i < cur_game.players.length; i++)
 		{
 			$('#playerslist').append("<option id='player_"+cur_game.players[i][0]+"'>"+cur_game.players[i][1]+"</option>")
+		}
+		$('#packsList').html("");
+		for (i = 0; i < cur_game.packsDetails.split(',').length; i++)
+		{
+			$('#packsList').append("<option id='pack_"+i.toString()+"'>"+cur_game.packsDetails.split(',')[i]+"</option>")
 		}
 	}
 }
@@ -269,11 +305,11 @@ function processMessage(s)
 			log(time + " " + msg.username + " has left the room\n");
 			break;
 		case "createSealedGame":
-			games[msg.uid] = new Game(msg.username,msg.uid,[[msg.uid,msg.username]],"sealed");
+			games[msg.uid] = new Game(msg.username,msg.uid,[[msg.uid,msg.username]],"sealed",msg.body);
 			rerenderGamesList(games);
 			break;
 		case "createDraftGame":
-			games[msg.uid] = new Game(msg.username,msg.uid,[[msg.uid,msg.username]],"draft");
+			games[msg.uid] = new Game(msg.username,msg.uid,[[msg.uid,msg.username]],"draft",msg.body);
 			rerenderGamesList(games);
 			break;
 		case "gameList":

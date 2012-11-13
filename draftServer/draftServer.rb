@@ -62,7 +62,7 @@ class DraftGame
 
 	def dispatchPack()
 		puts "dispatching packs..."
-		return pickCards("RTR")
+		return pickCards($PackDetails[@currentDraftRound-1])
 	end
 
 	def checkAndSavePicks()
@@ -91,10 +91,10 @@ class DraftGame
 		if (@sitArray == nil) then tryFormSitArray() end
 		if (@sitArray[0].currentPack.length == 0)
 			#we need to open new packs
+			@currentDraftRound+=1
 			@users.each_value{|u|
 				u.currentPack = dispatchPack()
 			}
-			@currentDraftRound+=1
 		end
 	end
 
@@ -203,9 +203,10 @@ end
 
 EventMachine.run {
 
-	$playerNames = ARGV[3..-1]
-	$game = DraftGame.new(ARGV[2].to_i)
 	$totalNoPacks = ARGV[1].to_i
+	$game = DraftGame.new(ARGV[2].to_i)
+	$PackDetails = ARGV[3..3+$totalNoPacks]
+	$playerNames = ARGV[3+$totalNoPacks..-1]
 	#File.open("log_draft_server_2.txt","w"){|f| f.write($game.totalUserNo)}
 	order = rand_n($game.totalUserNo,$game.totalUserNo)			#generate sit order
 	#puts "WebSocket server opened at localhost on port " + (12320+ARGV[0].to_i).to_s + "!"
