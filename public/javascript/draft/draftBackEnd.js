@@ -154,6 +154,9 @@ function start(){
 					$("#roundTable").attr("src",'/assets/lobby/connected.jpg');
 				}
 				break;
+			case "draftInfo":
+				updateDraftInfo(msg.body);
+				break;
 			case "disconnect":
 				// this is gotta be opponent disconnect, so no worries.
 				stage.get("#roundTablePlayers"+msg.body)[0].setFill('red');

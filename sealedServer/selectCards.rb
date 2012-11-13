@@ -44,6 +44,7 @@ def pickCards(exp, mythicThreshold = 3, foilThreshold = 3)
 		mythic = (rand(10) < mythicThreshold) ? mythicOrNot : false
 		foil =  (rand(10) < foilThreshold) ? true : false
 		if (foil) then foil = rand(4)+1 else foil = 0 end
+		if (foil==4 && mythic == false) then foil = 3 end
 		stmt = db.prepare "SELECT * FROM mtg_cards WHERE Expansion='"+exp+"'"
 		rs = stmt.execute
 		rs2 = Array.new

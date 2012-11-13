@@ -205,7 +205,7 @@ EventMachine.run {
 
 	$totalNoPacks = ARGV[1].to_i
 	$game = DraftGame.new(ARGV[2].to_i)
-	$PackDetails = ARGV[3..3+$totalNoPacks]
+	$PackDetails = ARGV[3..3+$totalNoPacks-1]
 	$playerNames = ARGV[3+$totalNoPacks..-1]
 	#File.open("log_draft_server_2.txt","w"){|f| f.write($game.totalUserNo)}
 	order = rand_n($game.totalUserNo,$game.totalUserNo)			#generate sit order
@@ -327,6 +327,8 @@ EventMachine.run {
 								#now send the new packs to the players
 								$game.checkAndSendSelections()
 							end
+							response = ResponseMessage.new("draftInfo",msgUsername,msgUID,$PackDetails.join('+'));
+							response.send(ws);
 						end
 					when "submitCard"
 						$game.users[msgUID].cardPool.push(msgBody)

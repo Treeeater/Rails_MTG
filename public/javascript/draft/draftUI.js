@@ -37,7 +37,7 @@ function loadFixedFrames() {
 	function testAndDraw(){
 		layer.draw();
 	}
-	stage = new Kinetic.Stage({container: "container", width: 1280, height: 920});
+	stage = new Kinetic.Stage({container: "container", width: 1280, height: 960});
 	layer = new Kinetic.Layer();
 	cardLayer = new Kinetic.Layer();
 	SBCardLayer = new Kinetic.Layer();
@@ -49,7 +49,7 @@ function loadFixedFrames() {
 	var greenLine2 = new Kinetic.Line({points: [920, 0, 920, 360],stroke: "green",strokeWidth: 3,lineCap: "round",lineJoin: "round",
 	});
 	
-	var blueLine2 = new Kinetic.Line({points: [240, 0, 240, 920],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
+	var blueLine2 = new Kinetic.Line({points: [240, 0, 240, 960],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 	
 	var blueLine3 = new Kinetic.Line({points: [0, 320, 240, 320],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
@@ -70,6 +70,8 @@ function loadFixedFrames() {
 	var blueLine8 = new Kinetic.Line({points: [0, 700, 240, 700],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
 	});
 
+	var blueLine9 = new Kinetic.Line({points: [0, 910, 240, 910],stroke: "blue",strokeWidth: 3,lineCap: "round",lineJoin: "round"
+	});
 	
 	layer.add(greenLine);
 	layer.add(greenLine2);
@@ -80,6 +82,7 @@ function loadFixedFrames() {
 	layer.add(blueLine6);
 	layer.add(blueLine7);
 	layer.add(blueLine8);
+	layer.add(blueLine9);
 	
 	//add timer
 	var timerTitleText = new Kinetic.Text({x: 40,y: 335,text: "Time Remaining : ",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
@@ -92,6 +95,11 @@ function loadFixedFrames() {
 	timer = 60;
 	timerLayer.add(timerText);
 	setInterval("timeDown();",1000);
+	//add rendered card count:
+	var downloadedCardNoText = new Kinetic.Text({x: 30,y: 920, text: "Card downloaded: 00/00",fontSize: 13,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle", id: "downloadedCardInfoText"});
+	layer.add(downloadedCardNoText);
+	var draftInfoText = new Kinetic.Text({x: 20,y: 940,text: "This is a ",fontSize: 13,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle", id: "draftInfoText"});
+	layer.add(draftInfoText);
 	//cardback
 	var imageObj = new Image();
 	imageObj.onload = function() {
@@ -585,7 +593,7 @@ function loadAllSBCards()
 				var image = new Kinetic.Image({x: X + Math.floor(displayOrder/2) * 128,y: Y + (displayOrder%2) * 170,image: imageObj,width: 120,height: 160,draggable: true,
 				dragBoundFunc: function(pos) {
 					var newY = pos.y < 370 ? 370 : pos.y;
-					newY = newY > 730 ? 730 : newY;
+					newY = newY > 770 ? 770 : newY;
 					var newX = pos.x < 250 ? 250 : pos.x;
 					newX = newX > 1160 ? 1160 : newX;
 					return {
@@ -702,6 +710,7 @@ function loadAllSBCards()
 				});
 				SBCardLayer.add(image);
 				selectionCardsLoaded++;
+				updateDownloadedCardInfo(selectionCardsLoaded,totalSelectionCardNumber);
 				if (selectionCardsLoaded == totalSelectionCardNumber) reLayerSBCards();
 			}
 			imageObj.src = sbCards[I].card.engSRC;
@@ -1098,6 +1107,18 @@ function changeAllGreenToYellow()
 function changeYellowToGreen(i)
 {
 	stage.get("#roundTablePlayers"+i)[0].setFill('green');
+	layer.draw();
+};
+
+function updateDraftInfo(info)
+{
+	stage.get("#draftInfoText")[0].setText("This is a "+info+" draft.");
+	layer.draw();
+};
+
+function updateDownloadedCardInfo(a,b)
+{
+	stage.get("#downloadedCardInfoText")[0].setText("Card downloaded: " + ((a>=10)?"":"0") + a.toString() + "/" + ((b>=10)?"":"0") + b.toString());
 	layer.draw();
 };
 
