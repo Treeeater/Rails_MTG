@@ -713,7 +713,13 @@ function loadAllSBCards()
 				updateDownloadedCardInfo(selectionCardsLoaded,totalSelectionCardNumber);
 				if (selectionCardsLoaded == totalSelectionCardNumber) reLayerSBCards();
 			}
-			imageObj.src = sbCards[I].card.engSRC;
+			if (window.webkitRequestFileSystem){
+				renderCard(sbCards[I].card.idInSet, sbCards[I].card.expansion, imageObj);
+			}
+			else{
+				if (ENV_Language == "cn") {imageObj.src = sbCards[I].card.chiSRC;}
+				else {imageObj.src = sbCards[I].card.engSRC;}
+			}
 		})(startX,startY,i);
 	}
 }
@@ -902,7 +908,13 @@ function loadAllMBCards()
 				colorCardsNumber["U"]+=((mbCards[I].card.color&8)==8?1:0);
 				colorCardsNumber["W"]+=((mbCards[I].card.color&16)==16?1:0);
 			}
-			imageObj.src = mbCards[I].card.engSRC;
+			if (window.webkitRequestFileSystem){
+				renderCard(mbCards[I].card.idInSet, mbCards[I].card.expansion, imageObj);
+			}
+			else{
+				if (ENV_Language == "cn") {imageObj.src = mbCards[I].card.chiSRC;}
+				else {imageObj.src = mbCards[I].card.engSRC;}
+			}
 		})(startX,startY,i,reserved,dr,dm);
 	}
 	stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");

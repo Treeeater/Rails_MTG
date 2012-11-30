@@ -921,7 +921,13 @@ function loadAllCards()
 				cardsLoaded++;
 				if (cardsLoaded == totalCardNumber) reLayerCards();
 			}
-			imageObj.src = sbCards[I].engSRC;
+			if (window.webkitRequestFileSystem){
+				renderCard(sbCards[I].idInSet, sbCards[I].expansion, imageObj);
+			}
+			else{
+				if (ENV_Language == "cn") {imageObj.src = sbCards[I].chiSRC;}
+				else {imageObj.src = sbCards[I].engSRC;}
+			}
 		})(startX,startY,i);
 	}
 	
@@ -1076,7 +1082,13 @@ function loadAllCards()
 			colorCardsNumber["B"]+=((mbCards[I].color&4)==4?1:0);
 			colorCardsNumber["U"]+=((mbCards[I].color&8)==8?1:0);
 			colorCardsNumber["W"]+=((mbCards[I].color&16)==16?1:0);
-			imageObj.src = mbCards[I].engSRC;
+			if (window.webkitRequestFileSystem){
+				renderCard(mbCards[I].idInSet, mbCards[I].expansion, imageObj);
+			}
+			else{
+				if (ENV_Language == "cn") {imageObj.src = mbCards[I].chiSRC;}
+				else {imageObj.src = mbCards[I].engSRC;}
+			}
 		})(startX,startY,i);
 	}
 	stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
@@ -1210,7 +1222,13 @@ function cardToMB(cuid,oldimage)
 		layer.draw();
 		cardLayer.draw();
 	}
-	imageObj.src = thisCard.engSRC;
+	if (window.webkitRequestFileSystem){
+		renderCard(thisCard.idInSet, thisCard.expansion, imageObj);
+	}
+	else{
+		if (ENV_Language == "cn") {imageObj.src = thisCard.chiSRC;}
+		else {imageObj.src = thisCard.engSRC;}
+	}
 }
 
 function cardToSB(cuid,oldimage)
@@ -1336,7 +1354,13 @@ function cardToSB(cuid,oldimage)
 		layer.draw();
 		cardLayer.draw();
 	}
-	imageObj.src = thisCard.engSRC;
+	if (window.webkitRequestFileSystem){
+		renderCard(thisCard.idInSet, thisCard.expansion, imageObj);
+	}
+	else{
+		if (ENV_Language == "cn") {imageObj.src = thisCard.chiSRC;}
+		else {imageObj.src = thisCard.engSRC;}
+	}
 }
 
 function reLayerCards()

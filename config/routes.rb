@@ -14,6 +14,7 @@ Mtg::Application.routes.draw do
   root :to => 'static_pages#home' 
   match 'deckbuilder', to: 'deckbuilder#show'
   match 'downloadDeckList', to: 'download#show'
+  match 'cachecards', to: 'cachecards#show'
   match '/signup',  to: 'users#new'
   match '/signin',  to: 'sessions#new'
   match '/signout', to: 'sessions#destroy', via: :delete		#Use the DELETE http verb

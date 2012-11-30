@@ -7,7 +7,7 @@
     <%= csrf_meta_tags %>
     <%= render 'layouts/shim' %>
     <%= yield(:head) %>
-	<script> var hostServerAddress = "<%= $hostServerAddress %>"; var hostServerDomain = "<%= $hostServerDomain %>";</script>
+	<script> var hostServerAddress = "<%= $hostServerAddress %>"; var hostServerDomain = "<%= $hostServerDomain %>"; var ENV_Language = "cn"; </script>
   </head>
   <body>
     <%= render 'layouts/header' %>

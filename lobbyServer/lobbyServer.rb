@@ -17,7 +17,7 @@ MaxPlayers = 8
 
 def sendMessage(ws, msg)
 	ws.send msg
-	puts "Sending Message to #{$cl.users[ws.object_id.inspect].name}: " + msg
+	if ($cl.users[ws.object_id.inspect]) then puts "Sending Message to #{$cl.users[ws.object_id.inspect].name}: " + msg end
 end
 
 def userLeaveGame(msgUID)
