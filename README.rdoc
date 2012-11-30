@@ -57,4 +57,6 @@ app/controllers/application_controller.rb : change all host info (to your curren
 draftServer/draftServer.rb : search for EventMachine::WebSocket.start(:host =>  and change it to the current host (ip address) 
 lobbyServer/lobbyServer.rb : same as above.
 
+11/30/2012: Added cache functionality in draft/deckbuilding for Chrome users. However, this means our server needs to serve MTG card. Here are the rules: for a specific expansion E, a specific cardID ID, and a specific language L, the card image file should be stored under public/cards/L/E/ID.jpg. Note that ID must be a three number digit, if the digit is under 10 or 100, we need to zero-extend it.
+
 Note: As you run bundle install for the first time on the cloud, it is likely to install bootstrap-sass with the newest version. Bootstrap-sass version needs to be 2.0.4.0 as of now, otherwise the css is all messed up. We should fix this.
