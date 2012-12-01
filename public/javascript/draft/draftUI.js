@@ -1133,5 +1133,4 @@ function updateDownloadedCardInfo(a,b)
 	stage.get("#downloadedCardInfoText")[0].setText("Card downloaded: " + ((a>=10)?"":"0") + a.toString() + "/" + ((b>=10)?"":"0") + b.toString());
 	layer.draw();
 };
-
-window.addEventListener("load",loadFixedFrames);
+if (!window.requestFileSystem) window.addEventListener("load",loadFixedFrames);

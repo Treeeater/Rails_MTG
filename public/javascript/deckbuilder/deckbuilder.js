@@ -1448,5 +1448,5 @@ function submitDeck(){
 	}
 	else alert("Deck submission failed, re-submit or check your connection!");
 }
+if (!window.requestFileSystem) window.addEventListener("load",loadFixedFrames);
 
-window.addEventListener("load",loadFixedFrames);

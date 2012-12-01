@@ -3,8 +3,6 @@
 var exp = "<%= @exp %>";
 var lang = "<%= @lang %>";
 </script>
-<script src="<%= $hostServerKineticJSLibAddress %>"></script>
-<script src="<%= $hostServerAddress %>javascript/localStorage.js"></script>
 <% end %>
 <div id="wrapper">
 <div>We are caching <span style="color:red; font-size:200%"><b><u><%= @exp.upcase %></u></b></span> cards in <span style="color:red;  font-size:200%"><b><u><% if (@lang == "cn") then %><%= "中文" %> <% else %> <%= "English" %> <% end %></u></b></span> for you. Please wait...</div>
@@ -12,3 +10,4 @@ var lang = "<%= @lang %>";
 <img id = "pic"></img>
 </div>
 <script src="<%= $hostServerAddress %>javascript/cache.js"></script>
+<script src="<%= $hostServerAddress %>javascript/localStorage.js"></script>

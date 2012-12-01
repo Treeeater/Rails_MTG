@@ -78,11 +78,8 @@ function downloadAndSaveImage(imageID, imageExp, callback)
 					var blob = new Blob([ buffer ], { type: 'image/jpeg' } )
 
 					fileWriter.write(blob);
-				}, errorHandler );
+				}, errorHandler);
 			});
-		}
-		if (xhr.readyState == 4 && xhr.status == 404) {
-			document.getElementById('wrapper').innerHTML = "<h1><span style='color:blue'>Done! Enjoy your draft!</span></h1>";
 		}
 	}
 	
@@ -93,10 +90,12 @@ if (window.requestFileSystem)
 {
 	function onInitFs(fs) { 
 		window.fs = fs;
-		start();
+		if (typeof(cacheStart)!=='undefined') {cacheStart();}		//for cache.js
+		if (typeof(loadFixedFrames)!=='undefined') {loadFixedFrames();}		//for deckbuilder and draft
 		console.log('Opened file system: ' + fs.name);
 	}
 	window.webkitStorageInfo.requestQuota(window.PERSISTENT, 300*1024*1024 /*300MB*/, function(){
 		window.requestFileSystem(PERSISTENT, 300*1024*1024 /*300MB*/, onInitFs, errorHandler);
 	}, errorHandler);
 }
+else {window.addEventListener('load',cacheStart);}
