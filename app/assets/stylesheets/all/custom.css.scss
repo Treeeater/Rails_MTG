@@ -122,6 +122,13 @@ $grayMediumLight: #eaeaea;
   @include box_sizing;
 }
 
+/* signin */
+.wide-input-text {
+	input {
+		height:40px;
+	}
+}
+
 /* sidebar */
 
 aside {

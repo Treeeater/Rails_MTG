@@ -4,10 +4,37 @@ var exp = "<%= @exp %>";
 var lang = "<%= @lang %>";
 </script>
 <% end %>
-<div id="wrapper">
-<div>We are caching <span style="color:red; font-size:200%"><b><u><%= @exp.upcase %></u></b></span> cards in <span style="color:red;  font-size:200%"><b><u><% if (@lang == "cn") then %><%= "中文" %> <% else %> <%= "English" %> <% end %></u></b></span> for you. Please wait...</div>
+<span style="font-size:20px">
+Please select the expansion and language of cards you want to cache.</br>
+请选择你想要缓存牌的环境和语言。
+</span>
+<hr style="margin-top:20px" />
+<div style="width:40%; margin:auto">
+<form style="margin-top:30px">
+<label style="color:red; font-size:20px; margin-top:30px">Language/语言:</label>
+<select id = "lang">
+  <option value="cn">中文</option>
+  <option value="en">English</option>
+</select>
+<label style="color:red; font-size:20px; margin-top:10px">Expansion/环境:</label>
+<select id = "exp">
+  <option value="RTR">RTR</option>
+  <option value="RAV">RAV</option>
+  <option value="GPT">GPT</option>
+  <option value="DIS">DIS</option>
+</select>
+</form>
+</div>
+<div style="margin-top:40px; width:100px; margin:0 auto">
+<button class="btn btn-large btn-primary" onclick="cacheStart();">Start/开始</button>
+</div>
+<div id="wrapper" style="visibility:hidden; width:300px; margin:40px auto;">
+<div>We are caching <span style="color:red; font-size:200%"><b><u><span id="expDisplay"></span></u></b></span> cards in <span style="color:red;  font-size:200%"><b><u><% if (@lang == "cn") then %><span id="langDisplay"></span> <% else %> <%= "English" %> <% end %></u></b></span> for you. Please wait...</div>
 <div>Progress: <b><u><span id="n" style="color:red;  font-size:200%">0</span></u></b> cards done so far</div>
-<img id = "pic"></img>
+<img id = "pic" style="margin-top:20px"></img>
+</div>
+<div id="finished" style="visibility:hidden; margin-top:40px; width:99%; margin-left:auto;">
+<h1><span style='color:blue'>Done! Enjoy your draft!</span></h1>
 </div>
 <script src="<%= $hostServerAddress %>javascript/cache.js"></script>
 <script src="<%= $hostServerAddress %>javascript/localStorage.js"></script>

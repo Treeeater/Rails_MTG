@@ -90,7 +90,7 @@ if (window.requestFileSystem)
 {
 	function onInitFs(fs) { 
 		window.fs = fs;
-		if (typeof(cacheStart)!=='undefined') {cacheStart();}		//for cache.js
+		if (typeof(cacheStart)!=='undefined') {cacheReady = true;}		//for cache.js
 		if (typeof(loadFixedFrames)!=='undefined') {loadFixedFrames();}		//for deckbuilder and draft
 		console.log('Opened file system: ' + fs.name);
 	}
@@ -98,4 +98,6 @@ if (window.requestFileSystem)
 		window.requestFileSystem(PERSISTENT, 300*1024*1024 /*300MB*/, onInitFs, errorHandler);
 	}, errorHandler);
 }
-else {window.addEventListener('load',cacheStart);}
+else {
+	if (typeof(cacheStart)!=='undefined') {cacheReady = true;}
+}
