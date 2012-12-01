@@ -12,7 +12,7 @@ function cacheCard(imageID, imageExp, img)
 			display(url,img);
 			cachedCards++;
 			document.getElementById('n').innerHTML=cachedCards.toString();
-			if (cachedCards == total){
+			if (cachedCards == total-1){
 				document.getElementById('wrapper').innerHTML = "<h1><span style='color:blue'>Done! Enjoy your draft!</span></h1>";
 			}
 		});
@@ -21,7 +21,7 @@ function cacheCard(imageID, imageExp, img)
 		display(fileEntry.toURL(),img);
 		cachedCards++;
 		document.getElementById('n').innerHTML=cachedCards.toString();
-		if (cachedCards == total){
+		if (cachedCards == total-1){
 			document.getElementById('wrapper').innerHTML = "<h1><span style='color:blue'>Done! Enjoy your draft!</span></h1>";
 		}
 	}, errorHandler);
