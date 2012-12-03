@@ -314,6 +314,7 @@ function loadFixedFrames() {
 	buttonSortColorText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortColorText.on("mouseout",function(){document.body.style.cursor = "default";});
 	buttonSortColorText.on("click",sortByColor);
+	buttonSortColorText.on("tap",sortByColor);
 	layer.add(buttonSortColorText);
 	
 	//sort by cmc
@@ -340,6 +341,7 @@ function loadFixedFrames() {
 	buttonSortCMCText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortCMCText.on("mouseout",function(){document.body.style.cursor = "default";});
 	buttonSortCMCText.on("click",sortByCMC);//sortByCMC;
+	buttonSortCMCText.on("tap",sortByCMC);//sortByCMC;
 	layer.add(buttonSortCMCText);
 	
 	//sort by rarity
@@ -367,6 +369,7 @@ function loadFixedFrames() {
 	buttonSortRarityText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortRarityText.on("mouseout",function(){document.body.style.cursor = "default";});
 	buttonSortRarityText.on("click",sortByRarity);//sortByCMC;
+	buttonSortRarityText.on("tap",sortByRarity);//sortByCMC;
 	layer.add(buttonSortRarityText);
 
 	//add land button
@@ -394,6 +397,7 @@ function loadFixedFrames() {
 	buttonAddLandText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonAddLandText.on("mouseout",function(){document.body.style.cursor = "default";});
 	buttonAddLandText.on("click",submitDeck);
+	buttonAddLandText.on("dbltap",submitDeck);
 	layer.add(buttonAddLandText);
 	
 	//card count
@@ -827,7 +831,10 @@ function loadAllCards()
 						cardLayer.draw();
 					}
 				});
-
+				image.on("tap", function(){
+					stage.get("#detailed")[0].setImage(imageObj);
+					layer.draw();
+				});
 				image.on("mouseout",function(evt){
 					if (evt.which == 2){
 						evt.stopPropagation();
@@ -901,6 +908,14 @@ function loadAllCards()
 					//evt.stopPropagation()
 					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
 					//console.log(evt.which);
+				});
+				image.on('dbltap',function(evt) {
+					evt.stopPropagation();
+					evt.preventDefault(evt);
+					evt.cancelBubble = true;
+					cardToMB(image.cuid,image);
+					cardLayer.draw();
+					return false;
 				});
 				image.on('dblclick', function(evt) {
 					//console.log('dblclicked');
@@ -983,7 +998,10 @@ function loadAllCards()
 						cardLayer.draw();
 					}
 				});
-
+				image.on("tap", function(){
+					stage.get("#detailed")[0].setImage(imageObj);
+					layer.draw();
+				});
 				image.on("mouseout",function(evt){
 					if (evt.which == 2){
 						evt.stopPropagation();
@@ -1058,6 +1076,14 @@ function loadAllCards()
 					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
 					//console.log(evt.which);
 				});
+				image.on('dbltap', function(evt) {
+					evt.stopPropagation();
+					evt.preventDefault(evt);
+					evt.cancelBubble = true;
+					cardToSB(image.cuid,image);
+					cardLayer.draw();
+					return false;
+				});
 				image.on('dblclick', function(evt) {
 					//console.log('dblclicked');
 					if (evt.which==1){
@@ -1101,7 +1127,6 @@ function loadAllCards()
 
 function cardToMB(cuid,oldimage)
 {	
-	oldimage.remove();			//visually remove this one.
 	//back end representation move
 	for (i in sbCards)
 	{
@@ -1110,6 +1135,9 @@ function cardToMB(cuid,oldimage)
 	var thisCard = sbCards[i];
 	mbCards.push(thisCard);
 	sbCards.splice(i,1);
+	sortByColor();
+	/*
+	//oldimage.remove();			//visually remove this one.
 	//visually add this image to MB
 	var imageObj = new Image();
 	X = 250;
@@ -1136,7 +1164,39 @@ function cardToMB(cuid,oldimage)
 		});
 		image.cuid = cuid;
 		image.cname = thisCard.cardName;
-		image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
+		image.on("mouseover",function(){
+			stage.get("#detailed")[0].setImage(imageObj);layer.draw();
+			if (middleMouseDown)
+			{
+				var imageTooltip = stage.get("#tooltip")[0];
+				var p = image.getPosition();
+				if (p.x<1000){
+					imageTooltip.setX(p.x+image.attrs.width+10);
+				}
+				else {imageTooltip.setX(p.x-250)};
+				if (p.y>570){
+					imageTooltip.setY(p.y-320+image.attrs.height);
+				}
+				else {imageTooltip.setY(p.y);}
+				imageTooltip.setImage(imageObj);
+				imageTooltip.show();
+				layer.draw();
+				cardLayer.draw();
+			}
+		});
+
+		image.on("mouseout",function(evt){
+			if (evt.which == 2){
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+				stage.get("#tooltip")[0].hide();
+				if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+				cardLayer.draw();
+				layer.draw();
+			}
+		});
+
 		image.on("mousedown",function(evt){
 			//console.log('downed');
 			if (evt.which==1) {
@@ -1149,6 +1209,9 @@ function cardToMB(cuid,oldimage)
 				evt.stopPropagation();
 				evt.preventDefault(evt);
 				evt.cancelBubble = true;
+				image.setDraggable(false);
+				middleMouseDown = true;				//this is used in mouseover event.
+				originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 				var imageTooltip = stage.get("#tooltip")[0];
 				var p = image.getPosition();
 				if (p.x<1000){
@@ -1176,9 +1239,11 @@ function cardToMB(cuid,oldimage)
 				evt.preventDefault(evt);
 				evt.cancelBubble = true;
 				stage.get("#tooltip")[0].hide();
+				originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+				middleMouseDown = false;
 			}
-			layer.draw();
 			cardLayer.draw();
+			layer.draw();
 			return false;
 		});
 		image.on('click', function(evt) {
@@ -1189,6 +1254,10 @@ function cardToMB(cuid,oldimage)
 				evt.cancelBubble = true;
 			}
 			return false;
+			//var evt = window.event;
+			//evt.stopPropagation()
+			//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
+			//console.log(evt.which);
 		});
 		image.on('dblclick', function(evt) {
 			//console.log('dblclicked');
@@ -1200,6 +1269,10 @@ function cardToMB(cuid,oldimage)
 				cardLayer.draw();
 			}
 			return false;
+			//var evt = window.event;
+			//evt.stopPropagation()
+			//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
+			//console.log(evt.which);
 		});
 		cardLayer.add(image);
 		stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
@@ -1228,12 +1301,11 @@ function cardToMB(cuid,oldimage)
 	else{
 		if (ENV_Language == "cn") {imageObj.src = thisCard.chiSRC;}
 		else {imageObj.src = thisCard.engSRC;}
-	}
+	}*/
 }
 
 function cardToSB(cuid,oldimage)
 {
-	oldimage.remove();			//visually remove this one.
 	//back end representation move
 	for (i in mbCards)
 	{
@@ -1242,6 +1314,9 @@ function cardToSB(cuid,oldimage)
 	thisCard = mbCards[i];
 	sbCards.push(thisCard);
 	mbCards.splice(i,1);
+	sortByColor();
+	/*
+	oldimage.remove();			//visually remove this one.
 	//visually add this image to MB
 	var imageObj = new Image();
 	X = 250;
@@ -1268,7 +1343,39 @@ function cardToSB(cuid,oldimage)
 		});
 		image.cuid = cuid;
 		image.cname = thisCard.cardName;
-		image.on("mouseover",function(){stage.get("#detailed")[0].setImage(imageObj);layer.draw();});
+		image.on("mouseover",function(){
+			stage.get("#detailed")[0].setImage(imageObj);layer.draw();
+			if (middleMouseDown)
+			{
+				var imageTooltip = stage.get("#tooltip")[0];
+				var p = image.getPosition();
+				if (p.x<1000){
+					imageTooltip.setX(p.x+image.attrs.width+10);
+				}
+				else {imageTooltip.setX(p.x-250)};
+				if (p.y>570){
+					imageTooltip.setY(p.y-320+image.attrs.height);
+				}
+				else {imageTooltip.setY(p.y);}
+				imageTooltip.setImage(imageObj);
+				imageTooltip.show();
+				layer.draw();
+				cardLayer.draw();
+			}
+		});
+
+		image.on("mouseout",function(evt){
+			if (evt.which == 2){
+				evt.stopPropagation();
+				evt.preventDefault(evt);
+				evt.cancelBubble = true;
+				stage.get("#tooltip")[0].hide();
+				if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+				cardLayer.draw();
+				layer.draw();
+			}
+		});
+
 		image.on("mousedown",function(evt){
 			//console.log('downed');
 			if (evt.which==1) {
@@ -1281,6 +1388,9 @@ function cardToSB(cuid,oldimage)
 				evt.stopPropagation();
 				evt.preventDefault(evt);
 				evt.cancelBubble = true;
+				image.setDraggable(false);
+				middleMouseDown = true;				//this is used in mouseover event.
+				originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 				var imageTooltip = stage.get("#tooltip")[0];
 				var p = image.getPosition();
 				if (p.x<1000){
@@ -1308,9 +1418,11 @@ function cardToSB(cuid,oldimage)
 				evt.preventDefault(evt);
 				evt.cancelBubble = true;
 				stage.get("#tooltip")[0].hide();
+				originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
+				middleMouseDown = false;
 			}
-			layer.draw();
 			cardLayer.draw();
+			layer.draw();
 			return false;
 		});
 		image.on('click', function(evt) {
@@ -1321,6 +1433,10 @@ function cardToSB(cuid,oldimage)
 				evt.cancelBubble = true;
 			}
 			return false;
+			//var evt = window.event;
+			//evt.stopPropagation()
+			//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
+			//console.log(evt.which);
 		});
 		image.on('dblclick', function(evt) {
 			//console.log('dblclicked');
@@ -1332,6 +1448,10 @@ function cardToSB(cuid,oldimage)
 				cardLayer.draw();
 			}
 			return false;
+			//var evt = window.event;
+			//evt.stopPropagation()
+			//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
+			//console.log(evt.which);
 		});
 		cardLayer.add(image);
 		stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
@@ -1360,7 +1480,7 @@ function cardToSB(cuid,oldimage)
 	else{
 		if (ENV_Language == "cn") {imageObj.src = thisCard.chiSRC;}
 		else {imageObj.src = thisCard.engSRC;}
-	}
+	}*/
 }
 
 function reLayerCards()
@@ -1448,5 +1568,6 @@ function submitDeck(){
 	}
 	else alert("Deck submission failed, re-submit or check your connection!");
 }
+
 if (!window.requestFileSystem) window.addEventListener("load",loadFixedFrames);
 

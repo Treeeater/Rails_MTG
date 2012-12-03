@@ -8,9 +8,10 @@ require './sealedServer/selectCards.rb'
 require 'sqlite3'
 require './serverConf.rb'
 
-#ARGV[0] is the host user's id
-#ARGV[1] is the total number of users
-#ARGV[2..-1] is the user name of all the users, including the host.
+#ARGV[0] is the host user's id			12/3/2012: This is currently deprecated, originally this is used to distinguish port number and also forward the information to 'game' after deckbuilding, but now we have only one port and this is currently unused. We use /draft/1 for all drafts instead.
+#ARGV[1] is the total number of packs
+#ARGV[2] is the total number of players
+#ARGV[3..-1] is the user name of all the users, including the host.
 
 class DraftGame
 	attr_accessor :users, :wsID_userHash, :wsID_wsHash, :totalUserNo, :currentDraftRound, :sitArray

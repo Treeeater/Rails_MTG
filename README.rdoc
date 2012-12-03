@@ -53,7 +53,7 @@ FIXME: player name cannot have spaces in them. This would make draft/new send wr
 
 Deploying on the cloud - what you need to change:
 
-app/controllers/application_controller.rb : change all host info (to your current ip address)
+./server_conf.rb : change all host info (to your current ip address)
 draftServer/draftServer.rb : search for EventMachine::WebSocket.start(:host =>  and change it to the current host (ip address) 
 lobbyServer/lobbyServer.rb : same as above.
 

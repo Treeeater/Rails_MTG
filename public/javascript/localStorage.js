@@ -1,4 +1,5 @@
 window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+var is_touch_screen = /(iPhone|iPod|iPad).*/i.test(navigator.userAgent);
 
 function errorHandler(e) {
   var msg = '';
@@ -92,7 +93,8 @@ if (window.requestFileSystem)
 		window.fs = fs;
 		if (typeof(cacheStart)!=='undefined') {cacheReady = true;}		//for cache.js
 		if (typeof(loadFixedFrames)!=='undefined') {loadFixedFrames();}		//for deckbuilder and draft
-		console.log('Opened file system: ' + fs.name);
+		if (typeof(startDraftBackEnd)!=='undefined') {startDraftBackEnd();}	//for draft
+		//console.log('Opened file system: ' + fs.name);
 	}
 	window.webkitStorageInfo.requestQuota(window.PERSISTENT, 300*1024*1024 /*300MB*/, function(){
 		window.requestFileSystem(PERSISTENT, 300*1024*1024 /*300MB*/, onInitFs, errorHandler);

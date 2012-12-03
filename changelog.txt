@@ -1,0 +1,14 @@
+12/3/2012:
+-- Fixed stage.get roundtable signals error each time after app is inited.
+-- Fixed display glitch - cards may have incorrect Z index randomly.
+-- Depracated /draft/userID - new 'draft' button in header. Players can reenter the draft by clicking on the draft button.
+-- Support Ipad support now. Tested on ipad 3 and 1, iOS 5.1.1
+	- single tap to preview
+	- double tap to select
+	- draggable
+	- sort available on single tap
+	- deckbuilder/submit button needs double tap
+-- Added this changelog file.
+
+TODO: Department has opened up all ports, we may adjust the app to utilize all ports (assign an unused port upon draft creation).
+TODO: KineticJS 4.1.2 has lots of bugs, we haven't incorporated that yet.

@@ -22,7 +22,7 @@ function prepareCardsToSend(cards)
 	return returnString;
 }
 
-function start(){
+function startDraftBackEnd(){
 	myUsername = $('#account').attr('uname');
 	myUID = $('#account').attr('uid');
 	var allPlayersConnected = 0;
@@ -223,4 +223,4 @@ function start(){
 	initializeCommunication();
 }
 
-window.addEventListener("load",start);
+if (!window.requestFileSystem) window.addEventListener("load",startDraftBackEnd);

@@ -29,7 +29,7 @@ function timeDown(){
 	seconds = timer - minute*60;
 	stage.get("#timerText")[0].setText(minute.toString()+":"+seconds.toString());
 	timerLayer.draw();
-}
+};
 //onload:
 function loadFixedFrames() {
 	var imgReady = 0;
@@ -173,6 +173,7 @@ function loadFixedFrames() {
 	buttonSortColorText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortColorText.on("mouseout",function(){document.body.style.cursor = "default";});
 	buttonSortColorText.on("click",sortByColor);
+	buttonSortColorText.on("tap",sortByColor);
 	layer.add(buttonSortColorText);
 	
 	//sort by cmc
@@ -184,6 +185,7 @@ function loadFixedFrames() {
 	buttonSortCMCText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortCMCText.on("mouseout",function(){document.body.style.cursor = "default";});
 	buttonSortCMCText.on("click",sortByCMC);//sortByCMC;
+	buttonSortCMCText.on("tap",sortByCMC);//sortByCMC;
 	layer.add(buttonSortCMCText);
 	
 	//sort by rarity
@@ -196,6 +198,7 @@ function loadFixedFrames() {
 	buttonSortRarityText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortRarityText.on("mouseout",function(){document.body.style.cursor = "default";});
 	buttonSortRarityText.on("click",sortByRarity);//sortByCMC;
+	buttonSortRarityText.on("tap",sortByRarity);//sortByCMC;
 	layer.add(buttonSortRarityText);
 
 	//add land button
@@ -281,7 +284,7 @@ function sortSBByCMC()
 			c[sbCards[i].card.cmc-1]++;
 		}
 	}
-}
+};
 
 function sortMBByCMC()
 {
@@ -310,7 +313,7 @@ function sortMBByCMC()
 			c[mbCards[i].card.cmc-1]++;
 		}
 	}
-}
+};
 
 function sortSBByColor()
 {
@@ -387,7 +390,7 @@ function sortSBByColor()
 				a++;
 		}
 	}
-}
+};
 
 function sortMBByColor()
 {
@@ -464,7 +467,7 @@ function sortMBByColor()
 				a++;
 		}
 	}
-}
+};
 
 function sortSBByRarity()
 {
@@ -519,7 +522,7 @@ function sortSBByRarity()
 			default:
 		}
 	}
-}
+};
 
 function sortMBByRarity()
 {
@@ -574,7 +577,7 @@ function sortMBByRarity()
 			default:
 		}
 	}
-}
+};
 
 function loadAllSBCards()
 {
@@ -626,7 +629,10 @@ function loadAllSBCards()
 						cardLayer.draw();
 					}
 				});
-
+				image.on("tap", function(){
+					stage.get("#detailed")[0].setImage(imageObj);
+					layer.draw();
+				});
 				image.on("mouseout",function(evt){
 					if (evt.which == 2){
 						evt.stopPropagation();
@@ -697,6 +703,14 @@ function loadAllSBCards()
 					}
 					return false;
 				});
+				image.on('dbltap',function(evt) {
+					evt.stopPropagation();
+					evt.preventDefault(evt);
+					evt.cancelBubble = true;
+					selectCard(image.cuid);
+					SBCardLayer.draw();
+					return false;
+				});
 				image.on('dblclick', function(evt) {
 					//console.log('dblclicked');
 					if (evt.which==1){
@@ -722,7 +736,7 @@ function loadAllSBCards()
 			}
 		})(startX,startY,i);
 	}
-}
+};
 
 
 function loadAllMBCards()
@@ -811,7 +825,10 @@ function loadAllMBCards()
 						cardLayer.draw();
 					}
 				});
-
+				image.on("tap", function(){
+					stage.get("#detailed")[0].setImage(imageObj);
+					layer.draw();
+				});
 				image.on("mouseout",function(evt){
 					if (evt.which == 2){
 						evt.stopPropagation();
@@ -886,6 +903,13 @@ function loadAllMBCards()
 					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
 					//console.log(evt.which);
 				});
+				image.on('dbltap',function(evt) {
+					evt.stopPropagation();
+					evt.preventDefault(evt);
+					evt.cancelBubble = true;
+					if (R) removeCardFromReserved(image.cuid); else moveCardToReserved(image.cuid);
+					return false;
+				});
 				image.on('dblclick', function(evt) {
 					//console.log('dblclicked');
 					if (evt.which==1){
@@ -935,7 +959,7 @@ function countMBCards()
 		count++;
 	}
 	return count.toString();
-}
+};
 
 function selectCard(cuid)
 {
@@ -959,7 +983,7 @@ function selectCard(cuid)
 	stage.get("#cardCountSBText")[0].setText((15-sbCards.length).toString());
 	sbCards = new Array();
 	sortByRarity();
-}
+};
 
 function moveCardToReserved(cuid)
 {
@@ -973,7 +997,7 @@ function moveCardToReserved(cuid)
 	sortMBByRarity();
 	MBCardLayer.removeChildren();
 	loadAllMBCards();
-}
+};
 
 function removeCardFromReserved(cuid)
 {
@@ -987,10 +1011,10 @@ function removeCardFromReserved(cuid)
 	sortMBByRarity();
 	MBCardLayer.removeChildren();
 	loadAllMBCards();
-}
+};
 
 function reLayerMBCards()
-{/*
+{
 	var dm=dr=-1;
 	for (d in mbDisplayOrderArray)
 	{
@@ -1004,19 +1028,19 @@ function reLayerMBCards()
 			dm++;
 			stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( dm % 11);
 		}
-	}*/
+	}
 	MBCardLayer.draw();
-}
+};
 
 function reLayerSBCards()
-{/*
+{
 	for (d in sbDisplayOrderArray)
 	{
 		i = sbDisplayOrderArray[d];
 		stage.get("#card"+sbCards[i].uid.toString())[0].setZIndex( sbCards[i].displayOrder % 11);
-	}*/
+	}
 	SBCardLayer.draw();
-}
+};
 
 function sortByColor()
 {
@@ -1118,8 +1142,11 @@ function changeAllGreenToYellow()
 
 function changeYellowToGreen(i)
 {
-	stage.get("#roundTablePlayers"+i)[0].setFill('green');
-	layer.draw();
+	if (stage.get("#roundTablePlayers"+i)[0])
+	{
+		stage.get("#roundTablePlayers"+i)[0].setFill('green');
+		layer.draw();
+	}
 };
 
 function updateDraftInfo(info)
@@ -1133,4 +1160,5 @@ function updateDownloadedCardInfo(a,b)
 	stage.get("#downloadedCardInfoText")[0].setText("Card downloaded: " + ((a>=10)?"":"0") + a.toString() + "/" + ((b>=10)?"":"0") + b.toString());
 	layer.draw();
 };
+
 if (!window.requestFileSystem) window.addEventListener("load",loadFixedFrames);
