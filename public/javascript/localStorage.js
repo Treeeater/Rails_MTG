@@ -89,16 +89,19 @@ function downloadAndSaveImage(imageID, imageExp, callback)
 
 if (window.requestFileSystem)
 {
+	loadedFixedFrames = false;
+	startedDraftBackEnd = false;
 	function onInitFs(fs) { 
 		window.fs = fs;
 		if (typeof(cacheStart)!=='undefined') {cacheReady = true;}		//for cache.js
-		if (typeof(loadFixedFrames)!=='undefined') {loadFixedFrames();}		//for deckbuilder and draft
-		if (typeof(startDraftBackEnd)!=='undefined') {startDraftBackEnd();}	//for draft
+		if (typeof(loadFixedFrames)!=='undefined') {loadedFixedFrames = true; loadFixedFrames();}		//for deckbuilder and draft
+		if (typeof(startDraftBackEnd)!=='undefined') {startedDraftBackEnd = true; startDraftBackEnd();}	//for draft
 		//console.log('Opened file system: ' + fs.name);
 	}
 	window.webkitStorageInfo.requestQuota(window.PERSISTENT, 300*1024*1024 /*300MB*/, function(){
 		window.requestFileSystem(PERSISTENT, 300*1024*1024 /*300MB*/, onInitFs, errorHandler);
 	}, errorHandler);
+	setTimeout("if (typeof(cacheStart)!=='undefined') {cacheReady = true;}; if (typeof(loadFixedFrames)!=='undefined' && loadedFixedFrames==false) {loadFixedFrames();}; if (typeof(startDraftBackEnd)!=='undefined' && startedDraftBackEnd == false) {startDraftBackEnd();}", 3000);		//workaround against the bug which sometimes onInitFs is not called.
 }
 else {
 	if (typeof(cacheStart)!=='undefined') {cacheReady = true;}

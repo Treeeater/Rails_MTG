@@ -1026,7 +1026,7 @@ function reLayerMBCards()
 		}
 		else {
 			dm++;
-			stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( dm % 11);
+			stage.get("#card"+mbCards[i].uid.toString())[0].setZIndex( dm % 11 + 100);
 		}
 	}
 	MBCardLayer.draw();
