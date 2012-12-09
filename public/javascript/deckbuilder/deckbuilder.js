@@ -1135,6 +1135,25 @@ function cardToMB(cuid,oldimage)
 	var thisCard = sbCards[i];
 	mbCards.push(thisCard);
 	sbCards.splice(i,1);
+	stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
+	stage.get("#cardCountSBText")[0].setText(sbCards.length.toString());
+	cardColor = (thisCard.color & 16) ? 'W' : '';
+	if (cardColor!='') colorCardsNumber[cardColor]--;
+	cardColor = (thisCard.color & 8) ? 'U' : '';
+	if (cardColor!='') colorCardsNumber[cardColor]--;
+	cardColor = (thisCard.color & 4) ? 'B' : '';
+	if (cardColor!='') colorCardsNumber[cardColor]--;
+	cardColor = (thisCard.color & 2) ? 'R' : '';
+	if (cardColor!='') colorCardsNumber[cardColor]--;
+	cardColor = (thisCard.color & 1) ? 'G' : '';
+	if (cardColor!='') colorCardsNumber[cardColor]--;
+	stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
+	stage.get("#UNumber")[0].setText(colorCardsNumber['U'].toString() + " " + 'U' + " cards");
+	stage.get("#BNumber")[0].setText(colorCardsNumber['B'].toString() + " " + 'B' + " cards");
+	stage.get("#RNumber")[0].setText(colorCardsNumber['R'].toString() + " " + 'R' + " cards");
+	stage.get("#GNumber")[0].setText(colorCardsNumber['G'].toString() + " " + 'G' + " cards");
+	layer.draw();
+	cardLayer.draw();
 	sortByColor();
 	/*
 	//oldimage.remove();			//visually remove this one.
@@ -1314,6 +1333,25 @@ function cardToSB(cuid,oldimage)
 	thisCard = mbCards[i];
 	sbCards.push(thisCard);
 	mbCards.splice(i,1);
+	stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
+	stage.get("#cardCountSBText")[0].setText(sbCards.length.toString());
+	cardColor = (thisCard.color & 16) ? 'W' : '';
+	if (cardColor!='') colorCardsNumber[cardColor]--;
+	cardColor = (thisCard.color & 8) ? 'U' : '';
+	if (cardColor!='') colorCardsNumber[cardColor]--;
+	cardColor = (thisCard.color & 4) ? 'B' : '';
+	if (cardColor!='') colorCardsNumber[cardColor]--;
+	cardColor = (thisCard.color & 2) ? 'R' : '';
+	if (cardColor!='') colorCardsNumber[cardColor]--;
+	cardColor = (thisCard.color & 1) ? 'G' : '';
+	if (cardColor!='') colorCardsNumber[cardColor]--;
+	stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
+	stage.get("#UNumber")[0].setText(colorCardsNumber['U'].toString() + " " + 'U' + " cards");
+	stage.get("#BNumber")[0].setText(colorCardsNumber['B'].toString() + " " + 'B' + " cards");
+	stage.get("#RNumber")[0].setText(colorCardsNumber['R'].toString() + " " + 'R' + " cards");
+	stage.get("#GNumber")[0].setText(colorCardsNumber['G'].toString() + " " + 'G' + " cards");
+	layer.draw();
+	cardLayer.draw();
 	sortByColor();
 	/*
 	oldimage.remove();			//visually remove this one.

@@ -1082,7 +1082,7 @@ function refreshSelectionDisplay()
 	sortSBByRarity();
 	SBCardLayer.removeChildren();
 	loadAllSBCards();
-	log('Info : pack rendered. Please build your deck before the time runs out.\n\n');
+	//log('Info : pack rendered. Please build your deck before the time runs out.\n\n');
 };
 
 //call this function upon receiving of cards
@@ -1094,7 +1094,7 @@ function refreshSelectedDisplay()
 	sortMBByRarity();
 	MBCardLayer.removeChildren();
 	loadAllMBCards();
-	log('Info : selected rendered. Please build your deck before the time runs out.\n\n');
+	//log('Info : selected rendered. Please build your deck before the time runs out.\n\n');
 };
 
 function showPlayerName(usrname, x, y)

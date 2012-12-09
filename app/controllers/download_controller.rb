@@ -50,6 +50,7 @@ class DownloadController < ApplicationController
 		l4 = srcObj["L4"].to_i
 		l5 = srcObj["L5"].to_i
 		@mainBoardCards = parseCards(mbCardString,db)
+		@sideBoardCards = parseCards(sbCardString,db)
 		for i in 1..l1
 			@mainBoardCards.push(getBasicLands(0))
 		end
@@ -94,7 +95,28 @@ EOF
 		}
 		stringToWrite += <<EOF
   </section>
-  <section name="Sideboard" />
+  <section name="Sideboard">
+EOF
+		sideNameHash = Hash.new
+		@sideBoardCards.each{|c|
+			thisID = ""
+			thisName = ""
+			exp = translate_to_OCTGN_exp(c.expansion)
+			id = translate_to_OCTGN_id(c.idInSet)
+			stmt = db_octgn.prepare "SELECT * FROM cards WHERE a6c8d2e87cd811dd8f94e62b56d89593Number='" + id + "' AND set_real_id=" + exp.to_s
+			rs = stmt.execute
+			rs.each{|r| 
+				thisID = r['id']
+				thisName = r['name']
+			}
+			qtyHash[thisID] = (qtyHash[thisID]==nil) ? 1 : (qtyHash[thisID]+1)
+			sideNameHash[thisID] = thisName
+		}
+		sideNameHash.each_key{|id|
+			stringToWrite += "    <card qty=\"" + qtyHash[id].to_s + "\" id=\"" + id + "\">" + sideNameHash[id] + "</card>\n"
+		}
+		stringToWrite += <<EOF
+  </section>
   <section name="Command Zone" />
   <section name="Planes/Schemes" />
 </deck>

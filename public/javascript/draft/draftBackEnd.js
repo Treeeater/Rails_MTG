@@ -168,6 +168,7 @@ function startDraftBackEnd(){
 			case "info":
 				log('Info : ' + msg.body + '\n\n');
 			case "nextPack":
+				aboutToAlert = false;			//reseting the alert if user already selected card.
 				var c = JSON.parse(msg.body);
 				var i = 0;
 				sbCards = new Array();
@@ -194,7 +195,7 @@ function startDraftBackEnd(){
 					mbCards.push(card);
 					totalSelectedCardNumber++;
 				}
-				log('Info : selected cards received, rendering card images...\n\n');
+				//log('Info : selected cards received, rendering card images...\n\n');
 				refreshSelectedDisplay();		//hand control over to sealedUI.js
 				break;
 			case "ackSubmitCard":
@@ -203,6 +204,16 @@ function startDraftBackEnd(){
 					showSubmissionACKBox();
 				}
 				changeYellowToGreen(msg.body);
+				var j = 0;
+				for (i = 0; i < totalPlayerNo; i++)
+				{
+					if (stage.get("#roundTablePlayers"+i)[0].getFill()=='green') j++;
+				}
+				if (stage.get("#submitConfirmationBoxText")[0].attrs.visible == false && j == totalPlayerNo-1)
+				{
+					aboutToAlert = true;
+					setTimeout("if (aboutToAlert) alert('Everyone else has selected a card, please do so soon!');",5000);
+				}
 				break;
 			case "submitSideBoard":
 				var sideBoards = new Array();
@@ -224,3 +235,4 @@ function startDraftBackEnd(){
 }
 
 if (!window.requestFileSystem) window.addEventListener("load",startDraftBackEnd);
+aboutToAlert = false;
