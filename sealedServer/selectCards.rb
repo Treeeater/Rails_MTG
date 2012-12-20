@@ -36,7 +36,7 @@ def checkExpIfMythicExists(exp)
 	return true
 end
 
-def pickCards(exp, mythicThreshold = 3, foilThreshold = 3)
+def pickCards(exp, mythicThreshold = 2, foilThreshold = 2)
 
 	begin
 		mythicOrNot = checkExpIfMythicExists(exp)

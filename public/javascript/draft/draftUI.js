@@ -677,6 +677,16 @@ function loadAllSBCards()
 					}
 					return false;
 				});
+				image.on("dragend",function(evt){
+					if (evt.which==1){
+						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+					}
+					cardLayer.draw();
+					MBCardLayer.draw();
+					SBCardLayer.draw();
+					layer.draw();
+					return false;
+				});
 				image.on("mouseup",function(evt){
 					//console.log('uped');
 					if (evt.which==1){
@@ -871,6 +881,16 @@ function loadAllMBCards()
 						imageTooltip.moveToTop();
 						layer.draw();
 					}
+					return false;
+				});
+				image.on("dragend",function(evt){
+					if (evt.which==1){
+						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+					}
+					cardLayer.draw();
+					MBCardLayer.draw();
+					SBCardLayer.draw();
+					layer.draw();
 					return false;
 				});
 				image.on("mouseup",function(evt){

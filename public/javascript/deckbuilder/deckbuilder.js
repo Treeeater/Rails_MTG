@@ -879,11 +879,18 @@ function loadAllCards()
 					}
 					return false;
 				});
-				image.on("mouseup",function(evt){
-					//console.log('uped');
+				image.on("dragend",function(evt){
 					if (evt.which==1){
 						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
 					}
+					cardLayer.draw();
+					layer.draw();
+					return false;
+				});
+				image.on("mouseup",function(evt){
+					if (evt.which==1){
+						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+					}	
 					if (evt.which==2){
 						evt.stopPropagation();
 						evt.preventDefault(evt);
@@ -1046,8 +1053,15 @@ function loadAllCards()
 					}
 					return false;
 				});
+				image.on("dragend",function(evt){
+					if (evt.which==1){
+						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+					}
+					cardLayer.draw();
+					layer.draw();
+					return false;
+				});	
 				image.on("mouseup",function(evt){
-					//console.log('uped');
 					if (evt.which==1){
 						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
 					}

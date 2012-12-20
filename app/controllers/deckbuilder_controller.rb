@@ -29,8 +29,9 @@ class DeckbuilderController < ApplicationController
 		if !signed_in?
 			store_location
 			redirect_to signin_path
+			return
 		end
-    		@user = current_user
+    	@user = current_user
 		uid = @user.id
 		db = SQLite3::Database.open "./db/development.sqlite3"
 		stmt = db.prepare "SELECT Deck_info FROM users WHERE Id='" + uid.to_s + "'"
