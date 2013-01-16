@@ -11,7 +11,7 @@ var addLands = function(l){
 	window[l] = number;
 	if (stage.get("#"+l+"Number").length==0)
 	{
-		var landText = new Kinetic.Text({x: 70,y: landsVisual[l],text: number + " " + l,fontSize: 12,fontFamily: "Calibri", textFill: "green", align: "center", verticalAlign: "middle",id: l+"Number"});
+		var landText = new Kinetic.Text({x: 70,y: landsVisual[l],text: number + " " + l,fontSize: 12,fontFamily: "Calibri", fill: "green", align: "center", verticalAlign: "middle",id: l+"Number"});
 		layer.add(landText);
 		stage.get("#"+l+"Number")[0].attrs.number = number;
 	}
@@ -85,20 +85,20 @@ function loadFixedFrames() {
 	layer.add(blueLine9);
 	
 	//add timer
-	var timerTitleText = new Kinetic.Text({x: 40,y: 335,text: "Time Remaining : ",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
+	var timerTitleText = new Kinetic.Text({x: 40,y: 335,text: "Time Remaining : ",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
 	});
 	layer.add(timerTitleText);
 	//frequent redraw timer layer
 	timerLayer = new Kinetic.Layer();
-	var timerText = new Kinetic.Text({x: 170,y: 335,text: "15:00",fontSize: 12,fontFamily: "Calibri",textFill: "green",align: "center",verticalAlign: "middle",id: "timerText"
+	var timerText = new Kinetic.Text({x: 170,y: 335,text: "15:00",fontSize: 12,fontFamily: "Calibri",fill: "green",align: "center",verticalAlign: "middle",id: "timerText"
 	});
 	timer = 60;
 	timerLayer.add(timerText);
 	setInterval("timeDown();",1000);
 	//add rendered card count:
-	var downloadedCardNoText = new Kinetic.Text({x: 30,y: 920, text: "Card downloaded: 00/00",fontSize: 13,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle", id: "downloadedCardInfoText"});
+	var downloadedCardNoText = new Kinetic.Text({x: 30,y: 920, text: "Card downloaded: 00/00",fontSize: 13,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle", id: "downloadedCardInfoText"});
 	layer.add(downloadedCardNoText);
-	var draftInfoText = new Kinetic.Text({x: 20,y: 940,text: "This is a ",fontSize: 13,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle", id: "draftInfoText"});
+	var draftInfoText = new Kinetic.Text({x: 20,y: 940,text: "This is a ",fontSize: 13,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle", id: "draftInfoText"});
 	layer.add(draftInfoText);
 	//cardback
 	var imageObj = new Image();
@@ -159,7 +159,7 @@ function loadFixedFrames() {
 	colorCardsNumber = {"W":0,"U":0,"B":0,"R":0,"G":0};
 	for (i in colorsVisual) {
 		if (colorsVisual.hasOwnProperty(i)) {
-			var cardsCountText = new Kinetic.Text({x: 165,y: colorsVisual[i], text: "0 " + i + " cards",fontSize: 12,fontFamily: "Calibri",textFill: "green",align: "center",verticalAlign: "middle",id: i+"Number"});
+			var cardsCountText = new Kinetic.Text({x: 165,y: colorsVisual[i], text: "0 " + i + " cards",fontSize: 12,fontFamily: "Calibri",fill: "green",align: "center",verticalAlign: "middle",id: i+"Number"});
 			layer.add(cardsCountText);
 		}
 	}
@@ -168,7 +168,7 @@ function loadFixedFrames() {
 	var buttonSortColor = new Kinetic.Rect({x: 30,y: 380,width: 80,height: 20,fill: "#00D2FF",stroke: "black",strokeWidth: 2
 	});
 	layer.add(buttonSortColor);
-	var buttonSortColorText = new Kinetic.Text({x: 40,y: 385,text: "ColorSort",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
+	var buttonSortColorText = new Kinetic.Text({x: 40,y: 385,text: "ColorSort",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
 	});
 	buttonSortColorText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortColorText.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -180,7 +180,7 @@ function loadFixedFrames() {
 	var buttonSortCMC = new Kinetic.Rect({x: 130,y: 380,width: 80,height: 20,fill: "#00D2FF",stroke: "black",strokeWidth: 2
 	});
 	layer.add(buttonSortCMC);
-	var buttonSortCMCText = new Kinetic.Text({x: 140,y: 385,text: "CMCSort",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
+	var buttonSortCMCText = new Kinetic.Text({x: 140,y: 385,text: "CMCSort",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
 	});
 	buttonSortCMCText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortCMCText.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -193,7 +193,7 @@ function loadFixedFrames() {
 	var buttonSortRarity = new Kinetic.Rect({x: 30,y: 410,width: 80,height: 20,fill: "#00D2FF",stroke: "black",strokeWidth: 2
 	});
 	layer.add(buttonSortRarity);
-	var buttonSortRarityText = new Kinetic.Text({x: 38,y: 415,text: "RaritySort",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
+	var buttonSortRarityText = new Kinetic.Text({x: 38,y: 415,text: "RaritySort",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
 	});
 	buttonSortRarityText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonSortRarityText.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -206,7 +206,7 @@ function loadFixedFrames() {
 	var buttonAddLand = new Kinetic.Rect({x: 130,y: 410,width: 80,height: 20,fill: "#FFFF00",stroke: "black",strokeWidth: 2
 	});
 	layer.add(buttonAddLand);
-	var buttonAddLandText = new Kinetic.Text({x: 138,y: 415,text: "Time out!",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
+	var buttonAddLandText = new Kinetic.Text({x: 138,y: 415,text: "Time out!",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
 	});
 	buttonAddLandText.on("mouseover",function(){document.body.style.cursor = "pointer";});
 	buttonAddLandText.on("mouseout",function(){document.body.style.cursor = "default";});
@@ -214,15 +214,15 @@ function loadFixedFrames() {
 	layer.add(buttonAddLandText);
 	
 	//card count
-	var cardCountHardCodedText = new Kinetic.Text({x: 20,y: 465,text: "Main board:        Current Pick:",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle"
+	var cardCountHardCodedText = new Kinetic.Text({x: 20,y: 465,text: "Main board:            Current Pick:",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
 	});
 	layer.add(cardCountHardCodedText);
 
-	var cardCountMBText = new Kinetic.Text({x: 100,y: 465,text: "",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id: "cardCountMBText"
+	var cardCountMBText = new Kinetic.Text({x: 90,y: 465,text: "",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle",id: "cardCountMBText"
 	});
 	layer.add(cardCountMBText);
 
-	var cardCountSBText = new Kinetic.Text({x: 215,y: 465,text: "",fontSize: 12,fontFamily: "Calibri",textFill: "black",align: "center",verticalAlign: "middle",id: "cardCountSBText"
+	var cardCountSBText = new Kinetic.Text({x: 205,y: 465,text: "",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle",id: "cardCountSBText"
 	});
 	layer.add(cardCountSBText);
 
@@ -237,11 +237,11 @@ function loadFixedFrames() {
 	}	
 	//playerNameBox
 	var playerNameBox = new Kinetic.Rect({x: 0,y: 0,width: 40,height: 20, visible:false, fill: "white", stroke: "black", strokeWidth:1, id:"playerNameBox"});
-	var playerNameBoxText = new Kinetic.Text({x:0, y:0, text:"", fontSize:12, fontFamily: "Calibri", textFill:"black", align: "center",verticalAlign: "middle", visible: false, id:"playerNameBoxText"});
+	var playerNameBoxText = new Kinetic.Text({x:0, y:0, text:"", fontSize:12, fontFamily: "Calibri", fill:"black", align: "center",verticalAlign: "middle", visible: false, id:"playerNameBoxText"});
 	layer.add(playerNameBox);
 	layer.add(playerNameBoxText);
 	var submitConfirmationBox = new Kinetic.Rect({x: 585,y: 400,width: 200,height: 50, visible:false, fill: "white", stroke: "black", strokeWidth:1, id:"submitConfirmationBox"});
-	var submitConfirmationBoxText = new Kinetic.Text({x:600, y:420, text:"Submission received", fontSize:16, fontFamily: "Calibri", textFill:"black", align: "center",verticalAlign: "middle", visible: false, id:"submitConfirmationBoxText"});
+	var submitConfirmationBoxText = new Kinetic.Text({x:600, y:420, text:"Submission received", fontSize:16, fontFamily: "Calibri", fill:"black", align: "center",verticalAlign: "middle", visible: false, id:"submitConfirmationBoxText"});
 	layer.add(submitConfirmationBox);
 	layer.add(submitConfirmationBoxText);
 	//finalize

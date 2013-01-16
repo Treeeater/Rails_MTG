@@ -18,7 +18,7 @@ var addLandsImpl = function(l,number)
 		  text: number + " " + l,
 		  fontSize: 12,
 		  fontFamily: "Calibri",
-		  textFill: "green",
+		  fill: "green",
 		  align: "center",
 		  verticalAlign: "middle",
 		  id: l+"Number"
@@ -136,7 +136,7 @@ function loadFixedFrames() {
 	  text: "Time Remaining : ",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
-	  textFill: "black",
+	  fill: "black",
 	  align: "center",
 	  verticalAlign: "middle"
 	});
@@ -149,7 +149,7 @@ function loadFixedFrames() {
 	  text: "15:00",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
-	  textFill: "green",
+	  fill: "green",
 	  align: "center",
 	  verticalAlign: "middle",
 	  id: "timerText"
@@ -281,7 +281,7 @@ function loadFixedFrames() {
 				  text: "0 " + i + " cards",
 				  fontSize: 12,
 				  fontFamily: "Calibri",
-				  textFill: "green",
+				  fill: "green",
 				  align: "center",
 				  verticalAlign: "middle",
 				  id: i+"Number"
@@ -307,7 +307,7 @@ function loadFixedFrames() {
 	  text: "ColorSort",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
-	  textFill: "black",
+	  fill: "black",
 	  align: "center",
 	  verticalAlign: "middle"
 	});
@@ -334,7 +334,7 @@ function loadFixedFrames() {
 	  text: "CMCSort",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
-	  textFill: "black",
+	  fill: "black",
 	  align: "center",
 	  verticalAlign: "middle"
 	});
@@ -362,7 +362,7 @@ function loadFixedFrames() {
 	  text: "RaritySort",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
-	  textFill: "black",
+	  fill: "black",
 	  align: "center",
 	  verticalAlign: "middle"
 	});
@@ -390,7 +390,7 @@ function loadFixedFrames() {
 	  text: "Submit Deck",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
-	  textFill: "black",
+	  fill: "black",
 	  align: "center",
 	  verticalAlign: "middle"
 	});
@@ -404,22 +404,22 @@ function loadFixedFrames() {
 	var cardCountHardCodedText = new Kinetic.Text({
 	  x: 20,
 	  y: 465,
-	  text: "Main board:        Side Board:",
+	  text: "Main board:             Side Board:",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
-	  textFill: "black",
+	  fill: "black",
 	  align: "center",
 	  verticalAlign: "middle"
 	});
 	layer.add(cardCountHardCodedText);
 
 	var cardCountMBText = new Kinetic.Text({
-	  x: 100,
+	  x: 90,
 	  y: 465,
 	  text: "",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
-	  textFill: "black",
+	  fill: "black",
 	  align: "center",
 	  verticalAlign: "middle",
 	  id: "cardCountMBText"
@@ -427,12 +427,12 @@ function loadFixedFrames() {
 	layer.add(cardCountMBText);
 
 	var cardCountSBText = new Kinetic.Text({
-	  x: 210,
+	  x: 200,
 	  y: 465,
 	  text: "",
 	  fontSize: 12,
 	  fontFamily: "Calibri",
-	  textFill: "black",
+	  fill: "black",
 	  align: "center",
 	  verticalAlign: "middle",
 	  id: "cardCountSBText"
