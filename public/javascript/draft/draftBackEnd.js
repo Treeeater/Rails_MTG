@@ -206,15 +206,18 @@ function startDraftBackEnd(){
 				}
 				changeYellowToGreen(msg.body);
 				var j = 0;
-				for (i = 0; i < totalPlayerNo; i++)
-				{
-					if (stage.get("#roundTablePlayers"+i)[0].getFill()=='green') j++;
-				}
-				if (stage.get("#submitConfirmationBoxText")[0].attrs.visible == false && j == totalPlayerNo-1)
-				{
-					aboutToAlert = true;
-					setTimeout("if (aboutToAlert) alert('Everyone else has selected a card, please do so soon!');",5000);
-				}
+                if (typeof totalPlayerNo != 'undefined')
+                {
+                    for (i = 0; i < totalPlayerNo; i++)
+                    {
+                        if (stage.get("#roundTablePlayers"+i)[0].getFill()=='green') j++;
+                    }
+                    if (stage.get("#submitConfirmationBoxText")[0].attrs.visible == false && j == totalPlayerNo-1)
+                    {
+                        aboutToAlert = true;
+                        setTimeout("if (aboutToAlert) alert('Everyone else has selected a card, please do so soon!');",5000);
+                    }
+                }
 				break;
 			case "submitSideBoard":
 				var sideBoards = new Array();

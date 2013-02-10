@@ -39,7 +39,6 @@ function loadFixedFrames() {
 	}
 	stage = new Kinetic.Stage({container: "container", width: 1280, height: 960});
 	layer = new Kinetic.Layer();
-	cardLayer = new Kinetic.Layer();
 	SBCardLayer = new Kinetic.Layer();
 	MBCardLayer = new Kinetic.Layer();
 	//draw section division lines
@@ -246,7 +245,6 @@ function loadFixedFrames() {
 	layer.add(submitConfirmationBoxText);
 	//finalize
 	stage.add(timerLayer);
-	stage.add(cardLayer);
 	stage.add(MBCardLayer);
 	stage.add(SBCardLayer);
 	stage.add(layer);
@@ -608,6 +606,7 @@ function loadAllSBCards()
 				cardsForSelection.push(image);
 				image.cuid = sbCards[I].uid;
 				image.cname = sbCards[I].card.cardName;
+                image.setDragOnTop(false);
 				image.on("mouseover",function(){
 					stage.get("#detailed")[0].setImage(imageObj);
 					layer.draw();
@@ -626,7 +625,6 @@ function loadAllSBCards()
 						imageTooltip.setImage(imageObj);
 						imageTooltip.show();
 						layer.draw();
-						cardLayer.draw();
 					}
 				});
 				image.on("tap", function(){
@@ -640,7 +638,6 @@ function loadAllSBCards()
 						evt.cancelBubble = true;
 						stage.get("#tooltip")[0].hide();
 						if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
-						cardLayer.draw();
 						layer.draw();
 					}
 				});
@@ -673,6 +670,8 @@ function loadAllSBCards()
 						imageTooltip.setImage(imageObj);
 						imageTooltip.show();
 						imageTooltip.moveToTop();
+                        MBCardLayer.draw();
+                        SBCardLayer.draw();
 						layer.draw();
 					}
 					return false;
@@ -681,7 +680,6 @@ function loadAllSBCards()
 					if (evt.which==1){
 						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
 					}
-					cardLayer.draw();
 					MBCardLayer.draw();
 					SBCardLayer.draw();
 					layer.draw();
@@ -699,7 +697,8 @@ function loadAllSBCards()
 						if (originalTipImage) originalTipImage.setDraggable(true);	//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
 						middleMouseDown = false;
 					}
-					cardLayer.draw();
+                    MBCardLayer.draw();
+                    SBCardLayer.draw();
 					layer.draw();
 					return false;
 				});
@@ -813,6 +812,7 @@ function loadAllMBCards()
 				}
 				image.cuid = mbCards[I].uid;
 				image.cname = mbCards[I].card.cardName;
+                image.setDragOnTop(false);
 				image.on("mouseover",function(){
 					stage.get("#detailed")[0].setImage(imageObj);
 					layer.draw();
@@ -831,7 +831,6 @@ function loadAllMBCards()
 						imageTooltip.setImage(imageObj);
 						imageTooltip.show();
 						layer.draw();
-						cardLayer.draw();
 					}
 				});
 				image.on("tap", function(){
@@ -845,7 +844,6 @@ function loadAllMBCards()
 						evt.cancelBubble = true;
 						stage.get("#tooltip")[0].hide();
 						if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
-						cardLayer.draw();
 						layer.draw();
 					}
 				});
@@ -878,6 +876,8 @@ function loadAllMBCards()
 						imageTooltip.setImage(imageObj);
 						imageTooltip.show();
 						imageTooltip.moveToTop();
+                        MBCardLayer.draw();
+                        SBCardLayer.draw();
 						layer.draw();
 					}
 					return false;
@@ -886,7 +886,6 @@ function loadAllMBCards()
 					if (evt.which==1){
 						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
 					}
-					cardLayer.draw();
 					MBCardLayer.draw();
 					SBCardLayer.draw();
 					layer.draw();
@@ -905,7 +904,8 @@ function loadAllMBCards()
 						if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
 						middleMouseDown = false;
 					}
-					cardLayer.draw();
+                    MBCardLayer.draw();
+                    SBCardLayer.draw();
 					layer.draw();
 					return false;
 				});

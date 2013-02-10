@@ -811,6 +811,7 @@ function loadAllCards()
 				});
 				image.cuid = sbCards[I].uid;
 				image.cname = sbCards[I].cardName;
+                image.setDragOnTop(false);
 				image.on("mouseover",function(){
 					stage.get("#detailed")[0].setImage(imageObj);layer.draw();
 					if (middleMouseDown)
@@ -985,6 +986,7 @@ function loadAllCards()
 				});
 				image.cuid = mbCards[I].uid;
 				image.cname = mbCards[I].cardName;
+                image.setDragOnTop(false);
 				image.on("mouseover",function(){
 					stage.get("#detailed")[0].setImage(imageObj);layer.draw();
 					if (middleMouseDown)
