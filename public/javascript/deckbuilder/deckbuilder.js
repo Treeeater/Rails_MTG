@@ -311,10 +311,10 @@ function loadFixedFrames() {
 	  align: "center",
 	  verticalAlign: "middle"
 	});
-	buttonSortColorText.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonSortColorText.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonSortColorText.on("click",sortByColor);
-	buttonSortColorText.on("tap",sortByColor);
+	buttonSortColor.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonSortColor.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonSortColor.on("click",sortByColor);
+	buttonSortColor.on("tap",sortByColor);
 	layer.add(buttonSortColorText);
 	
 	//sort by cmc
@@ -338,10 +338,10 @@ function loadFixedFrames() {
 	  align: "center",
 	  verticalAlign: "middle"
 	});
-	buttonSortCMCText.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonSortCMCText.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonSortCMCText.on("click",sortByCMC);//sortByCMC;
-	buttonSortCMCText.on("tap",sortByCMC);//sortByCMC;
+	buttonSortCMC.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonSortCMC.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonSortCMC.on("click",sortByCMC);//sortByCMC;
+	buttonSortCMC.on("tap",sortByCMC);//sortByCMC;
 	layer.add(buttonSortCMCText);
 	
 	//sort by rarity
@@ -366,10 +366,10 @@ function loadFixedFrames() {
 	  align: "center",
 	  verticalAlign: "middle"
 	});
-	buttonSortRarityText.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonSortRarityText.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonSortRarityText.on("click",sortByRarity);//sortByCMC;
-	buttonSortRarityText.on("tap",sortByRarity);//sortByCMC;
+	buttonSortRarity.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonSortRarity.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonSortRarity.on("click",sortByRarity);//sortByCMC;
+	buttonSortRarity.on("tap",sortByRarity);//sortByCMC;
 	layer.add(buttonSortRarityText);
 
 	//add land button
@@ -394,10 +394,10 @@ function loadFixedFrames() {
 	  align: "center",
 	  verticalAlign: "middle"
 	});
-	buttonAddLandText.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonAddLandText.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonAddLandText.on("click",submitDeck);
-	buttonAddLandText.on("dbltap",submitDeck);
+	buttonAddLand.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonAddLand.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonAddLand.on("click",submitDeck);
+	buttonAddLand.on("dbltap",submitDeck);
 	layer.add(buttonAddLandText);
 	
 	//card count

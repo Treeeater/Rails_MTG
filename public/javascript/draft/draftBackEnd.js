@@ -175,8 +175,8 @@ function startDraftBackEnd(){
 				totalSelectionCardNumber = 0;
 				for (i = 0; i<c.length; i++)
 				{
-					//var card = new Card(i+15*pickNumber+100,c[i]);			//very important not to be confused with the selectedCards pool
-					var card = new Card(i+1000,c[i]);			//very important not to be confused with the selectedCards pool, this means ID of cards in SB are 1000 greater than cards in MB. MB card ID starts from 0, SB starts from 1000
+					var card = new Card(i+15*pickNumber+1000,c[i]);			//very important not to be confused with the selectedCards pool
+					//var card = new Card(i+1000,c[i]);			//very important not to be confused with the selectedCards pool, this means ID of cards in SB are 1000 greater than cards in MB. MB card ID starts from 0, SB starts from 1000
 					sbCards.push(card);
 					totalSelectionCardNumber++;
 				}

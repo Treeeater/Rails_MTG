@@ -170,10 +170,10 @@ function loadFixedFrames() {
 	layer.add(buttonSortColor);
 	var buttonSortColorText = new Kinetic.Text({x: 40,y: 385,text: "ColorSort",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
 	});
-	buttonSortColorText.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonSortColorText.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonSortColorText.on("click",sortByColor);
-	buttonSortColorText.on("tap",sortByColor);
+	buttonSortColor.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonSortColor.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonSortColor.on("click",sortByColor);
+	buttonSortColor.on("tap",sortByColor);
 	layer.add(buttonSortColorText);
 	
 	//sort by cmc
@@ -182,10 +182,10 @@ function loadFixedFrames() {
 	layer.add(buttonSortCMC);
 	var buttonSortCMCText = new Kinetic.Text({x: 140,y: 385,text: "CMCSort",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
 	});
-	buttonSortCMCText.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonSortCMCText.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonSortCMCText.on("click",sortByCMC);//sortByCMC;
-	buttonSortCMCText.on("tap",sortByCMC);//sortByCMC;
+	buttonSortCMC.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonSortCMC.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonSortCMC.on("click",sortByCMC);//sortByCMC;
+	buttonSortCMC.on("tap",sortByCMC);//sortByCMC;
 	layer.add(buttonSortCMCText);
 	
 	//sort by rarity
@@ -195,10 +195,10 @@ function loadFixedFrames() {
 	layer.add(buttonSortRarity);
 	var buttonSortRarityText = new Kinetic.Text({x: 38,y: 415,text: "RaritySort",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
 	});
-	buttonSortRarityText.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonSortRarityText.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonSortRarityText.on("click",sortByRarity);//sortByCMC;
-	buttonSortRarityText.on("tap",sortByRarity);//sortByCMC;
+	buttonSortRarity.on("mouseover",function(){document.body.style.cursor = "pointer";});
+	buttonSortRarity.on("mouseout",function(){document.body.style.cursor = "default";});
+	buttonSortRarity.on("click",sortByRarity);//sortByCMC;
+	buttonSortRarity.on("tap",sortByRarity);//sortByCMC;
 	layer.add(buttonSortRarityText);
 
 	//add land button
@@ -657,7 +657,7 @@ function loadAllSBCards()
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
-						this.setDraggable(false);
+						image.setDraggable(false);
 						middleMouseDown = true;				//this is used in mouseover event.
 						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
