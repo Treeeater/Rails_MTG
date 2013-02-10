@@ -1,17 +1,36 @@
-This is a project intended to create a free MTG sealed/draft web application, totally based on HTML5 canvas, websocket and JavaScript.
-
----
-To inject cards into the db, first, copy the generated .rake file into ./lib/tasks/, and then run $rake import_AVR_cards
----
-
-Potential Bug: although basic lands' ID are fixed in download_controller.rb, they are not fixed elsewhere, so we might run into troubles.
-
-This app auto supports Chrome, in order to get better support from FireFox, turn off auto-scrolling at options->advanced->general. This will disable the default behavior of middle click.
+1. Introduction:
+This is a project intended to create a free MTG sealed/draft web application, totally based on HTML5 canvas, websocket and JavaScript.  This app fully supports Chrome ~>23.0 (you will run into card display problem due to offline storage API bug if your Chrome are lower than this version.), in order to get better support from FireFox, turn off auto-scrolling at options->advanced->general. This will disable the default behavior of middle click.
 
 ---
 
+2: Dev setup:
+	1) First time git checkout:
+	
+	Run bundle install to install all the required gems.
+	
+	2) To run the server:
+	
+		i) cd to root directory
+		ii) If not hosted on the UVa server, you have to change all variables in ./server_conf.rb
+		iii) run rails s -p $port		# $port is the port you want to run this app on.
+		iv) run ruby ./lobbyServer/lobbyServer.rb		# This defaults to use port 12341 for lobby server, you may change this to any arbitrary ports, but that would probably require changes in lobby.js as well.
+		v) For all other issues, please refer to source code (or contact me at pinkforpeace@gmail.com) if problem occurs.
+
+	3) Updating card DB:
+	
+		i) To inject cards into the db, first, copy the generated .rake file into ./lib/tasks/, and then run $rake import_XXX_cards, this XXX is the filename created by you.  Let's say I created import_AVR_cards for Avacyn restored.
+		ii) To make the download Decklist thing to work after each set update, you need to update OCTGN db to install that set; Then you copy the %octgn%/Database/master.db3 to %root%/db/; Then, you need to update the translate_to_OCTGN_exp function in downloadController.rb to have your new set map to the correct set number in the master.db3.
+		iii) Because of the cache functionality this server offers, it means this server has to serve MTG card.  Therefore if you want to serve a new set, you also need to download cards to your server.  Here are the rules: for a specific expansion E, a specific cardID ID, and a specific language L, the card image file should be stored under public/cards/L/E/ID.jpg. Note that ID must be a three number digit, if the digit is under 10 or 100, we need to zero-extend it. Also pay attention that E here must have all letters upper-case. Local cache is case sensitive.
+	
+	4) Known bugs:
+	
+		i) Player name cannot have spaces in them. This would make draft/new send wrong numbers/values of argument to draftServer.rb. Thanks to congcong who helped me find this bug. Will address later.
+		ii) Bootstrap-sass version needs to be 2.0.4.0 as of now, otherwise the css is all messed up.  This is now specified in the bundler file, so dev don't need to change anything. 
+
+---
+
+3: For my own reference:
 Ports on UVa hosting:
-
 12340: rails
 12341: lobby
 12342: draft
@@ -20,45 +39,4 @@ Ports on UVa hosting:
 
 ---
 
-First time git checkout:
-Run bundle install to install all the required gems.
-
----
-
-To run the server:
-
-1) cd to root directory
-
-2) run rails s -p 12340
-
-3) run ruby ./lobbyServer/lobbyServer.rb
-
-4) If not hosted on the UVa server, you have to change the hostServerAddress and related variables in app/controllers/application_controller.rb
-
-5) You may experience other issues if you are not hosting it on the UVa server. Please refer to source code if problem occurs.
-
----
-
-To make the download Decklist thing to work after each set update:
-
-You need to update OCTGN db to install that set; Then you copy the %octgn%/Database/master.db3 to %root%/db/
-
-Then, you need to update the translate_to_OCTGN_exp function in downloadController.rb to have your new set map to the correct set number in the master.db3
-
----
-
-FIXME: player name cannot have spaces in them. This would make draft/new send wrong numbers/values of argument to draftServer.rb. Thanks to congcong who helped me find this bug. Will address later.
-
----
-
-Deploying on the cloud - what you need to change:
-
-./server_conf.rb : change all host info (to your current ip address)
-draftServer/draftServer.rb : search for EventMachine::WebSocket.start(:host =>  and change it to the current host (ip address) 
-lobbyServer/lobbyServer.rb : same as above.
-
-11/30/2012: Added cache functionality in draft/deckbuilding for Chrome users. However, this means our server needs to serve MTG card. Here are the rules: for a specific expansion E, a specific cardID ID, and a specific language L, the card image file should be stored under public/cards/L/E/ID.jpg. Note that ID must be a three number digit, if the digit is under 10 or 100, we need to zero-extend it. Also pay attention that E here must have all letters upper-case. Local cache is case sensitive.
-
-12/1/2012: Chrome version under 23 is not guaranteed to work. Lower version of Chrome (at least v.18) is known to cause images not being stored correctly into the offline storage.
-
-Note: As you run bundle install for the first time on the cloud, it is likely to install bootstrap-sass with the newest version. Bootstrap-sass version needs to be 2.0.4.0 as of now, otherwise the css is all messed up. We should fix this.
+4: This app/site is NOT affiliated with Wizards of the Coast.
