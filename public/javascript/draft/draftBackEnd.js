@@ -10,6 +10,7 @@ mbCards = new Array();
 displayOrderArray = new Array();
 gotpacks = false;
 isGameHost = false;
+neverAlert = false;
 
 function prepareCardsToSend(cards)
 {
@@ -20,6 +21,13 @@ function prepareCardsToSend(cards)
 		returnString += (cards[i].card.expansion.toString() + "/" + cards[i].card.idInSet.toString()+"+");
 	}
 	return returnString;
+}
+
+function aboutToBeep()
+{
+    if (!aboutToAlert||neverAlert) return;
+    var sound = document.getElementById('beep');
+    sound.play();
 }
 
 function startDraftBackEnd(){
@@ -62,7 +70,12 @@ function startDraftBackEnd(){
    		}
 		ws.onclose = function(){
 			log("Game server disconnected.\n\n");
-			$("#roundTablePlayers0").attr("src",'/assets/lobby/broken.png');
+            var i = 0;
+            for (; i < totalPlayerNo; i++)
+            {
+			    stage.get("#roundTablePlayers"+ i.toString())[0].setFill('red');
+            }
+            layer.draw();
 		}
 		ws.onmessage = processMessage;
 	}
@@ -215,7 +228,7 @@ function startDraftBackEnd(){
                     if (stage.get("#submitConfirmationBoxText")[0].attrs.visible == false && j == totalPlayerNo-1)
                     {
                         aboutToAlert = true;
-                        setTimeout("if (aboutToAlert) alert('Everyone else has selected a card, please do so soon!');",5000);
+                        setTimeout(aboutToBeep,5000);
                     }
                 }
 				break;

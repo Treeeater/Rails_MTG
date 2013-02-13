@@ -64,7 +64,7 @@ end
 
 EventMachine.run {
 
-	puts "WebSocket server opened!"
+	puts "WebSocket lobby server opened!"
 	
 	$cl = ChatLobby.new
 	$cl.users = Hash.new				#ws.object_id.inspect => ChatUser

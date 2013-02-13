@@ -202,15 +202,14 @@ function loadFixedFrames() {
 
 	//add land button
 	
-	var buttonAddLand = new Kinetic.Rect({x: 130,y: 410,width: 80,height: 20,fill: "#FFFF00",stroke: "black",strokeWidth: 2
+	var beepToggleButton = new Kinetic.Rect({x: 130,y: 410,width: 80,height: 20,fill: "red",stroke: "black",strokeWidth: 2, id:"beepToggleButton"});
+	layer.add(beepToggleButton);
+	var beepToggleButtonText = new Kinetic.Text({x: 138,y: 415,text: "Toggle Beep",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
 	});
-	layer.add(buttonAddLand);
-	var buttonAddLandText = new Kinetic.Text({x: 138,y: 415,text: "Time out!",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
-	});
-	buttonAddLandText.on("mouseover",function(){document.body.style.cursor = "pointer";});
-	buttonAddLandText.on("mouseout",function(){document.body.style.cursor = "default";});
-	buttonAddLandText.on("click",function(){alert("Time out not implemented!")});
-	layer.add(buttonAddLandText);
+    beepToggleButton.on("mouseover",function(){document.body.style.cursor = "pointer";});
+    beepToggleButton.on("mouseout",function(){document.body.style.cursor = "default";});
+    beepToggleButton.on("click",function(){neverAlert = !neverAlert; if (neverAlert) {stage.get("#beepToggleButton")[0].setFill("green");} else {stage.get("#beepToggleButton")[0].setFill("red");} layer.draw();});
+	layer.add(beepToggleButtonText);
 	
 	//card count
 	var cardCountHardCodedText = new Kinetic.Text({x: 20,y: 465,text: "Main board:            Current Pick:",fontSize: 12,fontFamily: "Calibri",fill: "black",align: "center",verticalAlign: "middle"
