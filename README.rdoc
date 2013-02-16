@@ -19,8 +19,8 @@ This is a project intended to create a free MTG sealed/draft web application, to
 	3) Updating card DB:
 	
 		i) To inject cards into the db, first, copy the generated .rake file into ./lib/tasks/, and then run $rake import_XXX_cards, this XXX is the filename created by you.  Let's say I created import_AVR_cards for Avacyn restored.
-		ii) To make the download Decklist thing to work after each set update, you need to update OCTGN db to install that set; Then you copy the %octgn%/Database/master.db3 to %root%/db/; Then, you need to update the translate_to_OCTGN_exp function in downloadController.rb to have your new set map to the correct set number in the master.db3.
-		iii) Because of the cache functionality this server offers, it means this server has to serve MTG card.  Therefore if you want to serve a new set, you also need to download cards to your server.  Here are the rules: for a specific expansion E, a specific cardID ID, and a specific language L, the card image file should be stored under public/cards/L/E/ID.jpg. Note that ID must be a three number digit, if the digit is under 10 or 100, we need to zero-extend it. Also pay attention that E here must have all letters upper-case. Local cache is case sensitive.
+		ii) Add new set to lobby and cachecards's view, making it possible for users to select. We also need to modify 1st line of cache.js in /public/ to include how many cards this new set has.
+		iii) Because of the cache functionality this server offers, it means this server has to serve MTG card.  Therefore if you want to serve a new set, you also need to download cards to your server. You can use the tool provided in /crawler/downloadimages/, but if you want to do it manually, here are the rules: for a specific expansion E, a specific cardID ID, and a specific language L, the card image file should be stored under public/cards/L/E/ID.jpg. Note that ID must be a three number digit, if the digit is under 10 or 100, we need to zero-extend it. Also pay attention that E here must have all letters upper-case. Local cache is case sensitive.
 	
 	4) Known bugs:
 	

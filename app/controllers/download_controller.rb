@@ -66,7 +66,7 @@ class DownloadController < ApplicationController
 		for i in 1..l5
 			@mainBoardCards.push(getBasicLands(4))
     end
-    ringToWrite = ""
+    stringToWrite = ""
     recorded = Hash.new()
 		@mainBoardCards.each{|c|
       if (recorded[c.cardName]) then next end

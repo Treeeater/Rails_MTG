@@ -1,4 +1,4 @@
-﻿var numberOfCards = {"RTR":275,"RAV":306,"GPT":165,"DIS":148};
+﻿var numberOfCards = {"GTC":249,"RTR":275,"RAV":306,"GPT":165,"DIS":148};
 var cacheReady = false;
 
 function cacheCard(imageID, imageExp, img)
@@ -50,7 +50,7 @@ function cacheStart()
 		window.cachedCards = 0;
 		window.total = numberOfCards[exp];
 		ENV_Language = lang;
-		for (i = 1;i < total; i++)
+		for (i = 1;i <= total; i++)
 		{
 			cacheCard(i, exp, pic);
 		}
