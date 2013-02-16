@@ -65,64 +65,32 @@ class DownloadController < ApplicationController
 		end
 		for i in 1..l5
 			@mainBoardCards.push(getBasicLands(4))
-		end
-		stringToWrite = <<EOF
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<deck game="a6c8d2e8-7cd8-11dd-8f94-e62b56d89593">
-  <section name="Main">
-EOF
-		#actual fill in the cards.
-		db_octgn = SQLite3::Database.open "./db/master.db3"
-		db_octgn.results_as_hash = true
-		qtyHash = Hash.new
-		nameHash = Hash.new
+    end
+    ringToWrite = ""
+    recorded = Hash.new()
 		@mainBoardCards.each{|c|
-			thisID = ""
-			thisName = ""
-			exp = translate_to_OCTGN_exp(c.expansion)
-			id = translate_to_OCTGN_id(c.idInSet)
-			stmt = db_octgn.prepare "SELECT * FROM cards WHERE a6c8d2e87cd811dd8f94e62b56d89593Number='" + id + "' AND set_real_id=" + exp.to_s
-			rs = stmt.execute
-			rs.each{|r| 
-				thisID = r['id']
-				thisName = r['name']
-			}
-			qtyHash[thisID] = (qtyHash[thisID]==nil) ? 1 : (qtyHash[thisID]+1)
-			nameHash[thisID] = thisName
+      if (recorded[c.cardName]) then next end
+      thisName = c.cardName
+      quantity = 0
+			@mainBoardCards.each{|c2|
+        if (c2.cardName == thisName) then quantity+=1 end
+      }
+      recorded[c.cardName] = true
+      stringToWrite += "#{quantity} #{thisName}\n"
 		}
-		nameHash.each_key{|id|
-			stringToWrite += "    <card qty=\"" + qtyHash[id].to_s + "\" id=\"" + id + "\">" + nameHash[id] + "</card>\n"
-		}
-		stringToWrite += <<EOF
-  </section>
-  <section name="Sideboard">
-EOF
-		sideNameHash = Hash.new
-		@sideBoardCards.each{|c|
-			thisID = ""
-			thisName = ""
-			exp = translate_to_OCTGN_exp(c.expansion)
-			id = translate_to_OCTGN_id(c.idInSet)
-			stmt = db_octgn.prepare "SELECT * FROM cards WHERE a6c8d2e87cd811dd8f94e62b56d89593Number='" + id + "' AND set_real_id=" + exp.to_s
-			rs = stmt.execute
-			rs.each{|r| 
-				thisID = r['id']
-				thisName = r['name']
-			}
-			qtyHash[thisID] = (qtyHash[thisID]==nil) ? 1 : (qtyHash[thisID]+1)
-			sideNameHash[thisID] = thisName
-		}
-		sideNameHash.each_key{|id|
-			stringToWrite += "    <card qty=\"" + qtyHash[id].to_s + "\" id=\"" + id + "\">" + sideNameHash[id] + "</card>\n"
-		}
-		stringToWrite += <<EOF
-  </section>
-  <section name="Command Zone" />
-  <section name="Planes/Schemes" />
-</deck>
-EOF
+    recorded = Hash.new()
+    @sideBoardCards.each{|c|
+      if (recorded[c.cardName]) then next end
+      thisName = c.cardName
+      quantity = 0
+      @sideBoardCards.each{|c2|
+        if (c2.cardName == thisName) then quantity+=1 end
+      }
+      recorded[c.cardName] = true
+      stringToWrite += "SB: #{quantity} #{thisName}\n"
+    }
 		if (!File.directory? "./userDeckLists/") then Dir::mkdir("./userDeckLists/") end
-		fileName = "./userDeckLists/"+uid.to_s+".o8d"
+		fileName = "./userDeckLists/"+uid.to_s+".dec"
 		File.open(fileName,"w"){|f|
 			f.write(stringToWrite)
 		}
