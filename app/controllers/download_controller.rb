@@ -123,15 +123,15 @@ class DownloadController < ApplicationController
 	def getBasicLands(l)
 		case l
 			when 0
-				return Card.new(230,"plains",16, "http://magiccards.info/scans/en/avr/230.jpg", "http://magiccards.info/scans/cn/avr/230.jpg", nil, nil, 0, 0, 0, 1, "AVR")
+				return Card.new(230,"Plains",16, "http://magiccards.info/scans/en/avr/230.jpg", "http://magiccards.info/scans/cn/avr/230.jpg", nil, nil, 0, 0, 0, 1, "AVR")
 			when 1
-				return Card.new(235,"island",16, "http://magiccards.info/scans/en/avr/235.jpg", "http://magiccards.info/scans/cn/avr/235.jpg", nil, nil, 0, 0, 0, 1, "AVR")
+				return Card.new(235,"Island",16, "http://magiccards.info/scans/en/avr/235.jpg", "http://magiccards.info/scans/cn/avr/235.jpg", nil, nil, 0, 0, 0, 1, "AVR")
 			when 2
-				return Card.new(236,"swamp",16, "http://magiccards.info/scans/en/avr/236.jpg", "http://magiccards.info/scans/cn/avr/236.jpg", nil, nil, 0, 0, 0, 1, "AVR")
+				return Card.new(236,"Swamp",16, "http://magiccards.info/scans/en/avr/236.jpg", "http://magiccards.info/scans/cn/avr/236.jpg", nil, nil, 0, 0, 0, 1, "AVR")
 			when 3
-				return Card.new(239,"mountain",16, "http://magiccards.info/scans/en/avr/239.jpg", "http://magiccards.info/scans/cn/avr/239.jpg", nil, nil, 0, 0, 0, 1, "AVR")
+				return Card.new(239,"Mountain",16, "http://magiccards.info/scans/en/avr/239.jpg", "http://magiccards.info/scans/cn/avr/239.jpg", nil, nil, 0, 0, 0, 1, "AVR")
 			when 4
-				return Card.new(244,"forest",16, "http://magiccards.info/scans/en/avr/244.jpg", "http://magiccards.info/scans/cn/avr/244.jpg", nil, nil, 0, 0, 0, 1, "AVR")
+				return Card.new(244,"Forest",16, "http://magiccards.info/scans/en/avr/244.jpg", "http://magiccards.info/scans/cn/avr/244.jpg", nil, nil, 0, 0, 0, 1, "AVR")
 			else
 		end
 	end

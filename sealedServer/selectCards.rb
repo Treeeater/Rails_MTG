@@ -16,11 +16,11 @@ end
 
 def getBasicLands()
 	basicLands = Array.new
-	basicLands[0] = Card.new("1000","plains","16", "http://magiccards.info/scans/en/avr/230.jpg", "http://magiccards.info/scans/cn/avr/230.jpg", nil, nil, "0", "0", "0", "1", "AVR")
-	basicLands[1] = Card.new("1001","island","16", "http://magiccards.info/scans/en/avr/235.jpg", "http://magiccards.info/scans/cn/avr/235.jpg", nil, nil, "0", "0", "0", "1", "AVR")
-	basicLands[2] = Card.new("1001","swamp","16", "http://magiccards.info/scans/en/avr/236.jpg", "http://magiccards.info/scans/cn/avr/236.jpg", nil, nil, "0", "0", "0", "1", "AVR")
-	basicLands[3] = Card.new("1001","mountain","16", "http://magiccards.info/scans/en/avr/239.jpg", "http://magiccards.info/scans/cn/avr/239.jpg", nil, nil, "0", "0", "0", "1", "AVR")
-	basicLands[4] = Card.new("1001","forest","16", "http://magiccards.info/scans/en/avr/244.jpg", "http://magiccards.info/scans/cn/avr/244.jpg", nil, nil, "0", "0", "0", "1", "AVR")
+	basicLands[0] = Card.new("1000","Plains","16", "http://magiccards.info/scans/en/avr/230.jpg", "http://magiccards.info/scans/cn/avr/230.jpg", nil, nil, "0", "0", "0", "1", "AVR")
+	basicLands[1] = Card.new("1001","Island","16", "http://magiccards.info/scans/en/avr/235.jpg", "http://magiccards.info/scans/cn/avr/235.jpg", nil, nil, "0", "0", "0", "1", "AVR")
+	basicLands[2] = Card.new("1001","Swamp","16", "http://magiccards.info/scans/en/avr/236.jpg", "http://magiccards.info/scans/cn/avr/236.jpg", nil, nil, "0", "0", "0", "1", "AVR")
+	basicLands[3] = Card.new("1001","Mountain","16", "http://magiccards.info/scans/en/avr/239.jpg", "http://magiccards.info/scans/cn/avr/239.jpg", nil, nil, "0", "0", "0", "1", "AVR")
+	basicLands[4] = Card.new("1001","Forest","16", "http://magiccards.info/scans/en/avr/244.jpg", "http://magiccards.info/scans/cn/avr/244.jpg", nil, nil, "0", "0", "0", "1", "AVR")
 	return basicLands
 end
 
