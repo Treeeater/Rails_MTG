@@ -16,6 +16,9 @@
 
       <%= f.label :password_confirmation, "Confirmation" %>
       <%= f.password_field :password_confirmation %>
+	  
+	  <label for="user_secret_question">高中班主任是谁？（全拼，如果叫梁丽萍，则是Liang, Liping）</label>
+      <input id="user_secret_question" name="user[secret_question]" size="30" type="text" />
 
       <%= f.submit "Create my account", class: "btn btn-large btn-primary" %>
     <% end %>

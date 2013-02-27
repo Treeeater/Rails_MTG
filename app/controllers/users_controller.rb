@@ -21,7 +21,15 @@ class UsersController < ApplicationController
   end
   
   def create
-    @user = User.new(params[:user])
+	secret_question = params[:user].delete("secret_question")
+	adjusted = params[:user]
+	logger.info adjusted
+    @user = User.new(adjusted)
+	if (secret_question != 'Li, Yajie')
+		@user.errors.add(:secret_question, "is wrong!")
+		render 'new'
+		return
+	end
     if @user.save
       # Handle a successful save.
 	  sign_in @user
