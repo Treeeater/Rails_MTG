@@ -849,7 +849,6 @@ function loadAllCards()
 				});
 
 				image.on("mousedown",function(evt){
-					//console.log('downed');
 					if (evt.which==1) {
 						curMouseDownCardUID = image.cuid;		//global var
 						downLayer = image.getZIndex();
@@ -860,7 +859,7 @@ function loadAllCards()
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
-						image.setDraggable(false);
+						image.stopDrag();
 						middleMouseDown = true;				//this is used in mouseover event.
 						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
@@ -880,12 +879,18 @@ function loadAllCards()
 					}
 					return false;
 				});
+				image.on("dragstart", function (evt){
+					if (evt.which==2){
+						image.stopDrag();
+					}
+					return false;
+				});
 				image.on("dragend",function(evt){
 					if (evt.which==1){
 						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+						cardLayer.draw();
+						layer.draw();
 					}
-					cardLayer.draw();
-					layer.draw();
 					return false;
 				});
 				image.on("mouseup",function(evt){
@@ -912,10 +917,6 @@ function loadAllCards()
 						evt.cancelBubble = true;
 					}
 					return false;
-					//var evt = window.event;
-					//evt.stopPropagation()
-					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
-					//console.log(evt.which);
 				});
 				image.on('dbltap',function(evt) {
 					evt.stopPropagation();
@@ -926,7 +927,6 @@ function loadAllCards()
 					return false;
 				});
 				image.on('dblclick', function(evt) {
-					//console.log('dblclicked');
 					if (evt.which==1){
 						evt.stopPropagation();
 						evt.preventDefault(evt);
@@ -935,10 +935,6 @@ function loadAllCards()
 						cardLayer.draw();
 					}
 					return false;
-					//var evt = window.event;
-					//evt.stopPropagation()
-					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
-					//console.log(evt.which);
 				});
 				cardLayer.add(image);
 				cardsLoaded++;
@@ -1024,7 +1020,6 @@ function loadAllCards()
 				});
 
 				image.on("mousedown",function(evt){
-					//console.log('downed');
 					if (evt.which==1) {
 						curMouseDownCardUID = image.cuid;		//global var
 						downLayer = image.getZIndex();
@@ -1035,7 +1030,7 @@ function loadAllCards()
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
-						image.setDraggable(false);
+						image.stopDrag();
 						middleMouseDown = true;				//this is used in mouseover event.
 						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
@@ -1055,12 +1050,18 @@ function loadAllCards()
 					}
 					return false;
 				});
+				image.on("dragstart", function (evt){
+					if (evt.which==2){
+						image.stopDrag();
+					}
+					return false;
+				});
 				image.on("dragend",function(evt){
 					if (evt.which==1){
 						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+						cardLayer.draw();
+						layer.draw();
 					}
-					cardLayer.draw();
-					layer.draw();
 					return false;
 				});	
 				image.on("mouseup",function(evt){
@@ -1080,17 +1081,12 @@ function loadAllCards()
 					return false;
 				});
 				image.on('click', function(evt) {
-					//console.log('clicked');
 					if (evt.which==3){
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
 					}
 					return false;
-					//var evt = window.event;
-					//evt.stopPropagation()
-					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
-					//console.log(evt.which);
 				});
 				image.on('dbltap', function(evt) {
 					evt.stopPropagation();
@@ -1101,7 +1097,6 @@ function loadAllCards()
 					return false;
 				});
 				image.on('dblclick', function(evt) {
-					//console.log('dblclicked');
 					if (evt.which==1){
 						evt.stopPropagation();
 						evt.preventDefault(evt);
@@ -1110,10 +1105,6 @@ function loadAllCards()
 						cardLayer.draw();
 					}
 					return false;
-					//var evt = window.event;
-					//evt.stopPropagation()
-					//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
-					//console.log(evt.which);
 				});
 				cardLayer.add(image);
 				cardsLoaded++;
@@ -1171,172 +1162,6 @@ function cardToMB(cuid,oldimage)
 	layer.draw();
 	cardLayer.draw();
 	sortByColor();
-	/*
-	//oldimage.remove();			//visually remove this one.
-	//visually add this image to MB
-	var imageObj = new Image();
-	X = 250;
-	Y = 5;
-	imageObj.onload = function() {
-		var image = new Kinetic.Image({
-			x: X + Math.floor(mbCards.length/11) * 128,
-			y: Y + (mbCards.length%11) * 18,
-			image: imageObj,
-			width: 120,
-			height: 160,
-			draggable: true,
-			dragBoundFunc: function(pos) {
-				var newY = pos.y < 5 ? 5 : pos.y;
-				newY = newY > 200 ? 200 : newY;
-				var newX = pos.x < 250 ? 250 : pos.x;
-				newX = newX > 1160 ? 1160 : newX;
-				return {
-				  x: newX,
-				  y: newY
-				};
-			},
-			id: "card"+cuid.toString()
-		});
-		image.cuid = cuid;
-		image.cname = thisCard.cardName;
-		image.on("mouseover",function(){
-			stage.get("#detailed")[0].setImage(imageObj);layer.draw();
-			if (middleMouseDown)
-			{
-				var imageTooltip = stage.get("#tooltip")[0];
-				var p = image.getPosition();
-				if (p.x<1000){
-					imageTooltip.setX(p.x+image.attrs.width+10);
-				}
-				else {imageTooltip.setX(p.x-250)};
-				if (p.y>570){
-					imageTooltip.setY(p.y-320+image.attrs.height);
-				}
-				else {imageTooltip.setY(p.y);}
-				imageTooltip.setImage(imageObj);
-				imageTooltip.show();
-				layer.draw();
-				cardLayer.draw();
-			}
-		});
-
-		image.on("mouseout",function(evt){
-			if (evt.which == 2){
-				evt.stopPropagation();
-				evt.preventDefault(evt);
-				evt.cancelBubble = true;
-				stage.get("#tooltip")[0].hide();
-				if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
-				cardLayer.draw();
-				layer.draw();
-			}
-		});
-
-		image.on("mousedown",function(evt){
-			//console.log('downed');
-			if (evt.which==1) {
-				curMouseDownCardUID = image.cuid;		//global var
-				downLayer = image.getZIndex();
-				image.moveToTop();
-			}
-			if (evt.which==2)
-			{
-				evt.stopPropagation();
-				evt.preventDefault(evt);
-				evt.cancelBubble = true;
-				image.setDraggable(false);
-				middleMouseDown = true;				//this is used in mouseover event.
-				originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
-				var imageTooltip = stage.get("#tooltip")[0];
-				var p = image.getPosition();
-				if (p.x<1000){
-					imageTooltip.setX(p.x+image.attrs.width+10);
-				}
-				else {imageTooltip.setX(p.x-250)};
-				if (p.y>570){
-					imageTooltip.setY(p.y-320+image.attrs.height);
-				}
-				else {imageTooltip.setY(p.y);}
-				imageTooltip.setImage(imageObj);
-				imageTooltip.show();
-				imageTooltip.moveToTop();
-				layer.draw();
-			}
-			return false;
-		});
-		image.on("mouseup",function(evt){
-			//console.log('uped');
-			if (evt.which==1){
-				if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
-			}
-			if (evt.which==2){
-				evt.stopPropagation();
-				evt.preventDefault(evt);
-				evt.cancelBubble = true;
-				stage.get("#tooltip")[0].hide();
-				originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
-				middleMouseDown = false;
-			}
-			cardLayer.draw();
-			layer.draw();
-			return false;
-		});
-		image.on('click', function(evt) {
-			//console.log('clicked');
-			if (evt.which==3){
-				evt.stopPropagation();
-				evt.preventDefault(evt);
-				evt.cancelBubble = true;
-			}
-			return false;
-			//var evt = window.event;
-			//evt.stopPropagation()
-			//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
-			//console.log(evt.which);
-		});
-		image.on('dblclick', function(evt) {
-			//console.log('dblclicked');
-			if (evt.which==1){
-				evt.stopPropagation();
-				evt.preventDefault(evt);
-				evt.cancelBubble = true;
-				cardToSB(image.cuid,image);
-				cardLayer.draw();
-			}
-			return false;
-			//var evt = window.event;
-			//evt.stopPropagation()
-			//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
-			//console.log(evt.which);
-		});
-		cardLayer.add(image);
-		stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
-		stage.get("#cardCountSBText")[0].setText(sbCards.length.toString());
-		cardColor = (thisCard.color & 16) ? 'W' : '';
-		if (cardColor!='') colorCardsNumber[cardColor]++;
-		cardColor = (thisCard.color & 8) ? 'U' : '';
-		if (cardColor!='') colorCardsNumber[cardColor]++;
-		cardColor = (thisCard.color & 4) ? 'B' : '';
-		if (cardColor!='') colorCardsNumber[cardColor]++;
-		cardColor = (thisCard.color & 2) ? 'R' : '';
-		if (cardColor!='') colorCardsNumber[cardColor]++;
-		cardColor = (thisCard.color & 1) ? 'G' : '';
-		if (cardColor!='') colorCardsNumber[cardColor]++;
-		stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
-		stage.get("#UNumber")[0].setText(colorCardsNumber['U'].toString() + " " + 'U' + " cards");
-		stage.get("#BNumber")[0].setText(colorCardsNumber['B'].toString() + " " + 'B' + " cards");
-		stage.get("#RNumber")[0].setText(colorCardsNumber['R'].toString() + " " + 'R' + " cards");
-		stage.get("#GNumber")[0].setText(colorCardsNumber['G'].toString() + " " + 'G' + " cards");
-		layer.draw();
-		cardLayer.draw();
-	}
-	if (window.webkitRequestFileSystem){
-		renderCard(thisCard.idInSet, thisCard.expansion, imageObj);
-	}
-	else{
-		if (ENV_Language == "cn") {imageObj.src = thisCard.chiSRC;}
-		else {imageObj.src = thisCard.engSRC;}
-	}*/
 }
 
 function cardToSB(cuid,oldimage)
@@ -1369,172 +1194,6 @@ function cardToSB(cuid,oldimage)
 	layer.draw();
 	cardLayer.draw();
 	sortByColor();
-	/*
-	oldimage.remove();			//visually remove this one.
-	//visually add this image to MB
-	var imageObj = new Image();
-	X = 250;
-	Y = 370;
-	imageObj.onload = function() {
-		var image = new Kinetic.Image({
-			x: X + Math.floor(sbCards.length/11) * 128,
-			y: Y + (sbCards.length%11) * 18,
-			image: imageObj,
-			width: 120,
-			height: 160,
-			draggable: true,
-			dragBoundFunc: function(pos) {
-				var newY = pos.y < 370 ? 370 : pos.y;
-				newY = newY > 730 ? 730 : newY;
-				var newX = pos.x < 250 ? 250 : pos.x;
-				newX = newX > 1160 ? 1160 : newX;
-				return {
-				  x: newX,
-				  y: newY
-				};
-			},
-			id: "card"+cuid.toString()
-		});
-		image.cuid = cuid;
-		image.cname = thisCard.cardName;
-		image.on("mouseover",function(){
-			stage.get("#detailed")[0].setImage(imageObj);layer.draw();
-			if (middleMouseDown)
-			{
-				var imageTooltip = stage.get("#tooltip")[0];
-				var p = image.getPosition();
-				if (p.x<1000){
-					imageTooltip.setX(p.x+image.attrs.width+10);
-				}
-				else {imageTooltip.setX(p.x-250)};
-				if (p.y>570){
-					imageTooltip.setY(p.y-320+image.attrs.height);
-				}
-				else {imageTooltip.setY(p.y);}
-				imageTooltip.setImage(imageObj);
-				imageTooltip.show();
-				layer.draw();
-				cardLayer.draw();
-			}
-		});
-
-		image.on("mouseout",function(evt){
-			if (evt.which == 2){
-				evt.stopPropagation();
-				evt.preventDefault(evt);
-				evt.cancelBubble = true;
-				stage.get("#tooltip")[0].hide();
-				if (originalTipImage) originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
-				cardLayer.draw();
-				layer.draw();
-			}
-		});
-
-		image.on("mousedown",function(evt){
-			//console.log('downed');
-			if (evt.which==1) {
-				curMouseDownCardUID = image.cuid;		//global var
-				downLayer = image.getZIndex();
-				image.moveToTop();
-			}
-			if (evt.which==2)
-			{
-				evt.stopPropagation();
-				evt.preventDefault(evt);
-				evt.cancelBubble = true;
-				image.setDraggable(false);
-				middleMouseDown = true;				//this is used in mouseover event.
-				originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
-				var imageTooltip = stage.get("#tooltip")[0];
-				var p = image.getPosition();
-				if (p.x<1000){
-					imageTooltip.setX(p.x+image.attrs.width+10);
-				}
-				else {imageTooltip.setX(p.x-250)};
-				if (p.y>570){
-					imageTooltip.setY(p.y-320+image.attrs.height);
-				}
-				else {imageTooltip.setY(p.y);}
-				imageTooltip.setImage(imageObj);
-				imageTooltip.show();
-				imageTooltip.moveToTop();
-				layer.draw();
-			}
-			return false;
-		});
-		image.on("mouseup",function(evt){
-			//console.log('uped');
-			if (evt.which==1){
-				if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
-			}
-			if (evt.which==2){
-				evt.stopPropagation();
-				evt.preventDefault(evt);
-				evt.cancelBubble = true;
-				stage.get("#tooltip")[0].hide();
-				originalTipImage.setDraggable(true);		//the user may have moved the mouse when middle button is held, we need to reset the original tooltiped image, not this one.
-				middleMouseDown = false;
-			}
-			cardLayer.draw();
-			layer.draw();
-			return false;
-		});
-		image.on('click', function(evt) {
-			//console.log('clicked');
-			if (evt.which==3){
-				evt.stopPropagation();
-				evt.preventDefault(evt);
-				evt.cancelBubble = true;
-			}
-			return false;
-			//var evt = window.event;
-			//evt.stopPropagation()
-			//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
-			//console.log(evt.which);
-		});
-		image.on('dblclick', function(evt) {
-			//console.log('dblclicked');
-			if (evt.which==1){
-				evt.stopPropagation();
-				evt.preventDefault(evt);
-				evt.cancelBubble = true;
-				cardToMB(image.cuid,image);
-				cardLayer.draw();
-			}
-			return false;
-			//var evt = window.event;
-			//evt.stopPropagation()
-			//var rightClick = evt.which ? evt.which == 3 : evt.button == 2;
-			//console.log(evt.which);
-		});
-		cardLayer.add(image);
-		stage.get("#cardCountMBText")[0].setText(mbCards.length.toString());
-		stage.get("#cardCountSBText")[0].setText(sbCards.length.toString());
-		cardColor = (thisCard.color & 16) ? 'W' : '';
-		if (cardColor!='') colorCardsNumber[cardColor]--;
-		cardColor = (thisCard.color & 8) ? 'U' : '';
-		if (cardColor!='') colorCardsNumber[cardColor]--;
-		cardColor = (thisCard.color & 4) ? 'B' : '';
-		if (cardColor!='') colorCardsNumber[cardColor]--;
-		cardColor = (thisCard.color & 2) ? 'R' : '';
-		if (cardColor!='') colorCardsNumber[cardColor]--;
-		cardColor = (thisCard.color & 1) ? 'G' : '';
-		if (cardColor!='') colorCardsNumber[cardColor]--;
-		stage.get("#WNumber")[0].setText(colorCardsNumber['W'].toString() + " " + 'W' + " cards");
-		stage.get("#UNumber")[0].setText(colorCardsNumber['U'].toString() + " " + 'U' + " cards");
-		stage.get("#BNumber")[0].setText(colorCardsNumber['B'].toString() + " " + 'B' + " cards");
-		stage.get("#RNumber")[0].setText(colorCardsNumber['R'].toString() + " " + 'R' + " cards");
-		stage.get("#GNumber")[0].setText(colorCardsNumber['G'].toString() + " " + 'G' + " cards");
-		layer.draw();
-		cardLayer.draw();
-	}
-	if (window.webkitRequestFileSystem){
-		renderCard(thisCard.idInSet, thisCard.expansion, imageObj);
-	}
-	else{
-		if (ENV_Language == "cn") {imageObj.src = thisCard.chiSRC;}
-		else {imageObj.src = thisCard.engSRC;}
-	}*/
 }
 
 function reLayerCards()

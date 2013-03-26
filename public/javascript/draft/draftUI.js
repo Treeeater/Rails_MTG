@@ -653,7 +653,6 @@ function loadAllSBCards()
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
-						image.setDraggable(false);
 						middleMouseDown = true;				//this is used in mouseover event.
 						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
@@ -675,13 +674,19 @@ function loadAllSBCards()
 					}
 					return false;
 				});
+				image.on("dragstart", function (evt){
+					if (evt.which==2){
+						image.stopDrag();
+					}
+					return false;
+				});
 				image.on("dragend",function(evt){
 					if (evt.which==1){
 						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+						MBCardLayer.draw();
+						SBCardLayer.draw();
+						layer.draw();
 					}
-					MBCardLayer.draw();
-					SBCardLayer.draw();
-					layer.draw();
 					return false;
 				});
 				image.on("mouseup",function(evt){
@@ -859,7 +864,6 @@ function loadAllMBCards()
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
-						image.setDraggable(false);
 						middleMouseDown = true;				//this is used in mouseover event.
 						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
@@ -881,13 +885,19 @@ function loadAllMBCards()
 					}
 					return false;
 				});
+				image.on("dragstart", function (evt){
+					if (evt.which==2){
+						image.stopDrag();
+					}
+					return false;
+				});
 				image.on("dragend",function(evt){
 					if (evt.which==1){
 						if (curMouseDownCardUID == image.cuid) image.setZIndex(downLayer);
+						MBCardLayer.draw();
+						SBCardLayer.draw();
+						layer.draw();
 					}
-					MBCardLayer.draw();
-					SBCardLayer.draw();
-					layer.draw();
 					return false;
 				});
 				image.on("mouseup",function(evt){
