@@ -859,7 +859,6 @@ function loadAllCards()
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
-						image.stopDrag();
 						middleMouseDown = true;				//this is used in mouseover event.
 						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
@@ -1030,7 +1029,6 @@ function loadAllCards()
 						evt.stopPropagation();
 						evt.preventDefault(evt);
 						evt.cancelBubble = true;
-						image.stopDrag();
 						middleMouseDown = true;				//this is used in mouseover event.
 						originalTipImage = image;			//this is used to restore all images' draggable attribute after mouseup event.
 						var imageTooltip = stage.get("#tooltip")[0];
